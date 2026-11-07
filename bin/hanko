@@ -397,6 +397,7 @@ cmd_lock() {
       mkdir -p "$skin_dir"
       backup "$skin_dir/Skin.qml"
       cp -f "$EXTRAS/lock/Skin.qml" "$skin_dir/Skin.qml"
+      cp -f "$EXTRAS/plugins/hanko.desktop/logo-noir.svg" "$skin_dir/logo-noir.svg"
       ok "skin Hanko actif au prochain verrouillage — teste avec Super+Échap ou : omarchy-system-lock"
       [[ -x /usr/local/lib/hanko/lock-patch.sh ]] || warn "point d'accroche absent : lance d'abord hanko lock install"
       ;;
