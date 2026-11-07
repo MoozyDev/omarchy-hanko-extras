@@ -1,0 +1,14 @@
+# Hanko — re-add the lock screen skin hook after Omarchy updates its LockView.qml.
+# Installed by `hanko lock install` to /etc/pacman.d/hooks/hanko-lock.hook.
+# Remove with `hanko lock uninstall`.
+
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Path
+Target = usr/share/omarchy/shell/plugins/lock/LockView.qml
+
+[Action]
+Description = Hanko: re-applying the lock screen skin hook...
+When = PostTransaction
+Exec = /usr/local/lib/hanko/lock-patch.sh apply

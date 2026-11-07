@@ -1,0 +1,5 @@
+# Scripts and QML run on Linux: always LF.
+* text=auto eol=lf
+*.png binary
+*.ttf binary
+*.wav binary
