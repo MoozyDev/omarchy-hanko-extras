@@ -10,13 +10,29 @@ Installer, shell components and shared assets for the **Hanko** theme for [Omarc
 | Cramoisi | [omarchy-hanko-cramoisi-theme](https://github.com/MoozyDev/omarchy-hanko-cramoisi-theme) |
 | Vert billard | [omarchy-hanko-vert-billard-theme](https://github.com/MoozyDev/omarchy-hanko-vert-billard-theme) |
 
-## Install everything (one command)
+## Install — pick one level
+
+**Everything** (colours, wallpapers, icons, bar, menu, desktop widgets, screensaver, lock screen, boot screen):
 
 ```
-curl -fsSL https://raw.githubusercontent.com/MoozyDev/omarchy-hanko-extras/main/install.sh | bash -s vermillon
+curl -fsSL https://raw.githubusercontent.com/MoozyDev/omarchy-hanko-extras/main/install.sh | bash -s vermillon totale
 ```
 
-Replace `vermillon` with `cramoisi` or `vert-billard`. Run it as your user inside your Omarchy session (or over SSH: the session is found automatically). It asks once for `sudo`, for the lock screen hook only.
+**Essentials** (colours, wallpapers, folder and app icons, Anton font, ASCII logo, fastfetch — no plugins, no sudo):
+
+```
+curl -fsSL https://raw.githubusercontent.com/MoozyDev/omarchy-hanko-extras/main/install.sh | bash -s vermillon essentiel
+```
+
+**Theme only** (colours, wallpapers, folder icons):
+
+```
+curl -fsSL https://raw.githubusercontent.com/MoozyDev/omarchy-hanko-extras/main/install.sh | bash -s vermillon theme
+```
+
+Replace `vermillon` with `cramoisi` or `vert-billard`. Run it as your user inside your Omarchy session (or over SSH: the session is found automatically). The full install asks for `sudo` for the lock and boot screens only.
+
+**Step-by-step guide, every command explained (French): [docs/TUTORIEL.md](docs/TUTORIEL.md).**
 
 What it sets up:
 
@@ -41,6 +57,8 @@ omarchy theme install https://github.com/MoozyDev/omarchy-hanko-vermillon-theme
 hanko doctor                                  state of every part
 hanko theme <variant>                         switch variant
 hanko bar on|off · hanko menu on|off          bar and menu patches
+hanko widgets on|off                          desktop widgets + live HANKO wallpaper
+hanko boot on|off                             disk-unlock screen
 hanko screensaver on|off|test [animation]     eclipse orbite onde balayage defilement phases
 hanko lock on|off|edit|status|uninstall       lock screen skin (off = Omarchy's default look)
 hanko update · hanko uninstall
@@ -65,7 +83,7 @@ Why it is built this way (what Omarchy lets a theme do, and the lock screen): [d
 - `presentation/` — banners, comparison image, avatars.
 
 ## Status
-**1.1.0.** Done: installer, bar on hover, wide menu, lock screen skin, 6 of the 11 screensaver animations. Not yet: Marée, Vinyle, Fréquence, Trame, Phases 6d-3; dynamic / per-screen wallpaper; desktop widgets; window look'n'feel; OSD and notification styling.
+**1.1.0.** Done: installer (3 levels), bar on hover, wide menu, desktop widgets, live HANKO wallpaper, lock screen skin, boot screen, 6 of the 11 screensaver animations. Not yet: Marée, Vinyle, Fréquence, Trame, Phases 6d-3; window look'n'feel; OSD and notification styling.
 
 ---
 

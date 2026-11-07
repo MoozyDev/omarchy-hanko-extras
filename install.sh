@@ -1,15 +1,16 @@
 #!/bin/bash
 # Hanko for Omarchy 4 — one-command installer.
 #
-#   curl -fsSL https://raw.githubusercontent.com/MoozyDev/omarchy-hanko-extras/main/install.sh | bash -s vermillon
+#   curl -fsSL https://raw.githubusercontent.com/MoozyDev/omarchy-hanko-extras/main/install.sh | bash -s vermillon [totale|essentiel|theme]
 #
 # Variants: vermillon (default), cramoisi, vert-billard.
 # It clones this repo to ~/.local/share/hanko/extras, links the `hanko`
-# command into ~/.local/bin, then runs `hanko install <variant>`.
+# command into ~/.local/bin, then runs `hanko install <variant> <level>`.
 
 set -euo pipefail
 
 variant="${1:-vermillon}"
+level="${2:-totale}"
 repo="${HANKO_REPO:-https://github.com/MoozyDev/omarchy-hanko-extras.git}"
 home_dir="${HANKO_HOME:-$HOME/.local/share/hanko}"
 
@@ -34,7 +35,7 @@ ln -sfn "$home_dir/extras/bin/hanko" "$HOME/.local/bin/hanko"
 
 # Read answers from the keyboard even though this script arrives on a pipe.
 if [[ -r /dev/tty ]]; then
-  exec "$home_dir/extras/bin/hanko" install "$variant" </dev/tty
+  exec "$home_dir/extras/bin/hanko" install "$variant" "$level" </dev/tty
 else
-  exec "$home_dir/extras/bin/hanko" install "$variant"
+  exec "$home_dir/extras/bin/hanko" install "$variant" "$level"
 fi

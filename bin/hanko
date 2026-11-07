@@ -424,23 +424,39 @@ cmd_lock() {
 }
 
 # ───────────────────────────────────────────────────────────────── all
+# Three levels:
+#   totale     theme + extras + bar + menu + widgets + screensaver + lock + boot
+#   essentiel  theme + extras (Anton font, app icons, ASCII logo, fastfetch)
+#   theme      theme only (colours, wallpapers, folder icons)
 cmd_install() {
-  local variant="${1:-vermillon}"
+  local variant="${1:-vermillon}" level="${2:-totale}"
   valid_variant "$variant" || die "variante inconnue : $variant (${VARIANTS[*]})"
+  case "$level" in
+    totale|full|all) level=totale ;;
+    essentiel|essentiels|essentials|essential) level=essentiel ;;
+    theme|thème|colors|couleurs) level=theme ;;
+    *) die "niveau inconnu : $level (totale, essentiel ou theme)" ;;
+  esac
   need_omarchy
+  bold "Installation Hanko · $variant · $level"
   cmd_theme "$variant"
-  cmd_extras
-  cmd_bar on
-  cmd_menu on
-  cmd_widgets on
-  cmd_screensaver on
-  cmd_lock install
-  cmd_boot on
-  # The shell compiled LockView.qml and the plugins at startup: restart it so
-  # everything above is live without logging out (the bar blinks once).
-  omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
+  if [[ $level == totale || $level == essentiel ]]; then
+    cmd_extras
+  fi
+  if [[ $level == totale ]]; then
+    cmd_bar on
+    cmd_menu on
+    cmd_widgets on
+    cmd_screensaver on
+    cmd_lock install
+    cmd_boot on
+    # The shell compiled LockView.qml and the plugins at startup: restart it
+    # so everything above is live without logging out (the bar blinks once).
+    omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
+  fi
   echo
-  bold "Hanko est installé."
+  bold "Hanko est installé ($level)."
+  [[ $level != totale ]] && info "Pour ajouter le reste plus tard : hanko install $variant totale"
   info "Pour tout voir : hanko doctor · pour tout enlever : hanko uninstall"
 }
 
@@ -489,7 +505,7 @@ usage() {
   cat <<'EOF'
 hanko — thème Hanko pour Omarchy 4
 
-  hanko install [vermillon|cramoisi|vert-billard]   tout installer
+  hanko install [variante] [totale|essentiel|theme]  installer (totale par défaut)
   hanko theme <variante>                           changer de variante
   hanko extras                                     police, icônes, fastfetch, logo
   hanko bar on|off|status                          barre qui s'agrandit au survol
