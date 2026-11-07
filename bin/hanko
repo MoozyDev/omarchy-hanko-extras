@@ -227,7 +227,7 @@ cmd_menu() {
         # The menu stays loaded between uses: restart the shell so it is rebuilt.
         omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
       fi
-      ok "menu : 50 % de large, au plus 50 % de haut, centré à 45 %"
+      ok "menu : 50 % de large, 6 lignes visibles, centré à 45 %"
       ;;
     off)
       [[ -f $file ]] && bash "$EXTRAS/menu/menu-patch.sh" restore "$file"

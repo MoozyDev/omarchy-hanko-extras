@@ -4,7 +4,7 @@
 # Works on YOUR clone of the built-in menu (~/.config/omarchy/plugins/$USER.menu,
 # made by `omarchy plugin clone omarchy.menu`), never on Omarchy's own files.
 #   - card 50 % of the screen width (instead of 300 px)
-#   - at most 50 % of the screen height (the row list scrolls inside)
+#   - 6 rows visible (plus a peek of the next one); the list scrolls inside
 #   - centred at 45 % of the height (instead of 50 %)
 #
 #   menu-patch.sh apply   <Menu.qml>
@@ -24,7 +24,7 @@ die() { echo "hanko-menu: $*" >&2; exit 1; }
 O1='  property int cardWidth: Math.min(root.dmenuActive ? Style.space(root.dmenuWidth) : ((root.activeMenu === "trigger.capture.screenrecord" || root.activeMenu === "appearance.font" || root.activeMenu === "update.kernel") ? Style.space(520) : Style.space(300)), panel.width - Style.gapsOut * 2)'
 N1='  property int cardWidth: Math.min(Math.max(root.dmenuActive ? Style.space(root.dmenuWidth) : Style.space(300), Math.round(panel.width * 0.5)), panel.width - Style.gapsOut * 2) // '"$MARK"
 O2='  property int visibleRowsHeight: root.dmenuActive ? dmenuRowListHeight(layoutSerial, displayModel.count, filterText) : rowListHeight(layoutSerial, displayModel.count, filterText, searchDivider)'
-N2='  property int visibleRowsHeight: Math.min(root.dmenuActive ? dmenuRowListHeight(layoutSerial, displayModel.count, filterText) : rowListHeight(layoutSerial, displayModel.count, filterText, searchDivider), Math.max(baseRowHeight, Math.round(panel.height * 0.5) - contentMargin * 2 - headerHeight - contentSpacing)) // '"$MARK"
+N2='  property int visibleRowsHeight: Math.min(root.dmenuActive ? dmenuRowListHeight(layoutSerial, displayModel.count, filterText) : rowListHeight(layoutSerial, displayModel.count, filterText, searchDivider), (baseRowHeight + rowSpacing) * 6 + rowPeek) // '"$MARK"
 O3='    readonly property int centeredTop: Math.max(Style.gapsOut, Math.round((height - root.cardHeight) / 2))'
 N3='    readonly property int centeredTop: Math.max(Style.gapsOut, Math.round(height * 0.45 - root.cardHeight / 2)) // '"$MARK"
 
