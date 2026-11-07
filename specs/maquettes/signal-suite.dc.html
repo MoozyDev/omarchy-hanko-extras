@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/organic-ddd2cfb6-76a3-4f7e-a3f2-f6e9cb4180ca/styles.css">
+<script src="_ds/organic-ddd2cfb6-76a3-4f7e-a3f2-f6e9cb4180ca/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)}a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-900)}</style>
+</helmet>
+
+<div style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:14px 64px;background:#121010;color:#f1e7d6;font-family:'Space Mono',monospace;font-size:13px">
+  <span style="letter-spacing:.2em;font-weight:700">VARIANTE</span>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="3">
+      <button onClick="{{ s.pick }}" style="display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:999px;border:2px solid {{ s.ring }};background:transparent;color:#f1e7d6;font-family:'Space Mono',monospace;font-size:12px;cursor:pointer"><span style="width:22px;height:22px;border-radius:50%;background:{{ s.fond }}"></span>{{ s.name }}</button>
+    </sc-for>
+  </div>
+</div>
+
+<section style="padding:64px 64px 120px;display:flex;flex-direction:column;gap:80px">
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:980px">
+    <div style="font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Tour 11 · la suite du thème Signal</div>
+    <h1 style="margin:0;font-family:var(--font-heading);font-size:64px;line-height:1;font-weight:400">Logo, écrans, OSD, sons, applis</h1>
+  </div>
+
+  <!-- 11a LOGO -->
+  <div id="11a" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">11a</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Le logo Moozy dans Omarchy</h2></div>
+    <div style="background:#121010;padding:20px;max-width:1340px;box-sizing:border-box;display:flex;flex-direction:column;gap:10px">
+      <div style="height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;font-family:'Space Mono',monospace;font-size:12px;letter-spacing:.08em;color:#f1e7d6;border:1px solid #3a3330">
+        <div style="display:flex;align-items:center;gap:14px;font-weight:700"><span style="width:16px;height:16px;background:var(--acc,#ff4a1c);-webkit-mask:url('omarchy-suite/commun/icons/bar/menu.svg') center/contain no-repeat;mask:url('omarchy-suite/commun/icons/bar/menu.svg') center/contain no-repeat"></span><span style="color:var(--acc,#ff4a1c)">1</span><span>2</span><span>3</span></div>
+        <span style="font-weight:700">JEUDI 14:32</span>
+        <span style="color:#c9bfae">VOL 62</span>
+      </div>
+      <span style="font-family:'Space Mono',monospace;font-size:11px;color:#b5aa9a;letter-spacing:.14em">BOUTON DU MENU · menu.svg 24×24 · version petite taille · couleur accent · remplace le logo Omarchy</span>
+    </div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="position:relative;width:640px;height:360px;background:var(--wall,#e8431c);overflow:hidden;font-family:'Space Mono',monospace;color:#121010">
+          <svg viewBox="-104 -104 208 208" style="position:absolute;left:250px;top:62px;width:140px;height:auto;display:block"><path d="M-76.89 -63.94A32 32 0 0 1 -33.48 -69.37L26.37 -25.89A32 32 0 0 1 26.37 25.89L-33.48 69.37A32 32 0 0 1 -76.89 63.94A100 100 0 0 1 -76.89 -63.94ZM-12.26 -79.91A11 11 0 0 1 -6.51 -99.79A100 100 0 0 1 94.33 -33.2A11 11 0 0 1 90.42 -20.65L86.33 -17.68A11 11 0 0 1 73.4 -17.68L-12.26 -79.91ZM79.79 13.03A11 11 0 0 1 96.92 24.64A100 100 0 0 1 -6.51 99.79A11 11 0 0 1 -12.26 79.91L79.79 13.03Z" style="fill:#121010"></path></svg>
+          <div style="position:absolute;left:200px;top:236px;width:240px;height:34px;background:#121010;display:flex;align-items:center;gap:8px;padding:0 14px;box-sizing:border-box"><span style="width:7px;height:7px;border-radius:50%;background:#f1e7d6"></span><span style="width:7px;height:7px;border-radius:50%;background:#f1e7d6"></span><span style="width:7px;height:7px;border-radius:50%;background:#f1e7d6"></span><span style="width:7px;height:7px;border-radius:50%;background:#f1e7d6"></span><span style="width:2px;height:16px;background:var(--acc,#ff4a1c)"></span></div>
+          <div style="position:absolute;left:0;right:0;top:286px;text-align:center;font-size:10px;letter-spacing:.24em;font-weight:700">MOT DE PASSE DU DISQUE</div>
+        </div>
+        <strong style="font-size:15px">Déverrouillage du disque</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-700);max-width:640px">Logo noir sur la couleur du thème. Fichier <code>logo-moozy-noir.png</code> 900×520. Fond = couleur du thème, texte = #121010.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="width:640px;height:360px;background:#121010;border:3px solid #f1e7d6;box-sizing:border-box;padding:22px 26px;display:flex;gap:30px;font-family:'Space Mono',monospace;font-size:11.5px;line-height:1.55;color:#f1e7d6">
+          <pre style="margin:0;font-family:'Space Mono',monospace;font-size:9.5px;line-height:1;color:var(--wall,#e8431c)">            ▄███▄▄▄▄
+            ▀████████▄▄
+   ▄█████▄▄   ▀▀████████▄
+  ▄█████████▄▄   ▀███████▄
+ ██████████████▄    ▀██████
+ █████████████████▄    ▀██▀
+███████████████████
+███████████████████
+ █████████████████▀    ▄███
+ ██████████████▀    ▄██████
+  ▀█████████▀▀   ▄███████▀
+   ▀█████▀▀   ▄▄████████▀
+            ▄████████▀▀
+            ▀███▀▀▀▀</pre>
+          <div style="display:flex;flex-direction:column">
+            <span style="font-weight:700">moozy<span style="color:var(--acc,#ff4a1c)">@</span>aquarium</span>
+            <span style="color:#3a3330">──────────────</span>
+            <span><span style="color:var(--acc,#ff4a1c);font-weight:700">OS     </span> Omarchy · Arch Linux</span>
+            <span><span style="color:var(--acc,#ff4a1c);font-weight:700">NOYAU  </span> 6.17-arch1</span>
+            <span><span style="color:var(--acc,#ff4a1c);font-weight:700">WM     </span> Hyprland</span>
+            <span><span style="color:var(--acc,#ff4a1c);font-weight:700">THÈME  </span> Signal · Vermillon</span>
+            <span><span style="color:var(--acc,#ff4a1c);font-weight:700">POLICE </span> Space Mono NF</span>
+            <span><span style="color:var(--acc,#ff4a1c);font-weight:700">CPU    </span> Ryzen 7 · 16 cœurs</span>
+            <span><span style="color:var(--acc,#ff4a1c);font-weight:700">GPU    </span> RTX 4070</span>
+            <span><span style="color:var(--acc,#ff4a1c);font-weight:700">RAM    </span> 9,4 / 32 Go</span>
+            <div style="display:flex;gap:0;margin-top:10px"><span style="width:18px;height:12px;background:#121010;outline:1px solid #3a3330"></span><span style="width:18px;height:12px;background:#ff5a4a"></span><span style="width:18px;height:12px;background:#9cc77a"></span><span style="width:18px;height:12px;background:#f2c84b"></span><span style="width:18px;height:12px;background:#7aa2e8"></span><span style="width:18px;height:12px;background:#e07ab8"></span><span style="width:18px;height:12px;background:#6cc4c0"></span><span style="width:18px;height:12px;background:#f1e7d6"></span></div>
+          </div>
+        </div>
+        <strong style="font-size:15px">Écran « À propos » (fastfetch)</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-700);max-width:640px">C'est la fiche qui s'affiche quand tu tapes <code>fastfetch</code> dans le terminal, ou via Menu → À propos : ton logo à gauche, les infos du PC à droite. Logo en caractères (<code>about-grand.txt</code>, 28 colonnes) dans la couleur du thème, étiquettes en accent, valeurs en crème.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11b ECRANS -->
+  <div id="11b" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">11b</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Un fond et des widgets par écran</h2><span style="font-size:16px;color:var(--color-neutral-700)">plugin maison · couche arrière-plan · effort moyen</span></div>
+
+    <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end">
+      <!-- ECRAN 1 -->
+      <div data-screen-label="Écran 1 principal" style="display:flex;flex-direction:column;gap:10px">
+        <div style="position:relative;width:800px;height:450px;overflow:hidden;background:var(--wall,#e8431c);font-family:'Space Mono',monospace;color:#121010">
+          <div style="position:absolute;left:285px;top:110px;width:230px;height:230px;border-radius:50%;background:#121010"></div>
+          <div style="position:absolute;left:0;right:0;top:88px;text-align:center;font-family:'Anton',sans-serif;font-size:236px;line-height:.9;color:#f1e7d6">SIGNAL</div>
+          <div style="position:absolute;left:0;right:0;top:0;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:9px;letter-spacing:.08em;background:#121010;color:#f1e7d6">
+            <div style="display:flex;align-items:center;gap:10px;font-weight:700"><span style="width:11px;height:11px;background:var(--acc,#ff4a1c);-webkit-mask:url('omarchy-suite/commun/icons/bar/menu.svg') center/contain no-repeat;mask:url('omarchy-suite/commun/icons/bar/menu.svg') center/contain no-repeat"></span><span style="color:var(--acc,#ff4a1c)">1</span><span>2</span><span>3</span></div><span>JEUDI 14:32</span><span style="color:#b5aa9a">TS · WIFI · VOL 62</span>
+          </div>
+          <div style="position:absolute;left:4%;bottom:7%;display:flex;flex-direction:column;gap:2px;font-size:8px;letter-spacing:.14em;font-weight:700;line-height:1.6"><span style="opacity:.7">MÉTÉO · PARIS</span><span style="font-family:'Anton',sans-serif;font-size:34px;letter-spacing:0;font-weight:400;line-height:1;color:#f1e7d6">12°</span><span>NUAGEUX · MAX 15°</span></div>
+          <div style="position:absolute;right:4%;bottom:7%;width:200px;display:flex;flex-direction:column;gap:4px;font-size:8px;letter-spacing:.14em;font-weight:700;line-height:1.6;text-align:right"><span style="opacity:.7">EN LECTURE</span><span style="font-family:'Anton',sans-serif;font-size:20px;letter-spacing:0;font-weight:400;line-height:1.05;color:#f1e7d6">TITRE DU MORCEAU</span><span>ARTISTE</span><div style="height:2px;background:rgba(18,16,16,.3)"><div style="width:42%;height:2px;background:#121010"></div></div></div>
+        </div>
+        <strong style="font-size:15px">Écran 1 · principal horizontal (double écran)</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-700);max-width:800px">Fond <code>01-signal.png</code>. Le titre au centre, pas d'horloge (elle est sur l'écran 2). Météo en bas à gauche, musique en bas à droite, à 4 % des bords et 7 % du bas.</span>
+      </div>
+      <!-- ECRAN 2 -->
+      <div data-screen-label="Écran 2 vertical" style="display:flex;flex-direction:column;gap:10px">
+        <div style="position:relative;width:253px;height:450px;overflow:hidden;background:#f1e7d6;font-family:'Space Mono',monospace;color:#121010">
+          <div style="position:absolute;left:0;top:0;bottom:0;width:18px;display:flex;flex-direction:column;align-items:center;gap:7px;padding-top:8px;background:#121010;color:#f1e7d6;font-size:7px;font-weight:700"><span style="width:10px;height:10px;background:var(--acc,#ff4a1c);-webkit-mask:url('omarchy-suite/commun/icons/bar/menu.svg') center/contain no-repeat;mask:url('omarchy-suite/commun/icons/bar/menu.svg') center/contain no-repeat"></span><span style="color:var(--acc,#ff4a1c)">4</span><span>5</span></div>
+          <div style="position:absolute;left:18px;top:0;width:4px;height:100%;background:var(--wall,#e8431c)"></div>
+          <div style="position:absolute;left:36px;top:26px;font-size:7px;letter-spacing:.24em;font-weight:700">JEUDI · 05 NOV.</div>
+          <div style="position:absolute;left:30px;top:40px;display:flex;flex-direction:column;font-family:'Anton',sans-serif;font-size:118px;line-height:.84;color:#121010"><span>14</span><span style="display:flex;align-items:center;gap:8px">32<span style="width:22px;height:22px;border-radius:50%;background:var(--wall,#e8431c)"></span></span></div>
+          <div style="position:absolute;left:36px;right:18px;top:262px;height:1px;background:#121010"></div>
+          <div style="position:absolute;left:36px;right:18px;top:274px;display:flex;flex-direction:column;gap:5px;font-size:7.5px;font-weight:700;letter-spacing:.06em">
+            <span style="letter-spacing:.2em;color:var(--deep,#c2340f)">À FAIRE</span>
+            <span style="display:flex;gap:6px"><span style="width:7px;height:7px;border:1.5px solid #121010;box-sizing:border-box"></span>Devis réparation iPhone</span>
+            <span style="display:flex;gap:6px"><span style="width:7px;height:7px;border:1.5px solid #121010;box-sizing:border-box"></span>Câblage bureau client</span>
+            <span style="display:flex;gap:6px;opacity:.45;text-decoration:line-through"><span style="width:7px;height:7px;background:#121010"></span>Maquette UI</span>
+          </div>
+          <div style="position:absolute;left:36px;right:18px;bottom:22px;display:flex;flex-direction:column;gap:6px;font-size:7px;font-weight:700;letter-spacing:.14em">
+            <span style="letter-spacing:.2em;color:var(--deep,#c2340f)">SYSTÈME</span>
+            <div style="display:flex;align-items:center;gap:6px"><span style="width:26px">CPU</span><div style="flex:1;height:2px;background:#d8cdb9"><div style="width:34%;height:2px;background:#121010"></div></div><span style="width:20px;text-align:right">34</span></div>
+            <div style="display:flex;align-items:center;gap:6px"><span style="width:26px">RAM</span><div style="flex:1;height:2px;background:#d8cdb9"><div style="width:29%;height:2px;background:#121010"></div></div><span style="width:20px;text-align:right">29</span></div>
+            <div style="display:flex;align-items:center;gap:6px"><span style="width:26px">GPU</span><div style="flex:1;height:2px;background:#d8cdb9"><div style="width:61%;height:2px;background:var(--wall,#e8431c)"></div></div><span style="width:20px;text-align:right;color:var(--deep,#c2340f)">61</span></div>
+            <div style="display:flex;align-items:center;gap:6px"><span style="width:26px">NET</span><span style="flex:1">↓ 42 MB/s · ↑ 3</span></div>
+          </div>
+        </div>
+        <strong style="font-size:15px">Écran 2 · Koorui vertical</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-700);max-width:253px">Fond <code>05-papier-vertical.png</code> : crème uni, fin filet couleur le long de la barre. Horloge noire calée à gauche, le point couleur sert de « secondes » (il pulse doucement). Comme une page de carnet, à l'opposé de l'écran 1.</span>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+      <!-- ECRAN 3 -->
+      <div data-screen-label="Écran 3 PC simple" style="display:flex;flex-direction:column;gap:10px">
+        <div style="position:relative;width:800px;height:450px;overflow:hidden;background:var(--wall,#e8431c);font-family:'Space Mono',monospace;color:#121010">
+          <div style="position:absolute;left:285px;top:110px;width:230px;height:230px;border-radius:50%;background:#121010"></div>
+          <div style="position:absolute;left:0;right:0;top:88px;text-align:center;font-family:'Anton',sans-serif;font-size:236px;line-height:.9;color:#f1e7d6">SIGNAL</div>
+          <div style="position:absolute;left:0;right:0;top:0;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:9px;letter-spacing:.08em;background:#121010;color:#f1e7d6">
+            <div style="display:flex;align-items:center;gap:10px;font-weight:700"><span style="width:11px;height:11px;background:var(--acc,#ff4a1c);-webkit-mask:url('omarchy-suite/commun/icons/bar/menu.svg') center/contain no-repeat;mask:url('omarchy-suite/commun/icons/bar/menu.svg') center/contain no-repeat"></span><span style="color:var(--acc,#ff4a1c)">1</span><span>2</span><span>3</span></div><span>JEUDI 14:32</span><span style="color:#b5aa9a">WIFI · BAT 78 · VOL 62</span>
+          </div>
+          <div style="position:absolute;left:4%;bottom:7%;display:flex;flex-direction:column;gap:10px;font-size:8px;letter-spacing:.14em;font-weight:700;line-height:1.6">
+            <div style="display:flex;flex-direction:column;gap:0"><span style="font-family:'Anton',sans-serif;font-size:52px;letter-spacing:0;font-weight:400;line-height:1;color:#f1e7d6">14:32</span><span>JEUDI 05 NOVEMBRE</span></div>
+            <div style="height:2px;width:32px;background:#121010"></div>
+            <div style="display:flex;align-items:baseline;gap:8px"><span style="font-family:'Anton',sans-serif;font-size:22px;letter-spacing:0;font-weight:400;color:#f1e7d6">12°</span><span>PARIS · NUAGEUX</span></div>
+          </div>
+          <div style="position:absolute;right:4%;bottom:7%;width:200px;display:flex;flex-direction:column;gap:4px;font-size:8px;letter-spacing:.14em;font-weight:700;line-height:1.6;text-align:right"><span style="opacity:.7">EN LECTURE</span><span style="font-family:'Anton',sans-serif;font-size:20px;letter-spacing:0;font-weight:400;line-height:1.05;color:#f1e7d6">TITRE DU MORCEAU</span><span>ARTISTE</span><div style="height:2px;background:rgba(18,16,16,.3)"><div style="width:42%;height:2px;background:#121010"></div></div></div>
+        </div>
+        <strong style="font-size:15px">Écran 3 · PC à un seul écran (portable, publication)</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-700);max-width:800px">Même fond que l'écran 1. L'horloge revient en bas à gauche, au-dessus de la météo. Pas de À FAIRE ni de jauges (masquées par défaut, activables).</span>
+      </div>
+      <!-- ECRAN 4 -->
+      <div data-screen-label="Écran 4 troisième" style="display:flex;flex-direction:column;gap:10px">
+        <div style="position:relative;width:800px;height:450px;overflow:hidden;background:#121010;font-family:'Space Mono',monospace;color:#f1e7d6">
+          <div style="position:absolute;left:470px;top:40px;width:460px;height:460px;border-radius:50%;background:var(--wall,#e8431c)"></div>
+          <svg viewBox="-104 -104 208 208" style="position:absolute;left:560px;top:150px;width:220px;height:auto;display:block"><path d="M-76.89 -63.94A32 32 0 0 1 -33.48 -69.37L26.37 -25.89A32 32 0 0 1 26.37 25.89L-33.48 69.37A32 32 0 0 1 -76.89 63.94A100 100 0 0 1 -76.89 -63.94ZM-12.26 -79.91A11 11 0 0 1 -6.51 -99.79A100 100 0 0 1 94.33 -33.2A11 11 0 0 1 90.42 -20.65L86.33 -17.68A11 11 0 0 1 73.4 -17.68L-12.26 -79.91ZM79.79 13.03A11 11 0 0 1 96.92 24.64A100 100 0 0 1 -6.51 99.79A11 11 0 0 1 -12.26 79.91L79.79 13.03Z" style="fill:#121010"></path></svg>
+          <div style="position:absolute;left:0;right:0;top:0;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 12px;font-size:9px;letter-spacing:.08em;background:#121010;color:#f1e7d6;border-bottom:1px solid #3a3330">
+            <div style="display:flex;align-items:center;gap:10px;font-weight:700"><span style="width:11px;height:11px;background:var(--acc,#ff4a1c);-webkit-mask:url('omarchy-suite/commun/icons/bar/menu.svg') center/contain no-repeat;mask:url('omarchy-suite/commun/icons/bar/menu.svg') center/contain no-repeat"></span><span style="color:var(--acc,#ff4a1c)">6</span><span>7</span></div><span>JEUDI 14:32</span><span style="color:#b5aa9a">VOL 62</span>
+          </div>
+          <div style="position:absolute;left:4%;top:12%;display:flex;flex-direction:column;gap:4px;font-size:8px;letter-spacing:.14em;font-weight:700;line-height:1.6">
+            <span style="display:flex;align-items:center;gap:6px;color:var(--acc,#ff4a1c)"><span style="width:6px;height:6px;border-radius:50%;background:var(--acc,#ff4a1c)"></span>EN DIRECT · TWITCH</span>
+            <span style="font-family:'Anton',sans-serif;font-size:44px;letter-spacing:0;font-weight:400;line-height:1">01:42:13</span>
+            <span style="color:#b5aa9a">128 SPECTATEURS · MOOZYCORE</span>
+          </div>
+          <div style="position:absolute;left:4%;bottom:7%;font-family:'Anton',sans-serif;font-size:72px;line-height:.9">MOOZY</div>
+        </div>
+        <strong style="font-size:15px">Écran 4 · troisième écran (optionnel)</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-700);max-width:800px">Fond <code>04-moozy.png</code> : noir, grand disque coupé à droite avec ton logo. Écran de stream (OBS, chat). Widget « EN DIRECT » seulement quand tu streames, sinon il disparaît. Ce widget demande l'API Twitch : <strong>effort élevé</strong>, on peut le garder pour plus tard.</span>
+      </div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px;max-width:980px;font-size:15px;line-height:1.7">
+      <strong>Règles communes</strong>
+      <ul style="margin:0;padding-left:20px">
+        <li>Positions en % de l'écran : ça marche en 1920×1080, 2560×1440 et 3840×2160 sans rien changer.</li>
+        <li>Rôle de l'écran deviné automatiquement : vertical → écran 2 ; un seul écran → écran 3 ; écran le plus large → écran 1 ; le suivant → écran 4.</li>
+        <li>Un widget sans donnée disparaît : pas de musique, pas de météo, pas de stream.</li>
+        <li>Sur Vert billard et Cramoisi, les étiquettes noires passent en crème.</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- 11c OSD -->
+  <div id="11c" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">11c</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Jauge volume / luminosité (OSD)</h2><span style="font-size:16px;color:var(--color-neutral-700)">copie du plugin omarchy.osd · effort faible</span></div>
+    <div style="display:flex;gap:32px;flex-wrap:wrap;align-items:flex-start">
+      <div style="position:relative;width:640px;height:360px;background:var(--wall,#e8431c);overflow:hidden">
+        <div style="position:absolute;left:225px;top:70px;width:190px;height:190px;border-radius:50%;background:#121010"></div>
+        <div style="position:absolute;left:0;right:0;top:0;height:16px;background:#121010"></div>
+        <div style="position:absolute;left:200px;bottom:29px;width:240px;height:32px;background:#121010;display:flex;align-items:center;gap:10px;padding:0 12px;box-sizing:border-box;font-family:'Space Mono',monospace;font-size:11px;font-weight:700;color:#f1e7d6"><span style="width:12px;height:12px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/volume.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/volume.svg') center/contain no-repeat"></span><div style="flex:1;height:3px;background:#3a3330"><div style="width:62%;height:3px;background:var(--acc,#ff4a1c)"></div></div><span style="width:22px;text-align:right">62</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="width:360px;height:44px;background:#121010;display:flex;align-items:center;gap:14px;padding:0 16px;box-sizing:border-box;font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:#f1e7d6"><span style="width:18px;height:18px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/volume.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/volume.svg') center/contain no-repeat"></span><div style="flex:1;height:4px;background:#3a3330"><div style="width:62%;height:4px;background:var(--acc,#ff4a1c)"></div></div><span style="width:30px;text-align:right">62</span></div>
+        <div style="width:360px;height:44px;background:#121010;display:flex;align-items:center;gap:14px;padding:0 16px;box-sizing:border-box;font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:#f1e7d6"><span style="width:18px;height:18px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/display.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/display.svg') center/contain no-repeat"></span><div style="flex:1;height:4px;background:#3a3330"><div style="width:85%;height:4px;background:#f1e7d6"></div></div><span style="width:30px;text-align:right">85</span></div>
+        <div style="width:360px;height:44px;background:#121010;display:flex;align-items:center;gap:14px;padding:0 16px;box-sizing:border-box;font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:#6b625a"><span style="width:18px;height:18px;background:var(--acc,#ff4a1c);-webkit-mask:url('omarchy-signal/commun/icons/bar/mic-off.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/mic-off.svg') center/contain no-repeat"></span><div style="flex:1;height:4px;background:#3a3330"></div><span style="width:46px;text-align:right;color:var(--acc,#ff4a1c)">MUET</span></div>
+        <div style="width:360px;height:44px;background:#121010;display:flex;align-items:center;gap:14px;padding:0 16px;box-sizing:border-box;font-family:'Space Mono',monospace;font-size:15px;font-weight:700;color:#f1e7d6"><span style="width:18px;height:18px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/volume.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/volume.svg') center/contain no-repeat"></span><div style="flex:1;height:4px;background:#3a3330;display:flex"><div style="width:100%;height:4px;background:var(--acc,#ff4a1c)"></div></div><span style="width:30px;text-align:right;color:var(--acc,#ff4a1c)">120</span></div>
+      </div>
+      <pre style="margin:0;background:#121010;color:#f1e7d6;padding:20px 22px;border-radius:var(--radius-lg);font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.75;white-space:pre-wrap;max-width:420px">TAILLE     360 × 44 px (en 1920×1080)
+POSITION   centrée, 8 % du bas
+FOND       noir #121010, coins carrés
+JAUGE      4 px · vide #3a3330
+           volume = accent · luminosité = crème
+CHIFFRE    Space Mono 700, 15 px
+MUET       icône + mot en accent
+&gt; 100 %    chiffre en accent
+ENTRÉE     fondu + monte de 8 px · 120 ms
+SORTIE     après 1,5 s · fondu 200 ms</pre>
+    </div>
+  </div>
+
+  <!-- 11d SONS -->
+  <div id="11d" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">11d</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Sons</h2><span style="font-size:16px;color:var(--color-neutral-700)">fabriqués ici · WAV 48 kHz · moins de 0,3 s</span></div>
+    <p style="margin:0;max-width:900px;font-size:15px;line-height:1.6">Clique sur ▶ dans chaque carte (monte un peu le volume, ils sont courts). Si rien ne s'affiche, ils sont aussi dans <code>omarchy-suite/commun/sons/</code> : double-clic sur le fichier .wav.</p><div style="display:none"></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:20px;max-width:1340px">
+      <div style="display:flex;flex-direction:column;gap:10px;background:#121010;color:#f1e7d6;padding:20px;font-family:'Space Mono',monospace;font-size:12px"><span style="font-weight:700;letter-spacing:.14em">NOTIFICATION · A</span><span style="color:#b5aa9a">« tic » clair, très court</span><audio controls="true" preload="auto" src="omarchy-suite/commun/sons/notification-tic.wav" style="width:100%"></audio></div>
+      <div style="display:flex;flex-direction:column;gap:10px;background:#121010;color:#f1e7d6;padding:20px;font-family:'Space Mono',monospace;font-size:12px"><span style="font-weight:700;letter-spacing:.14em">NOTIFICATION · B</span><span style="color:#b5aa9a">deux « tic » qui montent</span><audio controls="true" preload="auto" src="omarchy-suite/commun/sons/notification-double.wav" style="width:100%"></audio></div>
+      <div style="display:flex;flex-direction:column;gap:10px;background:#121010;color:#f1e7d6;padding:20px;font-family:'Space Mono',monospace;font-size:12px"><span style="font-weight:700;letter-spacing:.14em">VERROUILLAGE · A</span><span style="color:#b5aa9a">« clac » grave et sec</span><audio controls="true" preload="auto" src="omarchy-suite/commun/sons/verrou-clac.wav" style="width:100%"></audio></div>
+      <div style="display:flex;flex-direction:column;gap:10px;background:#121010;color:#f1e7d6;padding:20px;font-family:'Space Mono',monospace;font-size:12px"><span style="font-weight:700;letter-spacing:.14em">VERROUILLAGE · B</span><span style="color:#b5aa9a">verrou en deux temps</span><audio controls="true" preload="auto" src="omarchy-suite/commun/sons/verrou-deux-temps.wav" style="width:100%"></audio></div>
+    </div>
+  </div>
+
+  <!-- 11e APPS -->
+  <div id="11e" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">11e</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Spotify, Discord, Obsidian, Steam</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,520px);gap:28px">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="height:300px;background:#121010;display:grid;grid-template-columns:120px 1fr;grid-template-rows:1fr 54px;font-family:'Space Mono',monospace;font-size:10px;color:#f1e7d6;overflow:hidden">
+          <div style="background:#0c0a0a;padding:14px 12px;display:flex;flex-direction:column;gap:9px"><span style="font-weight:700">Accueil</span><span style="color:#b5aa9a">Rechercher</span><span style="color:#b5aa9a">Bibliothèque</span><span style="height:6px"></span><span style="color:#b5aa9a">Lofi · Code</span><span style="color:#f1e7d6;font-weight:700">Stream · Chill</span></div>
+          <div style="padding:16px 18px;display:flex;flex-direction:column;gap:10px"><div style="display:flex;gap:14px;align-items:flex-end"><div style="width:92px;height:92px;background:#2a2523;display:flex;align-items:center;justify-content:center"><div style="width:44px;height:44px;border-radius:50%;background:#f1e7d6"></div></div><div style="display:flex;flex-direction:column;gap:2px"><span style="font-size:8px;letter-spacing:.2em;color:#b5aa9a">PLAYLIST</span><span style="font-family:'Anton',sans-serif;font-size:34px;line-height:1">STREAM · CHILL</span></div></div><div style="display:flex;justify-content:space-between;color:#b5aa9a"><span>1  Titre un</span><span>3:12</span></div><div style="display:flex;justify-content:space-between;color:#f1e7d6;font-weight:700"><span><span style="color:var(--acc,#ff4a1c)">▶</span> Titre deux</span><span>2:48</span></div><div style="display:flex;justify-content:space-between;color:#b5aa9a"><span>3  Titre trois</span><span>4:05</span></div></div>
+          <div style="grid-column:1/3;border-top:1px solid #3a3330;display:flex;align-items:center;gap:14px;padding:0 14px"><span style="width:26px;height:26px;border-radius:50%;background:#f1e7d6"></span><div style="flex:1;height:3px;background:#3a3330"><div style="width:38%;height:3px;background:var(--acc,#ff4a1c)"></div></div><span>1:04</span></div>
+        </div>
+        <strong style="font-size:15px">Spotify · thème Spicetify</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-700)">Fond noir, côté #0c0a0a, texte crème, secondaire #b5aa9a. Accent réservé à la barre de lecture et au ▶ du titre en cours. Bouton lecture crème. Titres de playlist en Anton. <strong>Effort faible</strong> (fichier color.ini + petit CSS).</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="height:300px;background:#121010;display:grid;grid-template-columns:44px 120px 1fr;font-family:'Space Mono',monospace;font-size:10px;color:#f1e7d6;overflow:hidden">
+          <div style="background:#0c0a0a;display:flex;flex-direction:column;align-items:center;gap:8px;padding-top:10px"><span style="width:28px;height:28px;border-radius:50%;background:var(--wall,#e8431c)"></span><span style="width:28px;height:28px;border-radius:50%;background:#2a2523"></span><span style="width:28px;height:28px;border-radius:50%;background:#2a2523"></span></div>
+          <div style="background:#181514;padding:12px 10px;display:flex;flex-direction:column;gap:7px"><span style="font-weight:700;letter-spacing:.1em">MOOZYCORE</span><span style="color:#b5aa9a"># général</span><span style="background:#2a2523;color:#f1e7d6;padding:2px 4px;margin:0 -4px"># annonces</span><span style="color:#b5aa9a"># clips</span><span style="color:#6b625a">VOCAL</span><span style="color:#b5aa9a">🔊 Salon</span></div>
+          <div style="padding:14px 16px;display:flex;flex-direction:column;gap:12px;position:relative"><span style="font-weight:700;border-bottom:1px solid #3a3330;padding-bottom:8px"># annonces</span><div style="display:flex;flex-direction:column;gap:2px"><span><span style="color:var(--acc,#ff4a1c);font-weight:700">Moozy</span> <span style="color:#6b625a">14:02</span></span><span>Live ce soir 21 h, on teste le nouveau thème.</span></div><div style="display:flex;flex-direction:column;gap:2px"><span><span style="font-weight:700">Membre</span> <span style="color:#6b625a">14:05</span></span><span>Trop propre <span style="background:var(--sel,#3a1d14);color:var(--acc,#ff4a1c);padding:0 3px">@Moozy</span></span></div><div style="position:absolute;left:16px;right:16px;bottom:14px;height:28px;background:#2a2523;display:flex;align-items:center;padding:0 10px;color:#6b625a">Envoyer un message</div></div>
+        </div>
+        <strong style="font-size:15px">Discord · thème CSS Vesktop</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-700)">Trois niveaux de noir (#0c0a0a, #121010, #181514), champs #2a2523. Ton pseudo, mentions et serveur actif en accent. Coins carrés. <strong>Effort faible</strong> : un fichier <code>signal.theme.css</code> qui remplace les variables de Discord.</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="height:300px;background:#121010;display:grid;grid-template-columns:130px 1fr;font-family:'Space Mono',monospace;font-size:10px;color:#f1e7d6;overflow:hidden">
+          <div style="background:#0c0a0a;padding:14px 12px;display:flex;flex-direction:column;gap:7px;color:#b5aa9a"><span>▾ Clients</span><span style="padding-left:10px">Devis</span><span style="padding-left:10px;color:#f1e7d6;font-weight:700">Réseau Durand</span><span>▾ Stream</span><span style="padding-left:10px">Idées</span></div>
+          <div style="padding:20px 26px;display:flex;flex-direction:column;gap:10px;line-height:1.6"><span style="font-family:'Anton',sans-serif;font-size:36px;line-height:1">RÉSEAU DURAND</span><span style="font-family:'Anton',sans-serif;font-size:18px;color:#b5aa9a">MATÉRIEL</span><span>— Switch 24 ports · <span style="color:#f1e7d6;text-decoration:underline;text-decoration-color:var(--acc,#ff4a1c);text-underline-offset:3px">[[Devis 042]]</span></span><span>— 2 bornes Wi-Fi</span><span style="background:#2a2523;padding:2px 6px;color:#f1e7d6">VLAN invités à prévoir</span></div>
+        </div>
+        <strong style="font-size:15px">Obsidian · couleurs + extrait CSS</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-700)">Omarchy colore déjà Obsidian. On ajoute un petit extrait CSS : titres en Anton capitales, H2 en gris, liens crème avec soulignement accent (seule touche de couleur). <strong>Effort faible.</strong></span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="height:300px;background:#171a21;display:flex;flex-direction:column;font-family:'Space Mono',monospace;font-size:10px;color:#c6d4df;overflow:hidden">
+          <div style="height:30px;background:#0f1218;display:flex;align-items:center;gap:16px;padding:0 14px;font-weight:700;letter-spacing:.1em"><span style="color:#ffffff">MAGASIN</span><span>BIBLIOTHÈQUE</span><span>COMMUNAUTÉ</span></div>
+          <div style="flex:1;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;line-height:1.6">Steam garde ses propres couleurs.<br>Un thème passe par Millennium<br>(logiciel tiers, peut casser à chaque<br>mise à jour de Steam).</div>
+        </div>
+        <strong style="font-size:15px">Steam · je conseille de ne pas toucher</strong>
+        <span style="font-size:13px;line-height:1.5;color:var(--color-neutral-700)">Pas de thème officiel. Avec Millennium, on peut le passer en noir + accent, mais c'est <strong>effort élevé</strong> et fragile. Seule l'icône de l'appli suit le thème.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11f LANCEUR -->
+  <div id="11f" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">11f</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Taille du lanceur (Super + Espace)</h2></div>
+    <p style="margin:0;max-width:900px;font-size:16px;line-height:1.6">Le lanceur est la fenêtre qui s'ouvre quand tu fais Super + Espace pour chercher une appli. Celui d'Omarchy est étroit et haut ; ma maquette 04 le montrait large et bas. Il faut juste choisir sa forme. Écrans ci-dessous à l'échelle de 1920×1080.</p>
+    <div style="display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="position:relative;width:640px;height:360px;background:var(--wall,#e8431c);overflow:hidden;font-family:'Space Mono',monospace;font-size:9px;color:#f1e7d6">
+          <div style="position:absolute;inset:0;background:rgba(18,16,16,.5)"></div>
+          <div style="position:absolute;left:220px;top:43px;width:200px;height:273px;background:#121010;border:2px solid #f1e7d6;box-sizing:border-box;display:flex;flex-direction:column">
+            <div style="padding:8px 10px;border-bottom:1px solid #3a3330"><span style="color:var(--acc,#ff4a1c);font-weight:700">›</span> ch</div>
+            <div style="background:var(--acc,#ff4a1c);color:#121010;font-weight:700;padding:4px 10px">Chromium</div>
+            <div style="padding:4px 10px">Chat — WhatsApp</div><div style="padding:4px 10px">Chatterino</div><div style="padding:4px 10px">Choisir un fond</div><div style="padding:4px 10px">Changer de thème</div><div style="padding:4px 10px">Character map</div><div style="padding:4px 10px">Checkupdates</div><div style="padding:4px 10px;color:#6b625a">Chess</div><div style="padding:4px 10px;color:#6b625a">Chrome flags</div><div style="padding:4px 10px;color:#6b625a">Chromecast</div>
+          </div>
+        </div>
+        <strong style="font-size:15px">A · Étroit et haut (Omarchy)</strong>
+        <span style="font-size:13px;color:var(--color-neutral-700)">600 × 820 px · 12 lignes · centré</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="position:relative;width:640px;height:360px;background:var(--wall,#e8431c);overflow:hidden;font-family:'Space Mono',monospace;font-size:10px;color:#f1e7d6">
+          <div style="position:absolute;inset:0;background:rgba(18,16,16,.5)"></div>
+          <div style="position:absolute;left:160px;top:80px;width:320px;height:180px;background:#121010;border:2px solid #f1e7d6;box-sizing:border-box;display:flex;flex-direction:column">
+            <div style="padding:10px 12px;border-bottom:1px solid #3a3330;font-size:12px"><span style="color:var(--acc,#ff4a1c);font-weight:700">›</span> ch</div>
+            <div style="background:var(--acc,#ff4a1c);color:#121010;font-weight:700;padding:5px 12px;display:flex;justify-content:space-between"><span>Chromium</span><span>↵</span></div>
+            <div style="padding:5px 12px">Chat — WhatsApp</div><div style="padding:5px 12px">Chatterino</div><div style="padding:5px 12px">Choisir un fond d'écran</div><div style="padding:5px 12px">Changer de thème</div>
+          </div>
+        </div>
+        <strong style="font-size:15px">B · Large et bas · ✓ choisi</strong>
+        <span style="font-size:13px;color:var(--color-neutral-700)">960 × 540 px · 7 lignes · centré, un peu au-dessus du milieu · laisse voir le titre du fond</span>
+      </div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;variante&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;vermillon&quot;,&quot;cramoisi&quot;,&quot;vert&quot;],&quot;default&quot;:&quot;vermillon&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const PALETTES = [
+  { id:'vermillon', name:'Vermillon', fond:'#e8431c', accent:'#ff4a1c', deep:'#c2340f', sel:'#3a1d14' },
+  { id:'cramoisi', name:'Cramoisi', fond:'#c8102e', accent:'#ff3355', deep:'#a50d26', sel:'#3a1219' },
+  { id:'vert', name:'Vert billard', fond:'#0d6b3e', accent:'#36d27e', deep:'#0a5a33', sel:'#123224' },
+];
+class Component extends DCLogic {
+  state = { id: this.props.variante ?? 'vermillon' };
+  apply() {
+    const p = PALETTES.find(x => x.id === this.state.id) || PALETTES[0];
+    const r = document.documentElement.style;
+    r.setProperty('--wall', p.fond); r.setProperty('--acc', p.accent); r.setProperty('--deep', p.deep); r.setProperty('--sel', p.sel);
+  }
+  componentDidMount() { this.apply(); }
+  componentDidUpdate() { this.apply(); }
+  renderVals() {
+    return { swatches: PALETTES.map(x => ({ ...x, ring: x.id === this.state.id ? '#f1e7d6' : '#3a3330', pick: () => this.setState({ id: x.id }) })) };
+  }
+}
+</script>
+</body>
+</html>

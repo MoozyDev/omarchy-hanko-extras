@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="stylesheet" href="_ds/organic-ddd2cfb6-76a3-4f7e-a3f2-f6e9cb4180ca/styles.css">
+<script src="_ds/organic-ddd2cfb6-76a3-4f7e-a3f2-f6e9cb4180ca/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>body{margin:0;background:var(--color-bg);color:var(--color-text);font-family:var(--font-body)}a{color:var(--color-accent-700)}a:hover{color:var(--color-accent-900)}</style>
+</helmet>
+
+<div style="position:sticky;top:0;z-index:10;display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:14px 64px;background:#121010;color:#f1e7d6;font-family:'Space Mono',monospace;font-size:13px">
+  <span style="letter-spacing:.2em;font-weight:700">ACCENT</span>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <sc-for list="{{ swatches }}" as="s" hint-placeholder-count="6">
+      <button onClick="{{ s.pick }}" style="display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:999px;border:2px solid {{ s.ring }};background:transparent;color:#f1e7d6;font-family:'Space Mono',monospace;font-size:12px;cursor:pointer"><span style="width:22px;height:22px;border-radius:50%;background:{{ s.wall }}"></span>{{ s.name }}</button>
+    </sc-for>
+  </div>
+  <span style="margin-left:auto;color:#b5aa9a">accent = <span style="color:var(--acc,#ff4a1c);font-weight:700">{{ acc }}</span></span>
+</div>
+<section style="padding:64px 64px 72px;display:flex;flex-direction:column;gap:56px;border-bottom:2px solid var(--color-neutral-300)">
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:960px">
+    <div style="font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Tour 4 · après les réponses de Claude Code</div>
+    <h1 style="margin:0;font-family:var(--font-heading);font-size:64px;line-height:1;font-weight:400">Widgets de bureau et barre complète</h1>
+    <p style="margin:0;font-size:18px;line-height:1.5;text-wrap:pretty">Les widgets sont posés sur la couche du fond d'écran, sous les fenêtres. On les voit sur un bureau vide. Uniquement du texte et des formes simples.</p>
+  </div>
+
+  <div id="4a" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">4a</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Widgets sur le bureau</h2><span style="font-size:16px;color:var(--color-neutral-700)">plugin maison, couche « arrière-plan » · effort moyen</span></div>
+    <div style="display:flex;gap:40px;align-items:flex-start;flex-wrap:wrap">
+      <div style="position:relative;width:960px;height:540px;overflow:hidden;background:var(--wall,#e8431c);font-family:'Space Mono',monospace;color:#121010">
+        <div style="position:absolute;left:342px;top:132px;width:276px;height:276px;border-radius:50%;background:#121010"></div>
+        <div style="position:absolute;left:0;right:0;top:110px;text-align:center;font-family:'Anton',sans-serif;font-size:140px;line-height:.9;color:#f1e7d6">SIG<br>NAL</div>
+        <div style="position:absolute;left:0;right:0;top:0;height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:10px;letter-spacing:.08em;background:#121010;color:#f1e7d6">
+          <div style="display:flex;gap:12px;font-weight:700"><span style="color:var(--acc,#ff4a1c)">● 1</span><span>2</span><span>3</span></div><span>JEUDI 14:32</span><span style="color:#b5aa9a">VOL 62</span>
+        </div>
+        <div style="position:absolute;left:40px;bottom:40px;display:flex;flex-direction:column;gap:14px;width:240px">
+          <div style="display:flex;flex-direction:column;gap:2px"><span style="font-family:'Anton',sans-serif;font-size:64px;line-height:1;color:#f1e7d6">14:32</span><span style="font-size:10px;letter-spacing:.24em;font-weight:700">JEUDI 05 NOVEMBRE</span></div>
+          <div style="height:2px;background:#121010;width:40px"></div>
+          <div style="display:flex;flex-direction:column;gap:2px;font-size:10px;letter-spacing:.14em;font-weight:700;line-height:1.6"><span style="opacity:.7">MÉTÉO · PARIS</span><span style="font-family:'Anton',sans-serif;font-size:28px;letter-spacing:0;font-weight:400;color:#f1e7d6">12°</span><span>NUAGEUX · MAX 15°</span></div>
+        </div>
+        <div style="position:absolute;right:40px;bottom:40px;width:240px;display:flex;flex-direction:column;gap:6px;font-size:10px;letter-spacing:.14em;font-weight:700;line-height:1.6;text-align:right">
+          <span style="opacity:.7">EN LECTURE</span>
+          <span style="font-family:'Anton',sans-serif;font-size:24px;letter-spacing:0;font-weight:400;line-height:1.05;color:#f1e7d6">TITRE DU MORCEAU</span>
+          <span>ARTISTE</span>
+          <div style="height:2px;background:rgba(18,16,16,.3);margin-top:4px"><div style="width:42%;height:2px;background:#121010"></div></div>
+          <span style="opacity:.7">1:38 / 3:54</span>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;max-width:440px;font-size:15px;line-height:1.6">
+        <strong>Règles</strong>
+        <ul style="margin:0;padding-left:20px">
+          <li>Deux colonnes collées aux coins bas, marge 4 % de l'écran. Le centre reste au titre.</li>
+          <li>Heure, chiffres clés et titre du morceau : Anton crème. Étiquettes : Space Mono 700, capitales, noir.</li>
+          <li>Aucun fond ni cadre. Un seul trait noir de 2 px (séparateur, barre de lecture).</li>
+          <li>Le bloc musique disparaît quand rien ne joue.</li>
+          <li>Mise à jour : heure à chaque minute, météo toutes les 30 min.</li>
+          <li>Sur le Koorui vertical : pas de widgets, le fond vertical suffit.</li>
+          <li>Thème Vert billard ou Cramoisi : les étiquettes noires passent en crème (contraste).</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="4b" style="display:flex;flex-direction:column;gap:20px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">4b</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Barre complète, dans ton ordre</h2><span style="font-size:16px;color:var(--color-neutral-700)">26 icônes SVG livrées · ici les vrais fichiers du zip</span></div>
+    <div style="background:#121010;color:#f1e7d6;padding:28px;display:flex;flex-direction:column;gap:24px;max-width:1968px;box-sizing:border-box;font-family:'Space Mono',monospace">
+      <div style="height:34px;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:0 16px;font-size:12px;letter-spacing:.08em;border:1px solid #3a3330">
+        <div style="display:flex;align-items:center;gap:14px;font-weight:700">
+          <span style="width:16px;height:16px;background:var(--acc,#ff4a1c);-webkit-mask:url('omarchy-signal/commun/icons/bar/menu.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/menu.svg') center/contain no-repeat"></span>
+          <span style="color:var(--acc,#ff4a1c)">1</span><span>2</span><span>3</span><span style="color:#6b625a">4</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:16px">
+          <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/dnd.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/dnd.svg') center/contain no-repeat"></span>
+          <span style="font-weight:700">JEUDI 14:32</span>
+          <span style="display:flex;align-items:center;gap:6px;color:#c9bfae"><span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/keyboard.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/keyboard.svg') center/contain no-repeat"></span>FR</span>
+          <span style="display:flex;align-items:center;gap:6px;color:#c9bfae"><span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/weather.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/weather.svg') center/contain no-repeat"></span>12°</span>
+          <span style="width:16px;height:16px;background:var(--acc,#ff4a1c);-webkit-mask:url('omarchy-signal/commun/icons/bar/mic-off.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/mic-off.svg') center/contain no-repeat"></span>
+          <span style="display:flex;align-items:center;gap:6px;color:#c9bfae"><span style="width:14px;height:14px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/media-pause.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/media-pause.svg') center/contain no-repeat"></span>TITRE — ARTISTE</span>
+          <span style="display:flex;align-items:center;gap:6px;color:#c9bfae"><span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/updates.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/updates.svg') center/contain no-repeat"></span>3</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:14px">
+          <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/tray.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/tray.svg') center/contain no-repeat"></span>
+          <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/tailscale.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/tailscale.svg') center/contain no-repeat"></span>
+          <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/ai.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/ai.svg') center/contain no-repeat"></span>
+          <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/bluetooth.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/bluetooth.svg') center/contain no-repeat"></span>
+          <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/wifi.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/wifi.svg') center/contain no-repeat"></span>
+          <span style="display:flex;align-items:center;gap:6px;color:#c9bfae"><span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/volume.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/volume.svg') center/contain no-repeat"></span>62</span>
+          <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/display.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/display.svg') center/contain no-repeat"></span>
+          <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/power.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/power.svg') center/contain no-repeat"></span>
+        </div>
+      </div>
+      <div style="display:flex;gap:32px;align-items:flex-start;flex-wrap:wrap">
+        <div style="display:flex;flex-direction:column;gap:8px"><span style="font-size:10px;letter-spacing:.2em;color:#6b625a">BARRE VERTICALE (KOORUI) · HORLOGE « HH — MM »</span>
+          <div style="width:40px;padding:12px 0;display:flex;flex-direction:column;align-items:center;gap:12px;border:1px solid #3a3330;font-size:12px;font-weight:700">
+            <span style="width:16px;height:16px;background:var(--acc,#ff4a1c);-webkit-mask:url('omarchy-signal/commun/icons/bar/menu.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/menu.svg') center/contain no-repeat"></span>
+            <span style="color:var(--acc,#ff4a1c)">1</span><span>2</span>
+            <span style="height:12px"></span><span>14</span><span style="color:#6b625a">—</span><span>32</span><span style="height:12px"></span>
+            <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/wifi.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/wifi.svg') center/contain no-repeat"></span>
+            <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/volume.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/volume.svg') center/contain no-repeat"></span>
+            <span style="width:16px;height:16px;background:#c9bfae;-webkit-mask:url('omarchy-signal/commun/icons/bar/power.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/power.svg') center/contain no-repeat"></span>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;flex:1;min-width:400px"><span style="font-size:10px;letter-spacing:.2em;color:#6b625a">11 NOUVELLES ICÔNES</span>
+          <div style="display:grid;grid-template-columns:repeat(auto-fill,96px);gap:10px;font-size:10px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/keyboard.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/keyboard.svg') center/contain no-repeat"></span>clavier</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/weather.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/weather.svg') center/contain no-repeat"></span>météo</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/media-play.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/media-play.svg') center/contain no-repeat"></span>lecture</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/media-pause.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/media-pause.svg') center/contain no-repeat"></span>pause</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/music.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/music.svg') center/contain no-repeat"></span>musique</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/updates.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/updates.svg') center/contain no-repeat"></span>mises à jour</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/ai.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/ai.svg') center/contain no-repeat"></span>agents IA</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/network-wired.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/network-wired.svg') center/contain no-repeat"></span>réseau filaire</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/dnd.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/dnd.svg') center/contain no-repeat"></span>ne pas déranger</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/headphones.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/headphones.svg') center/contain no-repeat"></span>casque</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:8px;padding:14px 0;border:1px solid #3a3330"><span style="width:36px;height:36px;background:#f1e7d6;-webkit-mask:url('omarchy-signal/commun/icons/bar/tray.svg') center/contain no-repeat;mask:url('omarchy-signal/commun/icons/bar/tray.svg') center/contain no-repeat"></span>tray</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<section style="padding:64px 64px 72px;display:flex;flex-direction:column;gap:64px;border-bottom:2px solid var(--color-neutral-300)">
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:960px">
+    <div style="font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Tour 3 · détails</div>
+    <h1 style="margin:0;font-family:var(--font-heading);font-size:64px;line-height:1;font-weight:400">Polices, icônes, curseur</h1>
+    <p style="margin:0;font-size:18px;line-height:1.5;text-wrap:pretty">Les polices à leur vraie taille, là où elles apparaissent ; les icônes que je dessine (barre + web apps) ; le curseur. Tout suit la couleur choisie dans la barre ACCENT.</p>
+  </div>
+
+  <div id="3a" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">3a</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Polices en contexte</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,960px));gap:32px">
+      <div style="display:flex;flex-direction:column;gap:18px;background:#121010;color:#f1e7d6;padding:32px;font-family:'Space Mono',monospace">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px"><span style="font-size:28px;font-weight:700">SpaceMono Nerd Font</span><span style="font-size:11px;letter-spacing:.2em;color:var(--acc,#ff4a1c)">SYSTÈME · CHASSE FIXE</span></div>
+        <div style="font-size:18px;line-height:1.5;color:#c9bfae">Aa Bb Cc Dd Ee Ff Gg 0123456789<br>é è à ç ù « » → ❯ ● ■ □ ─ │ { } [ ] != &gt;=</div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:10px;letter-spacing:.2em;color:#6b625a">BARRE · 11 PX · CAPITALES, INTERLETTRAGE +8 %</span>
+          <div style="height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:11px;letter-spacing:.08em;border:1px solid #3a3330"><div style="display:flex;gap:12px;font-weight:700"><span style="color:var(--acc,#ff4a1c)">● 1</span><span>2</span><span>3</span></div><span>JEU 05 NOV · 14:32</span><span style="color:#b5aa9a">VOL 62</span></div></div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-size:10px;letter-spacing:.2em;color:#6b625a">TERMINAL / NEOVIM · 13 PX · INTERLIGNE 1.6</span>
+          <div style="font-size:13px;line-height:1.6;border:1px solid #3a3330;padding:12px 14px"><div><span style="color:#7aa2e8">~/code</span> <span style="color:#e07ab8">main</span> <span style="color:var(--acc,#ff4a1c)">❯</span> cat notes.md</div><div style="color:#c9bfae">Lundi — finir le thème, tester le Koorui.</div></div></div>
+        <div style="display:flex;gap:16px">
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-size:10px;letter-spacing:.2em;color:#6b625a">LANCEUR · 13 PX</span>
+            <div style="border:2px solid #f1e7d6;font-size:13px"><div style="padding:8px 12px">› ob</div><div style="background:var(--acc,#ff4a1c);color:#121010;font-weight:700;padding:5px 12px">Obsidian</div><div style="padding:5px 12px">Observer — btop</div></div></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-size:10px;letter-spacing:.2em;color:#6b625a">NOTIFICATION · 11 PX</span>
+            <div style="background:#f1e7d6;color:#121010;padding:10px 12px;font-size:11px;line-height:1.5"><div style="font-size:9px;letter-spacing:.14em;color:var(--deep,#c2340f);font-weight:700">WHATSAPP · 2 MIN</div><div style="font-weight:700">Léa</div><div>On se voit ce soir ?</div></div></div>
+        </div>
+        <div style="font-size:12px;line-height:1.6;color:#b5aa9a">Gras (700) pour l'élément actif et les titres ; régulier (400) partout ailleurs. Pas d'italique.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:18px;background:var(--wall,#e8431c);color:#121010;padding:32px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline;gap:16px;font-family:'Space Mono',monospace"><span style="font-family:'Anton',sans-serif;font-size:40px;line-height:1;color:#f1e7d6">ANTON</span><span style="font-size:11px;letter-spacing:.2em;font-weight:700">AFFICHAGE · IMAGES + QML</span></div>
+        <div style="font-family:'Anton',sans-serif;font-size:30px;line-height:1.15;color:#f1e7d6">ABCDEFGHIJKLM 0123456789 :</div>
+        <div style="display:flex;flex-direction:column;gap:6px"><span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;font-weight:700">VERROUILLAGE · HORLOGE ≈ 55 % DE LA HAUTEUR</span>
+          <div style="position:relative;height:170px;border:2px solid #121010;overflow:hidden"><div style="position:absolute;left:50%;top:22px;width:130px;height:130px;margin-left:-65px;border-radius:50%;background:#121010"></div><div style="position:absolute;left:0;right:0;top:4px;text-align:center;font-family:'Anton',sans-serif;font-size:150px;line-height:1;color:#f1e7d6">14:32</div></div></div>
+        <div style="display:flex;gap:16px">
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;font-weight:700">FOND D'ÉCRAN</span>
+            <div style="height:110px;border:2px solid #121010;display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:76px;color:#f1e7d6">SIGNAL</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;gap:6px"><span style="font-family:'Space Mono',monospace;font-size:10px;letter-spacing:.2em;font-weight:700">PLYMOUTH · LOGO</span>
+            <div style="height:110px;background:#121010;display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:56px;color:#f1e7d6">SIGNAL</div></div>
+        </div>
+        <div style="font-family:'Space Mono',monospace;font-size:12px;line-height:1.6;font-weight:700">Toujours en capitales, jamais sous 32 px. Anton n'a qu'une graisse : c'est voulu.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="3b" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">3b</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Icônes de la barre</h2><span style="font-size:16px;color:var(--color-neutral-700)">SVG 24×24 · une couleur · trait 2 px · bouts carrés · angles vifs</span></div>
+    <div style="background:#121010;color:#f1e7d6;padding:32px;display:flex;flex-direction:column;gap:28px;max-width:1968px;box-sizing:border-box">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,120px);gap:12px;font-family:'Space Mono',monospace;font-size:11px">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M3 9.5a13 13 0 0 1 18 0M6 13a8.5 8.5 0 0 1 12 0M9 16.5a4 4 0 0 1 6 0"></path><rect x="11" y="19" width="2" height="2" fill="currentColor" stroke="none"></rect></svg><span>wifi</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330;color:#6b625a"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M3 9.5a13 13 0 0 1 18 0M6 13a8.5 8.5 0 0 1 12 0M9 16.5a4 4 0 0 1 6 0M3 3l18 18"></path></svg><span>wifi coupé</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><path d="M3 9h4l5-4v14l-5-4H3z"></path><path d="M16 9a4 4 0 0 1 0 6M18.5 6a8 8 0 0 1 0 12"></path></svg><span>volume</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><path d="M3 9h4l5-4v14l-5-4H3z"></path><path d="M16 10l5 5M21 10l-5 5"></path></svg><span>muet</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="9" y="3" width="6" height="11"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8 21h8"></path></svg><span>micro</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330;color:var(--acc,#ff4a1c)"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="9" y="3" width="6" height="11"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M8 21h8M3 3l18 18"></path></svg><span>micro coupé</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="4" height="4" opacity=".3"></rect><rect x="10" y="3" width="4" height="4" opacity=".3"></rect><rect x="17" y="3" width="4" height="4" opacity=".3"></rect><rect x="3" y="10" width="4" height="4"></rect><rect x="10" y="10" width="4" height="4"></rect><rect x="17" y="10" width="4" height="4"></rect><rect x="3" y="17" width="4" height="4" opacity=".3"></rect><rect x="10" y="17" width="4" height="4"></rect><rect x="17" y="17" width="4" height="4" opacity=".3"></rect></svg><span>tailscale</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><path d="M6 7l11 10-5 4V3l5 4L6 17"></path></svg><span>bluetooth</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="2" y="7" width="17" height="10"></rect><path d="M22 10v4"></path><rect x="5" y="10" width="8" height="4" fill="currentColor" stroke="none"></rect></svg><span>batterie</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="8" y="8" width="8" height="8"></rect><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"></path></svg><span>luminosité</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square" stroke-linejoin="miter"><path d="M6 17v-7a6 6 0 0 1 12 0v7l2 2H4z"></path><path d="M10 22h4"></path></svg><span>notifications</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><path d="M12 2v9M7 5.5a7.5 7.5 0 1 0 10 0"></path></svg><span>alimentation</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="square"><rect x="2" y="4" width="20" height="13"></rect><path d="M8 21h8M12 17v4"></path></svg><span>écrans</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330;color:var(--acc,#ff4a1c)"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"></circle><circle cx="12" cy="12" r="4.5" fill="currentColor" stroke="none"></circle></svg><span>enregistrement</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;padding:18px 0;border:1px solid #3a3330"><svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"></circle></svg><span>menu (logo)</span></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px;font-family:'Space Mono',monospace">
+        <span style="font-size:10px;letter-spacing:.2em;color:#6b625a">TAILLE RÉELLE · 16 PX DANS LA BARRE</span>
+        <div style="height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:11px;letter-spacing:.08em;border:1px solid #3a3330">
+          <div style="display:flex;align-items:center;gap:14px;font-weight:700"><svg width="14" height="14" viewBox="0 0 24 24" fill="var(--acc,#ff4a1c)"><circle cx="12" cy="12" r="9"></circle></svg><span style="color:var(--acc,#ff4a1c)">1</span><span>2</span><span>3</span></div>
+          <span>JEU 05 NOV · 14:32</span>
+          <div style="display:flex;align-items:center;gap:14px;color:#c9bfae">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="10" width="4" height="4"></rect><rect x="10" y="10" width="4" height="4"></rect><rect x="17" y="10" width="4" height="4"></rect><rect x="10" y="17" width="4" height="4"></rect><rect x="3" y="3" width="4" height="4" opacity=".3"></rect><rect x="10" y="3" width="4" height="4" opacity=".3"></rect><rect x="17" y="3" width="4" height="4" opacity=".3"></rect></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--acc,#ff4a1c)" stroke-width="2.4" stroke-linecap="square"><rect x="9" y="3" width="6" height="11"></rect><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21M3 3l18 18"></path></svg>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><path d="M3 9.5a13 13 0 0 1 18 0M6 13a8.5 8.5 0 0 1 12 0M9 16.5a4 4 0 0 1 6 0"></path></svg>
+            <span style="display:flex;align-items:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><path d="M3 9h4l5-4v14l-5-4H3z"></path><path d="M16 9a4 4 0 0 1 0 6"></path></svg>62</span>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square"><path d="M12 2v9M7 5.5a7.5 7.5 0 1 0 10 0"></path></svg>
+          </div>
+        </div>
+        <span style="font-size:12px;color:#b5aa9a;line-height:1.6">Le trait passe à 2,4 px sous 18 px pour rester net. L'accent ne sert qu'aux états d'alerte (micro coupé, enregistrement) et au bureau actif.</span>
+      </div>
+    </div>
+  </div>
+
+  <div id="3c" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">3c</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Icônes des web apps</h2><span style="font-size:16px;color:var(--color-neutral-700)">PNG 512×512 · carré noir, disque de la couleur du thème, logo officiel actuel en crème</span></div>
+    <div style="display:flex;flex-wrap:wrap;gap:24px;font-family:'Space Mono',monospace;font-size:12px">
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><div style="position:relative;width:128px;height:128px;background:#121010;display:flex;align-items:center;justify-content:center"><div style="width:96px;height:96px;border-radius:50%;background:var(--wall,#e8431c);display:flex;align-items:center;justify-content:center"><img src="https://cdn.simpleicons.org/youtube/f1e7d6" alt="YouTube" style="width:46px;height:46px;display:block"></div></div><span>YouTube</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><div style="position:relative;width:128px;height:128px;background:#121010;display:flex;align-items:center;justify-content:center"><div style="width:96px;height:96px;border-radius:50%;background:var(--wall,#e8431c);display:flex;align-items:center;justify-content:center"><img src="https://cdn.simpleicons.org/whatsapp/f1e7d6" alt="WhatsApp" style="width:46px;height:46px;display:block"></div></div><span>WhatsApp</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><div style="position:relative;width:128px;height:128px;background:#121010;display:flex;align-items:center;justify-content:center"><div style="width:96px;height:96px;border-radius:50%;background:var(--wall,#e8431c);display:flex;align-items:center;justify-content:center"><img src="https://cdn.simpleicons.org/googlephotos/f1e7d6" alt="Google Photos" style="width:46px;height:46px;display:block"></div></div><span>Google Photos</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><div style="position:relative;width:128px;height:128px;background:#121010;display:flex;align-items:center;justify-content:center"><div style="width:96px;height:96px;border-radius:50%;background:var(--wall,#e8431c);display:flex;align-items:center;justify-content:center"><img src="https://cdn.simpleicons.org/gmail/f1e7d6" alt="Gmail" style="width:46px;height:46px;display:block"></div></div><span>Gmail</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><div style="position:relative;width:128px;height:128px;background:#121010;display:flex;align-items:center;justify-content:center"><div style="width:96px;height:96px;border-radius:50%;background:var(--wall,#e8431c);display:flex;align-items:center;justify-content:center"><img src="https://cdn.simpleicons.org/claude/f1e7d6" alt="Claude" style="width:46px;height:46px;display:block"></div></div><span>Claude</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><div style="position:relative;width:128px;height:128px;background:#121010;display:flex;align-items:center;justify-content:center"><div style="width:96px;height:96px;border-radius:50%;background:var(--wall,#e8431c);display:flex;align-items:center;justify-content:center"><img src="https://cdn.simpleicons.org/googlemaps/f1e7d6" alt="Google Maps" style="width:46px;height:46px;display:block"></div></div><span>Google Maps</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><div style="position:relative;width:128px;height:128px;background:#121010;display:flex;align-items:center;justify-content:center"><div style="width:96px;height:96px;border-radius:50%;background:var(--wall,#e8431c);display:flex;align-items:center;justify-content:center"><img src="https://cdn.simpleicons.org/discord/f1e7d6" alt="Discord" style="width:46px;height:46px;display:block"></div></div><span>Discord</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;align-items:flex-start"><div style="position:relative;width:128px;height:128px;background:#121010;display:flex;align-items:center;justify-content:center"><div style="width:96px;height:96px;border-radius:50%;background:var(--wall,#e8431c);display:flex;align-items:center;justify-content:center"><img src="https://cdn.simpleicons.org/github/f1e7d6" alt="GitHub" style="width:46px;height:46px;display:block"></div></div><span>GitHub</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px;max-width:320px;font-family:var(--font-body);font-size:14px;line-height:1.5;color:var(--color-neutral-800)"><strong>Règle :</strong> disque à 75 % du carré, logo à 36 % du carré, toujours crème #f1e7d6. Logos monochromes officiels (bibliothèque Simple Icons, à jour). Envoie-moi la liste complète de tes web apps pour les autres.</div>
+    </div>
+  </div>
+
+  <div id="3d" style="display:flex;flex-direction:column;gap:24px">
+    <div style="display:flex;align-items:baseline;gap:16px;flex-wrap:wrap"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">3d</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Curseur</h2></div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,640px));gap:32px">
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:var(--wall,#e8431c);padding:32px;display:flex;gap:40px;align-items:center;font-family:'Space Mono',monospace;font-size:11px;color:#121010;font-weight:700">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><svg width="40" height="48" viewBox="0 0 20 24"><path d="M2 2v18l5-5 3.5 7 3-1.5-3.5-7H17z" fill="#121010" stroke="#f1e7d6" stroke-width="1.5" stroke-linejoin="round"></path></svg>flèche</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><svg width="40" height="48" viewBox="0 0 20 24"><path d="M7 2.5a1.5 1.5 0 0 1 3 0V10l4 .8c1.5.3 2.5 1.4 2.5 3V18c0 2.5-2 4.5-4.5 4.5H10c-1.5 0-2.8-.8-3.6-2L3 15c-.6-.8-.3-1.9.6-2.3.7-.3 1.5 0 2 .6L7 15z" fill="#121010" stroke="#f1e7d6" stroke-width="1.5" stroke-linejoin="round"></path></svg>lien</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><svg width="40" height="48" viewBox="0 0 20 24"><path d="M6 2h8M6 22h8M10 2v20" stroke="#f1e7d6" stroke-width="4" stroke-linecap="round"></path><path d="M6 2h8M6 22h8M10 2v20" stroke="#121010" stroke-width="1.6"></path></svg>texte</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><svg width="40" height="48" viewBox="0 0 20 24"><circle cx="10" cy="12" r="7" fill="none" stroke="#f1e7d6" stroke-width="4"></circle><path d="M10 5a7 7 0 0 1 7 7" fill="none" stroke="#121010" stroke-width="3"></path></svg>attente</div>
+        </div>
+        <div style="font-size:15px;line-height:1.6"><strong>Recommandé : Bibata Modern Classic</strong> (thème existant, noir à contour clair, taille 24). Effort nul, il va avec toutes les couleurs d'accent.</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:14px">
+        <div style="background:#121010;padding:32px;display:flex;gap:40px;align-items:center;font-family:'Space Mono',monospace;font-size:11px;color:#f1e7d6;font-weight:700">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><svg width="40" height="48" viewBox="0 0 20 24"><path d="M2 2v18l5-5 3.5 7 3-1.5-3.5-7H17z" fill="#f1e7d6" stroke="#121010" stroke-width="1.5" stroke-linejoin="miter"></path><circle cx="5" cy="9" r="1.8" fill="var(--acc,#ff4a1c)"></circle></svg>flèche</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><svg width="40" height="48" viewBox="0 0 20 24"><path d="M2 2v18l5-5 3.5 7 3-1.5-3.5-7H17z" fill="var(--acc,#ff4a1c)" stroke="#121010" stroke-width="1.5" stroke-linejoin="miter"></path></svg>lien</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><svg width="40" height="48" viewBox="0 0 20 24"><path d="M6 2h8M6 22h8M10 2v20" stroke="#f1e7d6" stroke-width="2" stroke-linecap="square"></path></svg>texte</div>
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px"><svg width="40" height="48" viewBox="0 0 20 24"><circle cx="10" cy="12" r="7" fill="var(--acc,#ff4a1c)"></circle><circle cx="10" cy="12" r="3" fill="#121010"></circle></svg>attente (pulse)</div>
+        </div>
+        <div style="font-size:15px;line-height:1.6"><strong>Option sur mesure « Signal »</strong> : flèche crème marquée d'un point d'accent, lien plein d'accent, attente = disque qui pulse. Il faut ~20 formes en 3 tailles. <strong>Effort moyen à élevé</strong> : à garder pour plus tard.</div>
+      </div>
+    </div>
+  </div>
+
+  <div id="3e" style="display:grid;grid-template-columns:repeat(2,minmax(0,640px));gap:48px">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;align-items:baseline;gap:16px"><span style="background:var(--color-text);color:var(--color-bg);border-radius:999px;padding:4px 14px;font-weight:700;font-size:16px">3e</span><h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Ce qui pourrait encore suivre le thème</h2></div>
+      <ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.7">
+        <li><strong>Jauge volume / luminosité (OSD)</strong> : barre noire fine, remplissage accent, chiffre en Space Mono. Couleurs seules = rien à faire.</li>
+        <li><strong>Capture d'écran</strong> : cadre de sélection en accent, fond assombri. Réglage simple.</li>
+        <li><strong>Gestionnaire de fichiers (Nautilus) et apps GTK/Qt</strong> : mode sombre + icônes Yaru-red ; vérifier qu'elles suivent bien.</li>
+        <li><strong>Spotify</strong> (Spicetify), <strong>Discord</strong> (Vesktop), <strong>Obsidian</strong>, <strong>Steam</strong> : thèmes à part, générables depuis colors.toml. Effort faible à moyen chacun.</li>
+        <li><strong>Sons</strong> : un son de notification et de verrouillage sobre (un « clic » sec). Effort faible.</li>
+        <li><strong>fastfetch</strong> (« À propos ») : disposition des infos à droite du disque, étiquettes en accent.</li>
+        <li><strong>Widgets de bureau</strong> sur l'écran horizontal (heure, météo, musique, posés sur le fond) : dépend de ce que le shell permet → question 1 ci-contre.</li>
+      </ul>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:36px">Questions pour Claude Code</h2>
+      <pre style="margin:0;background:#121010;color:#f1e7d6;padding:24px;border-radius:var(--radius-lg);font-family:'Space Mono',monospace;font-size:12.5px;line-height:1.6;white-space:pre-wrap">1. Le shell Omarchy (plugins QML) permet-il des widgets
+   posés sur le bureau, sous les fenêtres ? Lesquels existent
+   (horloge, météo, lecteur média) ?
+2. L'écran de verrouillage peut-il afficher un contenu
+   différent par écran (grande horloge sur le Koorui,
+   titre + widgets sur l'écran principal) ?
+3. Résolution et nom de sortie exacts des deux écrans
+   (hyprctl monitors) ?
+4. Liste complète des web apps installées et des icônes
+   de la barre utilisées (widgets, plugins, Tailscale…) ?
+5. Le fond d'écran peut-il être différent par écran avec
+   le changement de fond d'Omarchy ?
+6. Les noms exacts des clés de couleur dans limine.conf
+   pour la version installée ?
+7. Peut-on avoir 3 thèmes (vermillon, cramoisi,
+   vert-billard) qui partagent les mêmes fichiers
+   (polices, QML) et ne diffèrent que par colors.toml
+   et les images ?</pre>
+    </div>
+  </div>
+</section>
+<section style="padding:64px 64px 120px;display:flex;flex-direction:column;gap:48px">
+  <div style="display:flex;flex-direction:column;gap:10px;max-width:960px">
+    <div style="font-size:14px;letter-spacing:.12em;text-transform:uppercase;color:var(--color-accent-700)">Tour 2 · direction <a href="Directions Omarchy.dc.html#1c">1c</a> retenue</div>
+    <h1 style="margin:0;font-family:var(--font-heading);font-size:64px;line-height:1;font-weight:400">Vermillon</h1>
+    <p style="margin:0;font-size:18px;line-height:1.5;text-wrap:pretty">Chaque écran dans l'ordre d'apparition, puis l'écran vertical, puis la fiche technique pour Claude Code. Sous chaque maquette : ce qui la produit et l'effort.</p>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(2,960px);gap:56px 48px">
+
+    <!-- 01 LIMINE -->
+    <div id="2-01" data-screen-label="01 Limine" style="display:flex;flex-direction:column;gap:12px">
+      <div style="position:relative;width:960px;height:540px;overflow:hidden;background:#121010;font-family:'Space Mono',monospace;font-size:14px;color:#f1e7d6">
+        <div style="position:absolute;right:-90px;top:120px;width:400px;height:400px;border-radius:50%;background:var(--wall,#e8431c)"></div>
+        <div style="position:absolute;left:0;right:0;top:28px;text-align:center;color:var(--acc,#ff4a1c);font-weight:700;letter-spacing:.3em">VERMILLON</div>
+        <div style="position:absolute;left:60px;top:76px;width:520px;border:1px solid #6b625a;padding:14px 0;display:flex;flex-direction:column">
+          <div style="background:var(--acc,#ff4a1c);color:#121010;padding:2px 16px;font-weight:700">▸ Omarchy</div>
+          <div style="padding:2px 16px">&nbsp; Windows Boot Manager</div>
+          <div style="padding:2px 16px;color:#6b625a">&nbsp; Snapshots</div>
+        </div>
+        <div style="position:absolute;left:60px;bottom:40px;color:#6b625a">Booting automatically in <span style="color:#f1e7d6">10</span>, press any key to stop.</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:16px;font-size:15px"><span><strong>01 · Menu de démarrage</strong> — Limine</span><span style="color:var(--color-neutral-700)">limine.conf + 1 image BMP/PNG · effort faible</span></div>
+    </div>
+
+    <!-- 02 PLYMOUTH -->
+    <div id="2-02" data-screen-label="02 Plymouth" style="display:flex;flex-direction:column;gap:12px">
+      <div style="position:relative;width:960px;height:540px;overflow:hidden;background:var(--wall,#e8431c);font-family:'Space Mono',monospace;color:#121010">
+        <div style="position:absolute;left:380px;top:110px;width:200px;height:200px;border-radius:50%;background:#121010"></div>
+        <div style="position:absolute;left:0;right:0;top:140px;text-align:center;font-family:'Anton',sans-serif;font-size:130px;line-height:1;color:#f1e7d6">SIGNAL</div>
+        <div style="position:absolute;left:330px;top:350px;width:300px;height:40px;background:#121010;display:flex;align-items:center;justify-content:center;gap:10px">
+          <span style="width:8px;height:8px;background:#f1e7d6"></span><span style="width:8px;height:8px;background:#f1e7d6"></span><span style="width:8px;height:8px;background:#f1e7d6"></span><span style="width:8px;height:8px;background:#f1e7d6"></span><span style="width:8px;height:8px;background:#f1e7d6"></span><span style="width:2px;height:18px;background:var(--acc,#ff4a1c)"></span>
+        </div>
+        <div style="position:absolute;left:0;right:0;top:402px;text-align:center;font-size:11px;letter-spacing:.24em;font-weight:700">PHRASE DE PASSE DU DISQUE</div>
+        <div style="position:absolute;left:330px;top:500px;width:300px;height:2px;background:rgba(18,16,16,.25)"><div style="width:38%;height:2px;background:#121010"></div></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:16px;font-size:15px"><span><strong>02 · Déverrouillage du disque</strong> — Plymouth</span><span style="color:var(--color-neutral-700)">fond uni + PNG (logo, champ, point, barre) · effort faible</span></div>
+    </div>
+
+    <!-- 03 DESKTOP -->
+    <div id="2-03" data-screen-label="03 Bureau" style="display:flex;flex-direction:column;gap:12px">
+      <div style="position:relative;width:960px;height:540px;overflow:hidden;background:var(--wall,#e8431c);font-family:'Space Mono',monospace;color:#f1e7d6">
+        <div style="position:absolute;left:360px;top:128px;width:326px;height:326px;border-radius:50%;background:#121010"></div>
+        <div style="position:absolute;left:20px;right:20px;top:100px;font-family:'Anton',sans-serif;font-size:284px;line-height:.9;text-align:center">SIGNAL</div>
+        <div style="position:absolute;left:0;right:0;top:0;height:24px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;font-size:10px;letter-spacing:.08em;background:#121010">
+          <div style="display:flex;gap:12px;font-weight:700"><span style="color:var(--acc,#ff4a1c)">● 1</span><span>2</span><span>3</span><span style="color:#6b625a">4</span><span style="color:#6b625a">5</span></div>
+          <div>JEU 05 NOV · 14:32</div>
+          <div style="display:flex;gap:14px;color:#b5aa9a"><span>TS ●</span><span>MIC</span><span>WIFI</span><span>VOL 62</span></div>
+        </div>
+        <div style="position:absolute;left:16px;top:40px;width:448px;bottom:16px;border:3px solid #f1e7d6;background:rgba(18,16,16,.94);padding:16px 18px;font-size:11px;line-height:1.8;box-sizing:border-box">
+          <div><span style="color:#7aa2e8">~/code</span> <span style="color:#e07ab8">main</span> <span style="color:var(--acc,#ff4a1c)">❯</span> ls</div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap"><span style="color:#7aa2e8">aquarium/</span><span style="color:#7aa2e8">notes/</span><span>todo.md</span><span style="color:#e07ab8">cover.png</span><span style="color:#9cc77a">build.sh</span></div>
+          <div><span style="color:#7aa2e8">~/code</span> <span style="color:#e07ab8">main</span> <span style="color:var(--acc,#ff4a1c)">❯</span> git status -s</div>
+          <div><span style="color:#f2c84b"> M</span> todo.md</div>
+          <div><span style="color:#ff5a4a">??</span> cover.png</div>
+          <div><span style="color:#7aa2e8">~/code</span> <span style="color:#e07ab8">main</span> <span style="color:var(--acc,#ff4a1c)">❯</span> ping -c1 archlinux.org</div>
+          <div style="color:#c9bfae">64 bytes · time=<span style="color:#6cc4c0">18.4 ms</span></div>
+          <div><span style="color:#7aa2e8">~/code</span> <span style="color:#e07ab8">main</span> <span style="color:var(--acc,#ff4a1c)">❯</span> <span style="background:var(--acc,#ff4a1c)">&nbsp;</span></div>
+        </div>
+        <div style="position:absolute;left:480px;right:16px;top:40px;bottom:16px;border:3px solid #121010;background:rgba(18,16,16,.9);padding:16px 18px;font-size:11px;line-height:1.8;box-sizing:border-box">
+          <div style="color:#6b625a;margin-bottom:4px">build.sh</div>
+          <div><span style="color:#6b625a">1 </span> <span style="color:#6b625a">#!/usr/bin/env bash</span></div>
+          <div><span style="color:#6b625a">2 </span> <span style="color:#e07ab8">set</span> -euo pipefail</div>
+          <div><span style="color:#6b625a">3 </span> <span style="color:#f2c84b">THEME</span>=<span style="color:#9cc77a">"vermillon"</span></div>
+          <div style="background:var(--sel,#3a1d14)"><span style="color:#6b625a">4 </span> <span style="color:#e07ab8">for</span> f <span style="color:#e07ab8">in</span> backgrounds/*.png; <span style="color:#e07ab8">do</span></div>
+          <div><span style="color:#6b625a">5 </span>   <span style="color:#7aa2e8">echo</span> <span style="color:#9cc77a">"→ $f"</span> <span style="color:#6cc4c0">&gt;&amp;2</span></div>
+          <div><span style="color:#6b625a">6 </span> <span style="color:#e07ab8">done</span></div>
+          <div style="position:absolute;left:0;right:0;bottom:0;padding:3px 18px;font-size:10px;background:var(--acc,#ff4a1c);color:#121010;display:flex;justify-content:space-between;font-weight:700"><span>NORMAL</span><span>sh · 4:12</span></div>
+        </div>
+        <div style="position:absolute;right:28px;top:48px;width:260px;background:#f1e7d6;color:#121010;padding:12px 14px;font-size:10.5px;line-height:1.5;border:3px solid #121010">
+          <div style="letter-spacing:.14em;font-size:9px;color:var(--deep,#c2340f);font-weight:700">SPOTIFY · MAINTENANT</div>
+          <div style="margin-top:3px;font-weight:700">Lecture en cours</div>
+          <div>Titre — Artiste</div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:16px;font-size:15px"><span><strong>03 · Bureau</strong> — terminal, Neovim, notification</span><span style="color:var(--color-neutral-700)">colors.toml + looknfeel.lua · effort faible</span></div>
+    </div>
+
+    <!-- 04 LAUNCHER -->
+    <div id="2-04" data-screen-label="04 Lanceur" style="display:flex;flex-direction:column;gap:12px">
+      <div style="position:relative;width:960px;height:540px;overflow:hidden;background:var(--wall,#e8431c);font-family:'Space Mono',monospace;color:#f1e7d6">
+        <div style="position:absolute;left:360px;top:128px;width:326px;height:326px;border-radius:50%;background:#121010"></div>
+        <div style="position:absolute;left:20px;right:20px;top:100px;font-family:'Anton',sans-serif;font-size:284px;line-height:.9;text-align:center">SIGNAL</div>
+        <div style="position:absolute;inset:0;background:rgba(18,16,16,.55)"></div>
+        <div style="position:absolute;left:0;right:0;top:0;height:24px;background:#121010"></div>
+        <div style="position:absolute;left:250px;top:110px;width:460px;background:#121010;border:3px solid #f1e7d6;font-size:13px">
+          <div style="display:flex;align-items:center;gap:10px;padding:14px 18px;border-bottom:1px solid #3a3330"><span style="color:var(--acc,#ff4a1c);font-weight:700">›</span><span>ch</span><span style="width:2px;height:16px;background:var(--acc,#ff4a1c)"></span></div>
+          <div style="display:flex;flex-direction:column;padding:8px 0">
+            <div style="background:var(--acc,#ff4a1c);color:#121010;font-weight:700;padding:7px 18px;display:flex;justify-content:space-between"><span>Chromium</span><span>↵</span></div>
+            <div style="padding:7px 18px">Chat — WhatsApp</div>
+            <div style="padding:7px 18px">Choisir un fond d'écran</div>
+            <div style="padding:7px 18px">Changer de thème</div>
+            <div style="padding:7px 18px;color:#6b625a">Character map</div>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:16px;font-size:15px"><span><strong>04 · Lanceur</strong> — Super + Espace</span><span style="color:var(--color-neutral-700)">couleurs + police seulement · effort nul</span></div>
+    </div>
+
+    <!-- 05 LOCK -->
+    <div id="2-05" data-screen-label="05 Verrouillage" style="display:flex;flex-direction:column;gap:12px">
+      <div style="position:relative;width:960px;height:540px;overflow:hidden;background:var(--wall,#e8431c);font-family:'Space Mono',monospace;color:#121010">
+        <div style="position:absolute;left:360px;top:110px;width:300px;height:300px;border-radius:50%;background:#121010"></div>
+        <div style="position:absolute;left:20px;right:20px;top:90px;font-family:'Anton',sans-serif;font-size:270px;line-height:.9;text-align:center;color:#f1e7d6">SIGNAL</div>
+        <div style="position:absolute;right:40px;top:36px;font-size:11px;letter-spacing:.24em;line-height:1.8;font-weight:700;text-align:right">VERROUILLÉ<br>────</div>
+        <div style="position:absolute;left:40px;top:28px;display:flex;flex-direction:column;gap:2px"><span style="font-family:'Anton',sans-serif;font-size:56px;line-height:1;color:#f1e7d6">14:32</span><span style="font-size:11px;letter-spacing:.24em;font-weight:700">JEUDI 05 NOV</span></div>
+        <div style="position:absolute;left:40px;bottom:36px;display:flex;gap:28px;font-size:11px;letter-spacing:.14em;font-weight:700;line-height:1.6">
+          <div style="display:flex;flex-direction:column"><span style="opacity:.7">MÉTÉO</span><span>12° · NUAGEUX</span></div>
+          <div style="display:flex;flex-direction:column"><span style="opacity:.7">MUSIQUE</span><span>TITRE — ARTISTE</span></div>
+          <div style="display:flex;flex-direction:column"><span style="opacity:.7">BATTERIE CASQUE</span><span>74 %</span></div>
+        </div>
+        <div style="position:absolute;right:40px;bottom:30px;width:300px;height:44px;background:#121010;display:flex;align-items:center;padding:0 16px;gap:10px;box-sizing:border-box">
+          <span style="width:8px;height:8px;background:#f1e7d6"></span><span style="width:8px;height:8px;background:#f1e7d6"></span><span style="width:8px;height:8px;background:#f1e7d6"></span><span style="width:2px;height:18px;background:var(--acc,#ff4a1c)"></span>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:16px;font-size:15px"><span><strong>05 · Écran de verrouillage</strong> — horizontal : titre + petits widgets ; la grande horloge passe sur le Koorui (07)</span><span style="color:var(--color-neutral-700)">copie QML de omarchy.lock · effort moyen</span></div>
+    </div>
+
+    <!-- 06 SCREENSAVER -->
+    <div id="2-06" data-screen-label="06 Veille" style="display:flex;flex-direction:column;gap:12px">
+      <div style="position:relative;width:960px;height:540px;overflow:hidden;background:#121010;font-family:'Space Mono',monospace;color:#f1e7d6;display:flex;align-items:center;justify-content:center">
+        <pre style="margin:0;font-family:'Space Mono',monospace;font-size:15px;line-height:1.05">███████╗██╗ ██████╗ ███╗   ██╗ █████╗ ██╗
+██╔════╝██║██╔════╝ ████╗  ██║██╔══██╗██║
+███████╗██║██║  ███╗██╔██╗ ██║███████║██║
+╚════██║██║██║   ██║██║╚██╗██║██╔══██║██║
+███████║██║╚██████╔╝██║ ╚████║██║  ██║███████╗
+╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝</pre>
+        <div style="position:absolute;left:300px;top:120px;color:var(--acc,#ff4a1c);font-size:15px">█</div>
+        <div style="position:absolute;left:520px;top:80px;color:#6b625a;font-size:15px">╗</div>
+        <div style="position:absolute;left:610px;top:150px;color:var(--acc,#ff4a1c);font-size:15px">║</div>
+        <div style="position:absolute;left:410px;top:400px;color:#6b625a;font-size:15px">═</div>
+        <div style="position:absolute;left:0;right:0;bottom:36px;text-align:center;font-size:10px;letter-spacing:.3em;color:#6b625a">effet aléatoire en cours : pluie</div>
+      </div>
+      <div style="display:flex;justify-content:space-between;gap:16px;font-size:15px"><span><strong>06 · Écran de veille</strong> — après 150 s</span><span style="color:var(--color-neutral-700)">screensaver.txt · effort nul</span></div>
+    </div>
+  </div>
+
+  <!-- VERTICAL -->
+  <div id="2-07" data-screen-label="07 Koorui vertical" style="display:flex;flex-direction:column;gap:16px">
+    <div style="font-size:15px"><strong>07 · Écran vertical Koorui</strong> <span style="color:var(--color-neutral-700)">— bureau vide, deux fenêtres empilées, verrouillage</span></div>
+    <div style="display:flex;gap:40px;align-items:flex-start">
+      <div style="position:relative;width:304px;height:540px;overflow:hidden;background:var(--wall,#e8431c);font-family:'Space Mono',monospace;color:#f1e7d6">
+        <div style="position:absolute;left:0;right:0;top:0;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:9px;background:#121010"><span style="color:var(--acc,#ff4a1c);font-weight:700">● 6</span><span>14:32</span></div>
+        <div style="position:absolute;left:38px;top:200px;width:228px;height:228px;border-radius:50%;background:#121010"></div>
+        <div style="position:absolute;left:0;right:0;top:60px;font-family:'Anton',sans-serif;font-size:124px;line-height:.86;text-align:center">SIG<br>NAL</div>
+        <div style="position:absolute;right:16px;bottom:16px;font-size:8px;letter-spacing:.2em;color:#121010;font-weight:700">03 / 03</div>
+      </div>
+      <div style="position:relative;width:304px;height:540px;overflow:hidden;background:var(--wall,#e8431c);font-family:'Space Mono',monospace;color:#f1e7d6">
+        <div style="position:absolute;left:0;right:0;top:0;height:20px;display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-size:9px;background:#121010"><span style="color:var(--acc,#ff4a1c);font-weight:700">● 6</span><span>14:32</span></div>
+        <div style="position:absolute;left:12px;right:12px;top:32px;height:240px;border:3px solid #f1e7d6;background:rgba(18,16,16,.94);padding:12px;font-size:9.5px;line-height:1.7;box-sizing:border-box">
+          <div style="color:var(--acc,#ff4a1c);font-weight:700">btop</div>
+          <div>cpu <span style="color:#9cc77a">▁▂▃▅▂▁▁▂▆▃▂▁▂▃</span> 12%</div>
+          <div>mem <span style="color:#ff8a3d">██████░░░░░░░░</span> 5.8G</div>
+          <div>gpu <span style="color:#7aa2e8">███░░░░░░░░░░░</span> 21%</div>
+          <div>net <span style="color:#6cc4c0">▂▁▁▃▁▁▂▁▁▁▁▂▁▁</span></div>
+        </div>
+        <div style="position:absolute;left:12px;right:12px;top:284px;bottom:12px;border:3px solid #121010;background:rgba(18,16,16,.9);padding:12px;font-size:9.5px;line-height:1.7;box-sizing:border-box">
+          <div style="color:#6b625a">obsidian · notes</div>
+          <div style="font-family:'Anton',sans-serif;font-size:22px;margin:6px 0">À FAIRE</div>
+          <div><span style="color:var(--acc,#ff4a1c)">■</span> fond 4K vertical</div>
+          <div><span style="color:#6b625a">□</span> plymouth png</div>
+          <div><span style="color:#6b625a">□</span> lock qml</div>
+        </div>
+      </div>
+      <div style="position:relative;width:304px;height:540px;overflow:hidden;background:var(--wall,#e8431c);font-family:'Space Mono',monospace;color:#121010">
+        <div style="position:absolute;left:32px;top:150px;width:240px;height:240px;border-radius:50%;background:#121010"></div>
+        <div style="position:absolute;left:0;right:0;top:120px;text-align:center;font-family:'Anton',sans-serif;font-size:150px;line-height:.9;color:#f1e7d6">14<br>32</div>
+        <div style="position:absolute;left:20px;top:24px;font-size:8px;letter-spacing:.24em;line-height:1.8;font-weight:700">JEUDI<br>05 NOVEMBRE</div>
+        <div style="position:absolute;left:52px;right:52px;bottom:60px;height:34px;background:#121010;display:flex;align-items:center;padding:0 12px;gap:8px">
+          <span style="width:6px;height:6px;background:#f1e7d6"></span><span style="width:6px;height:6px;background:#f1e7d6"></span><span style="width:2px;height:14px;background:var(--acc,#ff4a1c)"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FICHE TECHNIQUE -->
+  <div id="2-fiche" data-screen-label="08 Fiche technique" style="display:flex;flex-direction:column;gap:32px;max-width:1968px">
+    <h2 style="margin:0;font-family:var(--font-heading);font-weight:400;font-size:44px">Fiche technique</h2>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(600px,1fr));gap:32px;align-items:start">
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <h3 style="margin:0;font-size:20px">colors.toml</h3>
+        <pre style="margin:0;background:#121010;color:#f1e7d6;padding:24px;border-radius:var(--radius-lg);font-family:'Space Mono',monospace;font-size:13px;line-height:1.6;overflow:auto">mode = "dark"
+
+background         = "#121010"
+dark_background    = "#0c0a0a"
+darker_background  = "#070606"
+lighter_background = "#1e1a19"
+
+foreground         = "#f1e7d6"
+dark_foreground    = "#c9bfae"
+light_foreground   = "#f7f0e4"
+bright_foreground  = "#fffaf1"
+
+accent             = "{{ acc }}"
+selection          = "{{ sel }}"
+muted              = "#6b625a"
+
+red     = "#ff5a4a"    bright_red     = "#ff7d70"
+yellow  = "#f2c84b"    bright_yellow  = "#ffdb7a"
+orange  = "#ff8a3d"    bright_orange  = "#ffa86b"
+green   = "#9cc77a"    bright_green   = "#b7dc98"
+cyan    = "#6cc4c0"    bright_cyan    = "#93dbd7"
+blue    = "#7aa2e8"    bright_blue    = "#9dbcf2"
+magenta = "#e07ab8"    bright_magenta = "#ef9dcf"
+brown   = "#b08458"    bright_brown   = "#c9a07a"
+
+# hors palette, pour les images uniquement
+# wallpaper_fond = "{{ wall }}"</pre>
+        <p style="margin:0;font-size:14px;color:var(--color-neutral-700)">Une clé par ligne dans le vrai fichier (mise en deux colonnes ici pour la lecture). Le texte courant (#f1e7d6) sur le fond est à ~15:1 ; toutes les couleurs du terminal dépassent 6:1.</p>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <h3 style="margin:0;font-size:20px">Polices, icônes, curseur</h3>
+          <ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.7">
+            <li><strong>Système :</strong> <code>SpaceMono Nerd Font</code> (Nerd Fonts) — <code>omarchy font set "SpaceMono Nerd Font"</code></li>
+            <li><strong>Affichage :</strong> <code>Anton</code> (Google Fonts, OFL) — fonds, Plymouth, verrouillage</li>
+            <li><strong>Icônes d'apps :</strong> <code>Yaru-red</code> dans <code>icons.theme</code></li>
+            <li><strong>Curseur :</strong> <code>Bibata-Modern-Classic</code> (noir), taille 24</li>
+            <li><strong>Clavier Wooting :</strong> <code>{{ acc }}</code></li>
+            <li><strong>Neovim / VS Code :</strong> aucun thème existant ne colle ; laisser Omarchy les générer depuis colors.toml</li>
+          </ul>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <h3 style="margin:0;font-size:20px">Fenêtres — looknfeel.lua</h3>
+          <ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.7">
+            <li>Bordure <strong>3 px</strong> ; active <code>#f1e7d6</code>, inactive <code>#121010</code>. Pas de dégradé.</li>
+            <li>Arrondi <strong>0 px</strong>. Ombres <strong>désactivées</strong>.</li>
+            <li>Espaces : <strong>8 px</strong> entre fenêtres (gaps_in), <strong>16 px</strong> au bord (gaps_out).</li>
+            <li>Opacité : active <strong>0.94</strong>, inactive <strong>0.90</strong>.</li>
+            <li>Flou : activé, taille 8, 2 passes, vibrance 0 — juste assez pour lire le vermillon derrière.</li>
+          </ul>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <h3 style="margin:0;font-size:20px">Animations — ressenti « sec et net »</h3>
+          <ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.7">
+            <li>Courbe unique, départ rapide et arrêt doux : bézier <code>0.16, 1, 0.3, 1</code>.</li>
+            <li>Ouverture : <strong>popin 85 %</strong>, 220 ms.</li>
+            <li>Fermeture : <strong>popin 90 %</strong> + fondu, 150 ms (plus rapide qu'à l'ouverture).</li>
+            <li>Changement de bureau : <strong>slide</strong>, 260 ms. Sur le Koorui : <strong>slidevert</strong>.</li>
+            <li>Fondus (bordures, opacité) : 180 ms. Aucun rebond.</li>
+          </ul>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <h3 style="margin:0;font-size:20px">Démarrage</h3>
+          <ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.7">
+            <li><strong>Limine :</strong> branding <code>VERMILLON</code> en accent ; fond terminal <code>121010</code>, texte <code>f1e7d6</code> ; palette = les 8 couleurs ci-contre ; image <code>boot.png</code> : noir, disque vermillon débordant à droite. Noms exacts des clés à vérifier selon la version de Limine.</li>
+            <li><strong>Plymouth :</strong> fond uni <code>{{ wall }}</code>. PNG : <code>logo.png</code> (disque noir + SIGNAL crème, 600 px), <code>entry.png</code> (rectangle noir 300×40), <code>bullet.png</code> (carré crème 8 px), <code>progress_bar.png</code> (noir 2 px). Animation possible : le disque pulse (3 images, opacité 100 → 85 %).</li>
+          </ul>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <h3 style="margin:0;font-size:20px">screensaver.txt <span style="font-weight:400;color:var(--color-neutral-700)">· 46 colonnes</span></h3>
+        <pre style="margin:0;background:#121010;color:#f1e7d6;padding:24px;border-radius:var(--radius-lg);font-family:'Space Mono',monospace;font-size:13px;line-height:1.1;overflow:auto">███████╗██╗ ██████╗ ███╗   ██╗ █████╗ ██╗
+██╔════╝██║██╔════╝ ████╗  ██║██╔══██╗██║
+███████╗██║██║  ███╗██╔██╗ ██║███████║██║
+╚════██║██║██║   ██║██║╚██╗██║██╔══██║██║
+███████║██║╚██████╔╝██║ ╚████║██║  ██║███████╗
+╚══════╝╚═╝ ╚═════╝ ╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝</pre>
+        <h3 style="margin:16px 0 0;font-size:20px">about.txt <span style="font-weight:400;color:var(--color-neutral-700)">· disque plein, 18 colonnes</span></h3>
+        <pre style="margin:0;background:#121010;color:var(--acc,#ff4a1c);padding:24px;border-radius:var(--radius-lg);font-family:'Space Mono',monospace;font-size:13px;line-height:1.1;overflow:auto">     ▄██████▄
+  ▄████████████▄
+ ████████████████
+██████████████████
+██████████████████
+ ████████████████
+  ▀████████████▀
+     ▀██████▀
+
+    S I G N A L</pre>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <h3 style="margin:0;font-size:20px">Fonds d'écran — backgrounds/</h3>
+        <ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.7">
+          <li><strong>01-signal.png</strong> (horizontal, à la résolution de l'écran principal, source 3840×2160) : fond <code>{{ wall }}</code> ; disque <code>#121010</code> de 60 % de la hauteur, centré légèrement à droite ; « SIGNAL » en Anton crème <code>#f1e7d6</code>, 52 % de la hauteur, centré, par-dessus le disque ; « 01 / 03 ────» en Space Mono 10 pt noir en bas à droite. Grain papier léger (bruit 3 %) facultatif.</li>
+          <li><strong>02-noir.png</strong> (horizontal, variante calme) : fond <code>#121010</code>, petit disque de la couleur du thème (15 % de la hauteur) en bas à gauche, aucun texte.</li>
+          <li><strong>03-koorui.png</strong> (vertical, 2160×3840) : même composition que 01, « SIG / NAL » sur deux lignes en haut, disque dans le tiers bas.</li>
+          <li><strong>Fond animé (option) :</strong> une vidéo Wallpaper Engine où le disque respire lentement (échelle 100 → 103 %, boucle de 8 s). À fabriquer en MP4 — pas de fond « web ».</li>
+          <li><strong>preview.png / preview-unlock.png :</strong> captures des écrans 03 et 05 ; <strong>unlock.png</strong> = logo Plymouth.</li>
+        </ul>
+        <h3 style="margin:16px 0 0;font-size:20px">Effort, à toi de choisir</h3>
+        <ul style="margin:0;padding-left:20px;font-size:15px;line-height:1.7">
+          <li><strong>Config seule (nul) :</strong> palette, fenêtres, animations, polices, icônes, lanceur, notifications, terminal, veille, à propos.</li>
+          <li><strong>Faible :</strong> 3 fonds d'écran, PNG Plymouth, image Limine, pastille du bureau actif dans la barre (petite retouche QML).</li>
+          <li><strong>Moyen :</strong> écran de verrouillage avec horloge géante (copie QML de omarchy.lock). C'est l'écran le plus « magazine » : je le recommande.</li>
+          <li><strong>Sauté :</strong> SDDM (connexion automatique), curseur sur mesure.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;accent&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;vermillon&quot;,&quot;cramoisi&quot;,&quot;vert&quot;],&quot;default&quot;:&quot;vermillon&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+const PALETTES = [
+  { id:'vermillon', name:'Vermillon', wall:'#e8431c', acc:'#ff4a1c', sel:'#3a1d14', deep:'#c2340f' },
+  { id:'cramoisi', name:'Cramoisi', wall:'#c8102e', acc:'#ff3355', sel:'#3a1018', deep:'#a50d26' },
+  { id:'vert', name:'Vert billard', wall:'#0d6b3e', acc:'#36d27e', sel:'#10301f', deep:'#0a5a33' },
+];
+class Component extends DCLogic {
+  state = { id: this.props.accent ?? 'vermillon' };
+  apply() {
+    const p = PALETTES.find(x => x.id === this.state.id) || PALETTES[0];
+    const r = document.documentElement.style;
+    r.setProperty('--acc', p.acc); r.setProperty('--wall', p.wall); r.setProperty('--sel', p.sel); r.setProperty('--deep', p.deep);
+    return p;
+  }
+  componentDidMount() { this.apply(); }
+  componentDidUpdate() { this.apply(); }
+  renderVals() {
+    const p = PALETTES.find(x => x.id === this.state.id) || PALETTES[0];
+    return {
+      acc: p.acc, wall: p.wall, sel: p.sel,
+      swatches: PALETTES.map(x => ({ ...x, ring: x.id === p.id ? '#f1e7d6' : '#3a3330', pick: () => this.setState({ id: x.id }) })),
+    };
+  }
+}
+</script>
+</body>
+</html>

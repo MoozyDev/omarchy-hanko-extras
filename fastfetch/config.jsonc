@@ -1,0 +1,12 @@
+{
+  "$schema": "https://github.com/fastfetch-cli/fastfetch/raw/dev/doc/json_schema.json",
+  "logo": { "type": "file", "source": "~/.config/omarchy/branding/about-grand.txt", "color": { "1": "red" }, "padding": { "right": 4 } },
+  "display": { "separator": "  ", "color": { "keys": "red", "title": "white" }, "key": { "width": 8 } },
+  "modules": [
+    "title", { "type": "separator", "string": "─" },
+    { "type": "os", "key": "OS" }, { "type": "kernel", "key": "NOYAU" }, { "type": "wm", "key": "WM" },
+    { "type": "command", "key": "THÈME", "text": "omarchy-theme-current" },
+    { "type": "terminalfont", "key": "POLICE" }, { "type": "cpu", "key": "CPU" }, { "type": "gpu", "key": "GPU" },
+    { "type": "memory", "key": "RAM" }, "break", "colors"
+  ]
+}
