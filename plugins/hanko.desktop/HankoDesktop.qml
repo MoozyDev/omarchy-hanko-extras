@@ -237,15 +237,20 @@ Item {
           visible: root.liveTitle
           color: root.fond
 
-          // Disc: noir, centred, 52 % of the height (70 % of the width on a vertical screen).
+          // Moozy logo (V1, black symbol) where the disc used to be: centred,
+          // 52 % of the height (70 % of the width on a vertical screen).
+          // logo/GUIDE.md: V1 is nudged 3 % of its diameter to the right.
           readonly property real discD: canvas.vertical ? canvas.cw * 0.70 : canvas.ch * 0.52
-          Rectangle {
+          Image {
             width: liveBg.discD
             height: width
-            radius: width / 2
-            x: (canvas.cw - width) / 2
+            x: (canvas.cw - width) / 2 + width * 0.03
             y: canvas.ch * (canvas.vertical ? 0.42 : 0.50) - height / 2
-            color: root.noir
+            source: Qt.resolvedUrl("logo-noir.svg")
+            sourceSize: Qt.size(Math.ceil(width), Math.ceil(height))
+            fillMode: Image.PreserveAspectFit
+            smooth: true
+            asynchronous: false
           }
 
           // Title: as large as fits in the title zone, never into the widget strip.
