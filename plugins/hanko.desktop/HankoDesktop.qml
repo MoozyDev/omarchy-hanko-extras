@@ -146,6 +146,37 @@ Item {
     onTriggered: if (root.player) root.player.positionChanged()
   }
 
+  // ── Live title wallpaper ───────────────────────────────────────────────
+  // The HANKO title wallpapers (01-hanko, 02-hanko-plein) are fixed 16:9
+  // pictures: cropped on other screen shapes, and their title either runs
+  // into the clock or sits too small. When one of them is selected, this
+  // plugin draws it live instead, sized for the actual screen and keeping
+  // the bottom strip free for the widgets. Any other wallpaper shows as is.
+  readonly property bool liveWallpaper: setting("liveWallpaper", true)
+  property string backgroundName: ""
+  readonly property bool liveTitle: liveWallpaper && /^0[12]-hanko/.test(backgroundName) && themeName.indexOf("hanko-") === 0
+  readonly property var fondByTheme: ({
+    "hanko-vermillon": "#e8431c",
+    "hanko-cramoisi": "#c8102e",
+    "hanko-vert-billard": "#0d6b3e"
+  })
+  readonly property color fond: fondByTheme[themeName] || accent
+
+  Process {
+    id: bgProc
+    command: ["readlink", "-f", root.stateDir + "/background"]
+    stdout: StdioCollector {
+      onStreamFinished: root.backgroundName = text.trim().split("/").pop()
+    }
+  }
+  Timer {
+    interval: 2000
+    running: root.primary
+    repeat: true
+    triggeredOnStart: true
+    onTriggered: if (!bgProc.running) bgProc.running = true
+  }
+
   // ── Roles per screen ───────────────────────────────────────────────────
   readonly property var screenList: Quickshell.screens
   readonly property bool hasVertical: {
@@ -176,7 +207,7 @@ Item {
       required property var modelData
       screen: modelData
       readonly property string role: root.roleFor(modelData)
-      visible: role !== "none"
+      visible: role !== "none" || root.liveTitle
       color: "transparent"
       exclusionMode: ExclusionMode.Ignore
       WlrLayershell.layer: WlrLayer.Bottom
@@ -198,6 +229,72 @@ Item {
         readonly property bool clockHere: root.showClock && (win.role === "single" || win.role === "vertical")
         readonly property bool weatherHere: root.showWeather && root.weatherTemp !== "" && (win.role === "single" || win.role === "main")
         readonly property bool musicHere: root.showMusic && root.hasMusic && (win.role === "single" || win.role === "main")
+
+        // ── Live title wallpaper (under the widgets) ──
+        Rectangle {
+          id: liveBg
+          anchors.fill: parent
+          visible: root.liveTitle
+          color: root.fond
+
+          // Disc: noir, centred, 52 % of the height (70 % of the width on a vertical screen).
+          readonly property real discD: canvas.vertical ? canvas.cw * 0.70 : canvas.ch * 0.52
+          Rectangle {
+            width: liveBg.discD
+            height: width
+            radius: width / 2
+            x: (canvas.cw - width) / 2
+            y: canvas.ch * (canvas.vertical ? 0.42 : 0.50) - height / 2
+            color: root.noir
+          }
+
+          // Title: as large as fits in the title zone, never into the widget strip.
+          //   horizontal: one line, ≤ 78 % of the width, caps between 18 % and 64 % of the height
+          //   vertical:   "HAN / KO", ≤ 80 % of the width, centred at 42 % of the height
+          TextMetrics {
+            id: refLine
+            font.family: "Anton"
+            font.pixelSize: 100
+            text: canvas.vertical ? "HAN" : "HANKO"
+          }
+          readonly property real capRef: Math.max(1, -refLine.tightBoundingRect.y)
+          readonly property real widthRef: Math.max(1, refLine.tightBoundingRect.width)
+          readonly property real titlePx: canvas.vertical
+            ? 100 * Math.min(canvas.cw * 0.80 / widthRef, canvas.ch * 0.20 / capRef)
+            : 100 * Math.min(canvas.cw * 0.78 / widthRef, canvas.ch * 0.46 / capRef)
+          readonly property real capPx: capRef * titlePx / 100
+
+          Text {
+            id: titleText
+            visible: !canvas.vertical
+            text: "HANKO"
+            color: root.creme
+            font.family: "Anton"
+            font.pixelSize: liveBg.titlePx
+            renderType: Text.CurveRendering
+            x: (canvas.cw - contentWidth) / 2
+            // Caps centred in the 18 %–64 % zone.
+            y: canvas.ch * 0.41 + liveBg.capPx / 2 - baselineOffset
+          }
+          Column {
+            visible: canvas.vertical
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: canvas.ch * 0.42 - height / 2
+            spacing: liveBg.capPx * 0.12
+            Repeater {
+              model: ["HAN", "KO"]
+              Text {
+                anchors.horizontalCenter: parent.horizontalCenter
+                text: modelData
+                color: root.creme
+                font.family: "Anton"
+                font.pixelSize: liveBg.titlePx
+                renderType: Text.CurveRendering
+                lineHeight: 0.82
+              }
+            }
+          }
+        }
 
         // ── Bottom-left: clock, date, weather ──
         Column {

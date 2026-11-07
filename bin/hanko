@@ -277,6 +277,35 @@ remove_widget_plugin() {
   shell_ok && omarchy-shell shell rescanPlugins >/dev/null || true
 }
 
+# ───────────────────────────────────────────────────────────────── boot unlock
+# The disk-unlock screen (Plymouth) and the login screen, via Omarchy's own
+# `omarchy plymouth set`. Colours come from the variant's boot/plymouth.md.
+cmd_boot() {
+  local action="${1:-on}" variant theme_dir md bg fg logo
+  variant=$(current_variant)
+  theme_dir="$CONFIG/omarchy/themes/hanko-$variant"
+  case "$action" in
+    on)
+      bold "Écran de déverrouillage du disque"
+      md="$theme_dir/boot/plymouth.md"
+      logo="$theme_dir/unlock.png"
+      [[ -f $md && -f $logo ]] || die "thème hanko-$variant incomplet (boot/plymouth.md ou unlock.png absent)"
+      bg=$(grep -m1 '`fond`' "$md" | grep -oE '#[0-9a-fA-F]{6}' | head -1)
+      fg=$(grep -m1 '`noir`' "$md" | grep -oE '#[0-9a-fA-F]{6}' | head -1)
+      [[ -n $bg && -n $fg ]] || die "couleurs introuvables dans $md"
+      info "Fond $bg, texte $fg, logo Moozy — Omarchy demande sudo et reconstruit l'image de démarrage."
+      ask "Appliquer au démarrage (déverrouillage du disque et connexion) ?" || { warn "écran de démarrage inchangé"; return 0; }
+      omarchy-plymouth-set "$bg" "$fg" "$logo"
+      ok "visible au prochain démarrage"
+      ;;
+    off)
+      omarchy-plymouth-reset
+      ok "écran de démarrage Omarchy remis"
+      ;;
+    *) die "usage : hanko boot on|off" ;;
+  esac
+}
+
 # ───────────────────────────────────────────────────────────────── widgets
 cmd_widgets() {
   local action="${1:-on}"
@@ -406,6 +435,7 @@ cmd_install() {
   cmd_widgets on
   cmd_screensaver on
   cmd_lock install
+  cmd_boot on
   # The shell compiled LockView.qml and the plugins at startup: restart it so
   # everything above is live without logging out (the bar blinks once).
   omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
@@ -467,6 +497,7 @@ hanko — thème Hanko pour Omarchy 4
   hanko widgets on|off|status                      horloge, météo, musique sur le bureau
   hanko screensaver on|off|test [animation]        écran de veille Hanko
   hanko lock install|on|off|edit|status|uninstall  écran de verrouillage Hanko
+  hanko boot on|off                                écran de déverrouillage du disque
   hanko update                                     mettre Hanko à jour
   hanko doctor                                     état de chaque élément
   hanko uninstall                                  tout retirer
@@ -485,6 +516,7 @@ main() {
     widgets) cmd_widgets "$@" ;;
     screensaver) cmd_screensaver "$@" ;;
     lock) cmd_lock "$@" ;;
+    boot) cmd_boot "$@" ;;
     update) cmd_update ;;
     uninstall) cmd_uninstall ;;
     doctor|status) cmd_doctor ;;
