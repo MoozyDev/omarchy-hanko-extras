@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "hanko.desktop",
+  "name": "Hanko Desktop Widgets",
+  "version": "1.0.0",
+  "author": "MoozyDev",
+  "description": "Hanko desktop widgets drawn over the wallpaper: clock, date, weather and now playing. An invisible bar widget that owns one window per screen.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "HankoDesktop.qml"
+  },
+  "barWidget": {
+    "displayName": "Hanko desktop widgets",
+    "category": "System",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": { "clock": true, "weather": true, "music": true, "weatherLocation": "", "liveWallpaper": true },
+    "schema": [
+      { "key": "clock", "type": "bool", "label": "Horloge et date" },
+      { "key": "weather", "type": "bool", "label": "Météo" },
+      { "key": "music", "type": "bool", "label": "Musique en cours" },
+      { "key": "weatherLocation", "type": "string", "label": "Ville pour la météo (vide = automatique)" },
+      { "key": "liveWallpaper", "type": "bool", "label": "Fonds HANKO dessinés à la taille de l'écran" }
+    ]
+  }
+}

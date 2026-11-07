@@ -1,0 +1,544 @@
+#!/bin/bash
+# hanko — install and manage the Hanko theme for Omarchy 4.
+#
+# The theme repos only carry what Omarchy lets a theme carry (colours,
+# wallpapers, icons, shell.toml). Everything that is code — the bar that grows
+# on hover, the screensaver, the lock screen skin — is installed by this
+# command. Run `hanko help` for the list of commands.
+
+set -euo pipefail
+
+HANKO_HOME="${HANKO_HOME:-$HOME/.local/share/hanko}"
+EXTRAS="$HANKO_HOME/extras"
+STATE="${XDG_STATE_HOME:-$HOME/.local/state}/hanko"
+BACKUP="$HANKO_HOME/backup"
+CONFIG="${XDG_CONFIG_HOME:-$HOME/.config}"
+PLUGINS="$CONFIG/omarchy/plugins"
+REPO_BASE="https://github.com/MoozyDev"
+VARIANTS=(vermillon cramoisi vert-billard)
+BAR_GROW="${HANKO_BAR_GROW:-18}"
+
+bold() { printf '\e[1m%s\e[0m\n' "$*"; }
+info() { printf '  %s\n' "$*"; }
+ok() { printf '  \e[32m✓\e[0m %s\n' "$*"; }
+warn() { printf '  \e[33m!\e[0m %s\n' "$*" >&2; }
+die() { printf '  \e[31m✗\e[0m %s\n' "$*" >&2; exit 1; }
+
+need_omarchy() {
+  command -v omarchy-shell >/dev/null 2>&1 || die "Omarchy 4 introuvable (omarchy-shell absent)."
+  [[ $EUID -ne 0 ]] || die "Lance hanko en tant qu'utilisateur, pas en root (sudo sera demandé si besoin)."
+  session_env
+}
+
+# From SSH or a TTY the graphical session's variables are missing, so the
+# shell and Hyprland can't be reached. Borrow them from the running shell.
+session_env() {
+  [[ -n ${WAYLAND_DISPLAY:-} && -n ${HYPRLAND_INSTANCE_SIGNATURE:-} ]] && return 0
+  local pid line
+  pid=$(pgrep -u "$(id -u)" -x quickshell 2>/dev/null | head -1) || true
+  [[ -n $pid && -r /proc/$pid/environ ]] || return 0
+  while IFS= read -r -d '' line; do
+    case "$line" in
+      WAYLAND_DISPLAY=*|XDG_RUNTIME_DIR=*|HYPRLAND_INSTANCE_SIGNATURE=*|DBUS_SESSION_BUS_ADDRESS=*|OMARCHY_PATH=*)
+        export "${line?}" ;;
+    esac
+  done < "/proc/$pid/environ"
+}
+
+ask() {
+  # ask "question" → 0 for yes. Without a terminal the answer is no.
+  local reply
+  { read -r -p "  $1 [o/N] " reply </dev/tty; } 2>/dev/null || return 1
+  [[ $reply =~ ^[oOyY] ]]
+}
+
+# Keep the user's file once, before Hanko first replaces it.
+backup() {
+  local src="$1" rel
+  [[ -e $src ]] || return 0
+  rel="${src#"$HOME"/}"
+  [[ -e $BACKUP/$rel ]] && return 0
+  mkdir -p "$(dirname -- "$BACKUP/$rel")"
+  cp -a -- "$src" "$BACKUP/$rel"
+}
+
+current_theme() { cat "$HOME/.local/state/omarchy/current/theme.name" 2>/dev/null || true; }
+current_variant() { local t; t=$(current_theme); [[ $t == hanko-* ]] && echo "${t#hanko-}" || echo "${VARIANTS[0]}"; }
+
+valid_variant() { local v; for v in "${VARIANTS[@]}"; do [[ $1 == "$v" ]] && return 0; done; return 1; }
+
+shell_ok() { omarchy-shell shell ping >/dev/null 2>&1; }
+
+SHELL_JSON="$CONFIG/omarchy/shell.json"
+
+# Omarchy's screensaver delay in seconds (150 when unset).
+idle_screensaver() { jq -r '.idle.screensaver // 150' "$SHELL_JSON" 2>/dev/null || echo 150; }
+
+# The shell watches shell.json and applies a new idle timing at once.
+set_idle_screensaver() {
+  local tmp
+  [[ -f $SHELL_JSON ]] || return 0
+  tmp=$(mktemp "$SHELL_JSON.hanko.XXXXXX")
+  jq --argjson s "$1" '.idle = ((.idle // {}) + {screensaver: $s})' "$SHELL_JSON" >"$tmp" && mv -f "$tmp" "$SHELL_JSON" || rm -f "$tmp"
+}
+
+# The menu's System > Screensaver row runs Omarchy's screensaver directly; a
+# user menu extension may override that row (whole-line comments only: an
+# inline comment would break Omarchy's JSONC parser).
+MENU_EXT="$CONFIG/omarchy/extensions/omarchy-menu.jsonc"
+MENU_MARK='  // hanko: System > Screensaver opens the Hanko screensaver (removed by `hanko screensaver off`)'
+MENU_LINE='  "system.screensaver": {"icon":"󱄄","label":"Screensaver","action":"omarchy-shell hanko-screensaver open random"},'
+
+menu_hook_on() {
+  mkdir -p "$(dirname -- "$MENU_EXT")"
+  [[ -f $MENU_EXT ]] || printf '{\n}\n' >"$MENU_EXT"
+  backup "$MENU_EXT"
+  menu_hook_off # drop any Hanko row already there (also older versions), then add one
+  local tmp
+  tmp=$(mktemp "$MENU_EXT.hanko.XXXXXX")
+  # Insert before the last closing brace of the file.
+  awk -v mark="$MENU_MARK" -v line="$MENU_LINE" '
+    { lines[NR] = $0 }
+    END {
+      last = 0
+      for (i = NR; i >= 1; i--) if (lines[i] ~ /^[[:space:]]*}[[:space:]]*$/) { last = i; break }
+      for (i = 1; i <= NR; i++) {
+        if (i == last) { print mark; print line }
+        print lines[i]
+      }
+    }' "$MENU_EXT" >"$tmp" && mv -f "$tmp" "$MENU_EXT"
+}
+
+menu_hook_off() {
+  [[ -f $MENU_EXT ]] || return 0
+  local tmp
+  tmp=$(mktemp "$MENU_EXT.hanko.XXXXXX")
+  grep -vxF -e "$MENU_MARK" -e "$MENU_LINE" "$MENU_EXT" | grep -vE '^  "system\.screensaver": .*hanko-screensaver' >"$tmp" || true
+  mv -f "$tmp" "$MENU_EXT"
+}
+
+# Hanko's own delay, stored on its bar entry (150 when unset).
+widget_delay() {
+  jq -r '[.bar.layout[]?[]? | select(.id == "hanko.screensaver") | .delay] | map(select(. != null)) | (.[0] // 150)' "$SHELL_JSON" 2>/dev/null || echo 150
+}
+
+# ───────────────────────────────────────────────────────────────── theme
+cmd_theme() {
+  local variant="${1:-$(current_variant)}"
+  valid_variant "$variant" || die "variante inconnue : $variant (${VARIANTS[*]})"
+  bold "Thème Hanko · $variant"
+  omarchy-theme-install "$REPO_BASE/omarchy-hanko-$variant-theme" || warn "omarchy-theme-install a signalé une erreur (voir ci-dessus)."
+  [[ $(current_theme) == "hanko-$variant" ]] && ok "thème actif : hanko-$variant" || warn "le thème n'est pas actif — lance : omarchy-theme-set hanko-$variant"
+}
+
+# ───────────────────────────────────────────────────────────────── extras
+cmd_extras() {
+  local variant theme_dir
+  variant=$(current_variant)
+  theme_dir="$CONFIG/omarchy/themes/hanko-$variant"
+  bold "Extras"
+
+  # Font: Anton (OFL) for the clock, screensaver and lock.
+  mkdir -p "$HOME/.local/share/fonts/hanko"
+  cp -f "$EXTRAS/fonts/Anton-Regular.ttf" "$EXTRAS/fonts/Anton-OFL.txt" "$HOME/.local/share/fonts/hanko/"
+  fc-cache -f "$HOME/.local/share/fonts/hanko" >/dev/null 2>&1 || true
+  ok "police Anton"
+  if ! fc-list | grep -qi "SpaceMono Nerd"; then
+    warn "SpaceMono Nerd Font absente — installe-la : omarchy pkg add ttf-space-mono-nerd"
+  fi
+
+  # App and web-app icons from the variant (Omarchy reads them from here).
+  if [[ -d $theme_dir ]]; then
+    local icons="$HOME/.local/share/applications/icons" f
+    mkdir -p "$icons"
+    for f in "$theme_dir"/apps/*.png "$theme_dir"/webapps/*.png; do
+      [[ -f $f ]] || continue
+      backup "$icons/$(basename -- "$f")"
+      cp -f -- "$f" "$icons/"
+    done
+    ok "icônes d'applications et de web apps"
+  else
+    warn "thème hanko-$variant absent — icônes ignorées (lance : hanko theme $variant)"
+  fi
+
+  # Screensaver / about text, fastfetch.
+  mkdir -p "$CONFIG/omarchy/branding" "$CONFIG/fastfetch"
+  for f in screensaver.txt about.txt; do
+    backup "$CONFIG/omarchy/branding/$f"
+    cp -f "$EXTRAS/branding/$f" "$CONFIG/omarchy/branding/$f"
+  done
+  backup "$CONFIG/fastfetch/config.jsonc"
+  cp -f "$EXTRAS/fastfetch/config.jsonc" "$CONFIG/fastfetch/config.jsonc"
+  ok "logo de veille ASCII, page À propos, fastfetch"
+}
+
+# ───────────────────────────────────────────────────────────────── bar
+bar_file() { echo "$PLUGINS/${USER:-$(id -un)}.bar/Bar.qml"; }
+
+cmd_bar() {
+  local action="${1:-on}" file
+  file=$(bar_file)
+  case "$action" in
+    on)
+      bold "Barre qui s'agrandit au survol"
+      need_omarchy
+      if [[ ! -f $file ]]; then
+        shell_ok || die "le shell Omarchy ne répond pas — ouvre une session graphique puis relance."
+        omarchy-plugin-clone omarchy.bar >/dev/null
+        ok "copie personnelle de la barre Omarchy créée ($(dirname -- "$file"))"
+      fi
+      omarchy-bar use "${USER:-$(id -un)}.bar" >/dev/null || die "impossible d'activer la barre — essaie : omarchy bar use ${USER:-$(id -un)}.bar"
+      # Patch after the switch: saving the file makes the shell reload the bar
+      # once it is in use, which also fills in its widgets.
+      sleep 1
+      bash "$EXTRAS/bar/bar-patch.sh" apply "$file" "$BAR_GROW"
+      ok "barre active : survole-la pour la voir grandir (+${BAR_GROW} px)"
+      ;;
+    off)
+      [[ -f $file ]] && bash "$EXTRAS/bar/bar-patch.sh" restore "$file"
+      omarchy-bar reset >/dev/null 2>&1 || true
+      ok "barre Omarchy d'origine remise (ta copie reste dans $(dirname -- "$file"))"
+      ;;
+    status)
+      [[ -f $file ]] && bash "$EXTRAS/bar/bar-patch.sh" status "$file" || echo "absent"
+      ;;
+    *) die "usage : hanko bar on|off|status" ;;
+  esac
+}
+
+# ───────────────────────────────────────────────────────────────── menu
+menu_file() { echo "$PLUGINS/${USER:-$(id -un)}.menu/Menu.qml"; }
+
+cmd_menu() {
+  local action="${1:-on}" file
+  file=$(menu_file)
+  case "$action" in
+    on)
+      bold "Menu large et bas (choix B)"
+      need_omarchy
+      if [[ ! -f $file ]]; then
+        shell_ok || die "le shell Omarchy ne répond pas — ouvre une session graphique puis relance."
+        omarchy-plugin-clone omarchy.menu >/dev/null
+        ok "copie personnelle du menu Omarchy créée ($(dirname -- "$file"))"
+        sleep 1
+      fi
+      if [[ $(bash "$EXTRAS/menu/menu-patch.sh" status "$file") != patched ]]; then
+        bash "$EXTRAS/menu/menu-patch.sh" apply "$file"
+        # The menu stays loaded between uses: restart the shell so it is rebuilt.
+        omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
+      fi
+      ok "menu : 50 % de large, 6 lignes visibles, centré à 45 %"
+      ;;
+    off)
+      [[ -f $file ]] && bash "$EXTRAS/menu/menu-patch.sh" restore "$file"
+      ok "menu Omarchy d'origine remis (ta copie reste dans $(dirname -- "$file"))"
+      ;;
+    status)
+      [[ -f $file ]] && bash "$EXTRAS/menu/menu-patch.sh" status "$file" || echo "absent"
+      ;;
+    *) die "usage : hanko menu on|off|status" ;;
+  esac
+}
+
+# Install or refresh one of Hanko's shell plugins (invisible bar widgets).
+install_widget_plugin() {
+  local id="$1" dest="$PLUGINS/$1"
+  mkdir -p "$PLUGINS"
+  shell_ok || die "le shell Omarchy ne répond pas — ouvre une session graphique puis relance."
+  # The shell hot-reloads a plugin as soon as a file in it changes, and a
+  # half-copied file fails to load until the shell restarts. So build the
+  # folder aside, then swap it in with one rename.
+  local stage="$PLUGINS/.$id.new" old="$PLUGINS/.$id.old"
+  rm -rf "$stage" "$old"
+  cp -r "$EXTRAS/plugins/$id" "$stage"
+  omarchy-plugin-validate "$stage" >/dev/null || { rm -rf "$stage"; die "$id ne passe pas la validation Omarchy"; }
+  omarchy-plugin-disable "$id" >/dev/null 2>&1 || true # also drops an old plugins[] entry
+  local replaced=0
+  [[ -d $dest ]] && { mv "$dest" "$old"; replaced=1; }
+  mv "$stage" "$dest"
+  rm -rf "$old"
+  omarchy-shell shell rescanPlugins >/dev/null || true
+  local attempt
+  for ((attempt = 0; attempt < 40; attempt++)); do
+    omarchy-plugin-list --json 2>/dev/null | jq -e --arg id "$id" 'any(.[]; .id == $id)' >/dev/null && break
+    sleep 0.1
+  done
+  omarchy-plugin-enable "$id" --section right >/dev/null || die "activation refusée — essaie : omarchy plugin enable $id --section right"
+  # The shell keeps the previous version's compiled QML: restart it so an
+  # update really shows (the bar blinks once).
+  if (( replaced )); then omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"; fi
+}
+
+remove_widget_plugin() {
+  local id="$1"
+  [[ -d $PLUGINS/$id ]] || return 0
+  omarchy-plugin-disable "$id" >/dev/null 2>&1 || true
+  rm -rf "${PLUGINS:?}/$id"
+  shell_ok && omarchy-shell shell rescanPlugins >/dev/null || true
+}
+
+# ───────────────────────────────────────────────────────────────── boot unlock
+# The disk-unlock screen (Plymouth) and the login screen, via Omarchy's own
+# `omarchy plymouth set`. Colours come from the variant's boot/plymouth.md.
+cmd_boot() {
+  local action="${1:-on}" variant theme_dir md bg fg logo
+  variant=$(current_variant)
+  theme_dir="$CONFIG/omarchy/themes/hanko-$variant"
+  case "$action" in
+    on)
+      bold "Écran de déverrouillage du disque"
+      md="$theme_dir/boot/plymouth.md"
+      logo="$theme_dir/unlock.png"
+      [[ -f $md && -f $logo ]] || die "thème hanko-$variant incomplet (boot/plymouth.md ou unlock.png absent)"
+      bg=$(grep -m1 '`fond`' "$md" | grep -oE '#[0-9a-fA-F]{6}' | head -1)
+      fg=$(grep -m1 '`noir`' "$md" | grep -oE '#[0-9a-fA-F]{6}' | head -1)
+      [[ -n $bg && -n $fg ]] || die "couleurs introuvables dans $md"
+      info "Fond $bg, texte $fg, logo Moozy — Omarchy demande sudo et reconstruit l'image de démarrage."
+      ask "Appliquer au démarrage (déverrouillage du disque et connexion) ?" || { warn "écran de démarrage inchangé"; return 0; }
+      omarchy-plymouth-set "$bg" "$fg" "$logo"
+      ok "visible au prochain démarrage"
+      ;;
+    off)
+      omarchy-plymouth-reset
+      ok "écran de démarrage Omarchy remis"
+      ;;
+    *) die "usage : hanko boot on|off" ;;
+  esac
+}
+
+# ───────────────────────────────────────────────────────────────── widgets
+cmd_widgets() {
+  local action="${1:-on}"
+  case "$action" in
+    on)
+      bold "Widgets du bureau"
+      need_omarchy
+      install_widget_plugin hanko.desktop
+      ok "horloge, date, météo et musique sur le fond d'écran (masqués quand il n'y a pas de donnée)"
+      info "Ville météo : omarchy bar set hanko.desktop weatherLocation Paris · masquer : omarchy bar set hanko.desktop weather false"
+      ;;
+    off)
+      need_omarchy
+      remove_widget_plugin hanko.desktop
+      ok "widgets du bureau retirés"
+      ;;
+    status)
+      [[ -d $PLUGINS/hanko.desktop ]] && echo actif || echo inactif
+      ;;
+    *) die "usage : hanko widgets on|off|status" ;;
+  esac
+}
+
+# ───────────────────────────────────────────────────────────────── screensaver
+cmd_screensaver() {
+  local action="${1:-on}"
+  local dest="$PLUGINS/hanko.screensaver"
+  case "$action" in
+    on)
+      bold "Écran de veille Hanko"
+      need_omarchy
+      mkdir -p "$STATE"
+      install_widget_plugin hanko.screensaver
+      # Omarchy shows its ASCII screensaver whenever idle.screensaver > 0, so
+      # Hanko takes that delay over as its own widget setting and sets
+      # Omarchy's to 0. The lock delay (idle.lock) is untouched.
+      local delay
+      delay=$(idle_screensaver)
+      if (( delay > 0 )); then
+        omarchy-bar set hanko.screensaver delay "$delay" >/dev/null || warn "délai non enregistré — essaie : omarchy bar set hanko.screensaver delay $delay"
+        set_idle_screensaver 0
+      else
+        delay=$(widget_delay)
+      fi
+      # An early Hanko version used this toggle; it does nothing in Omarchy 4.
+      if omarchy-toggle-enabled screensaver-off; then omarchy-toggle screensaver-off >/dev/null; fi
+      menu_hook_on
+      touch "$STATE/screensaver-on"
+      ok "actif — se lance après ${delay} s d'inactivité, et depuis Menu > Système > Screensaver · essai : hanko screensaver test"
+      ;;
+    off)
+      need_omarchy
+      if [[ -f $STATE/screensaver-on ]] && (( $(idle_screensaver) == 0 )); then
+        set_idle_screensaver "$(widget_delay)"
+      fi
+      menu_hook_off
+      rm -f "$STATE/screensaver-on" "$CONFIG/uwsm/env.d/50-hanko" # the latter: left by an early version
+      if [[ -d $dest ]]; then
+        omarchy-plugin-disable hanko.screensaver >/dev/null 2>&1 || true
+        rm -rf "$dest"
+        shell_ok && omarchy-shell shell rescanPlugins >/dev/null || true
+      fi
+      ok "écran de veille Omarchy d'origine remis"
+      ;;
+    test)
+      need_omarchy
+      omarchy-shell hanko-screensaver open "${2:-}"
+      ;;
+    *) die "usage : hanko screensaver on|off|test [eclipse|orbite|onde|balayage|defilement|phases]" ;;
+  esac
+}
+
+# ───────────────────────────────────────────────────────────────── lock
+cmd_lock() {
+  local action="${1:-status}"
+  local skin_dir="$CONFIG/omarchy/lock-skin"
+  case "$action" in
+    install)
+      bold "Écran de verrouillage Hanko"
+      info "Omarchy dessine son écran de verrouillage dans un fichier système"
+      info "(/usr/share/omarchy/shell/plugins/lock/LockView.qml). Hanko y ajoute un"
+      info "point d'accroche pour ton skin, sans toucher à la vérification du mot de passe."
+      info "Un hook pacman le remet après chaque mise à jour d'Omarchy."
+      ask "Installer ce point d'accroche (sudo requis) ?" || { warn "écran de verrouillage ignoré"; return 0; }
+      sudo bash "$EXTRAS/lock/system.sh" install
+      cmd_lock on
+      ;;
+    on)
+      mkdir -p "$skin_dir"
+      backup "$skin_dir/Skin.qml"
+      cp -f "$EXTRAS/lock/Skin.qml" "$skin_dir/Skin.qml"
+      ok "skin Hanko actif au prochain verrouillage — teste avec Super+Échap ou : omarchy-system-lock"
+      [[ -x /usr/local/lib/hanko/lock-patch.sh ]] || warn "point d'accroche absent : lance d'abord hanko lock install"
+      ;;
+    off)
+      rm -rf "$skin_dir"
+      ok "écran de verrouillage Omarchy par défaut (le point d'accroche reste, inactif)"
+      ;;
+    uninstall)
+      rm -rf "$skin_dir"
+      sudo bash "$EXTRAS/lock/system.sh" uninstall
+      shell_ok && omarchy-restart-shell >/dev/null 2>&1 || true
+      ok "écran de verrouillage d'origine remis et hook pacman supprimé"
+      ;;
+    edit)
+      [[ -f $skin_dir/Skin.qml ]] || cmd_lock on
+      ${EDITOR:-nano} "$skin_dir/Skin.qml"
+      ;;
+    status)
+      local patch="absent"
+      [[ -x /usr/local/lib/hanko/lock-patch.sh ]] && patch=$(/usr/local/lib/hanko/lock-patch.sh status)
+      echo "point d'accroche : $patch ; skin : $([[ -f $skin_dir/Skin.qml ]] && echo actif || echo inactif)"
+      ;;
+    *) die "usage : hanko lock install|on|off|edit|status|uninstall" ;;
+  esac
+}
+
+# ───────────────────────────────────────────────────────────────── all
+# Three levels:
+#   totale     theme + extras + bar + menu + widgets + screensaver + lock + boot
+#   essentiel  theme + extras (Anton font, app icons, ASCII logo, fastfetch)
+#   theme      theme only (colours, wallpapers, folder icons)
+cmd_install() {
+  local variant="${1:-vermillon}" level="${2:-totale}"
+  valid_variant "$variant" || die "variante inconnue : $variant (${VARIANTS[*]})"
+  case "$level" in
+    totale|full|all) level=totale ;;
+    essentiel|essentiels|essentials|essential) level=essentiel ;;
+    theme|thème|colors|couleurs) level=theme ;;
+    *) die "niveau inconnu : $level (totale, essentiel ou theme)" ;;
+  esac
+  need_omarchy
+  bold "Installation Hanko · $variant · $level"
+  cmd_theme "$variant"
+  if [[ $level == totale || $level == essentiel ]]; then
+    cmd_extras
+  fi
+  if [[ $level == totale ]]; then
+    cmd_bar on
+    cmd_menu on
+    cmd_widgets on
+    cmd_screensaver on
+    cmd_lock install
+    cmd_boot on
+    # The shell compiled LockView.qml and the plugins at startup: restart it
+    # so everything above is live without logging out (the bar blinks once).
+    omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
+  fi
+  echo
+  bold "Hanko est installé ($level)."
+  [[ $level != totale ]] && info "Pour ajouter le reste plus tard : hanko install $variant totale"
+  info "Pour tout voir : hanko doctor · pour tout enlever : hanko uninstall"
+}
+
+cmd_update() {
+  bold "Mise à jour de Hanko"
+  git -C "$EXTRAS" pull --ff-only
+  [[ -f $(bar_file) ]] && cmd_bar on
+  [[ -f $(menu_file) ]] && cmd_menu on
+  [[ -d $PLUGINS/hanko.desktop ]] && cmd_widgets on
+  [[ -f $STATE/screensaver-on ]] && cmd_screensaver on
+  [[ -f $CONFIG/omarchy/lock-skin/Skin.qml ]] && cmd_lock on
+  omarchy-theme-update >/dev/null 2>&1 || true
+  ok "à jour"
+}
+
+cmd_uninstall() {
+  bold "Désinstallation de Hanko"
+  cmd_bar off
+  cmd_menu off
+  cmd_widgets off
+  cmd_screensaver off
+  if [[ -x /usr/local/lib/hanko/lock-patch.sh ]]; then cmd_lock uninstall; else rm -rf "$CONFIG/omarchy/lock-skin"; fi
+  if [[ -d $BACKUP ]]; then
+    (cd "$BACKUP" && find . -type f -print0) | while IFS= read -r -d '' f; do
+      mkdir -p "$(dirname -- "$HOME/${f#./}")"
+      cp -a -- "$BACKUP/${f#./}" "$HOME/${f#./}"
+    done
+    ok "fichiers d'origine remis depuis $BACKUP"
+  fi
+  info "Le thème reste installé ; change-le avec Super+Ctrl+Maj+Espace."
+}
+
+cmd_doctor() {
+  session_env
+  bold "Hanko — état"
+  echo "  thème actif     : $(current_theme)"
+  echo "  barre           : $(cmd_bar status)"
+  echo "  menu            : $(cmd_menu status)"
+  echo "  widgets bureau  : $(cmd_widgets status)"
+  echo "  écran de veille : $([[ -f $STATE/screensaver-on ]] && echo actif || echo inactif)"
+  echo "  verrouillage    : $(cmd_lock status)"
+  echo "  shell Omarchy   : $(shell_ok && echo répond || echo 'ne répond pas')"
+}
+
+usage() {
+  cat <<'EOF'
+hanko — thème Hanko pour Omarchy 4
+
+  hanko install [variante] [totale|essentiel|theme]  installer (totale par défaut)
+  hanko theme <variante>                           changer de variante
+  hanko extras                                     police, icônes, fastfetch, logo
+  hanko bar on|off|status                          barre qui s'agrandit au survol
+  hanko menu on|off|status                         menu large et bas
+  hanko widgets on|off|status                      horloge, météo, musique sur le bureau
+  hanko screensaver on|off|test [animation]        écran de veille Hanko
+  hanko lock install|on|off|edit|status|uninstall  écran de verrouillage Hanko
+  hanko boot on|off                                écran de déverrouillage du disque
+  hanko update                                     mettre Hanko à jour
+  hanko doctor                                     état de chaque élément
+  hanko uninstall                                  tout retirer
+EOF
+}
+
+main() {
+  local cmd="${1:-help}"
+  if (( $# > 0 )); then shift; fi
+  case "$cmd" in
+    install) cmd_install "$@" ;;
+    theme) need_omarchy; cmd_theme "$@" ;;
+    extras) cmd_extras ;;
+    bar) cmd_bar "$@" ;;
+    menu) cmd_menu "$@" ;;
+    widgets) cmd_widgets "$@" ;;
+    screensaver) cmd_screensaver "$@" ;;
+    lock) cmd_lock "$@" ;;
+    boot) cmd_boot "$@" ;;
+    update) cmd_update ;;
+    uninstall) cmd_uninstall ;;
+    doctor|status) cmd_doctor ;;
+    help|-h|--help) usage ;;
+    *) usage; exit 2 ;;
+  esac
+}
+
+main "$@"

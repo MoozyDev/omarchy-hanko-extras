@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "hanko.screensaver",
+  "name": "Hanko Screensaver",
+  "version": "1.0.0",
+  "author": "MoozyDev",
+  "description": "Hanko screensaver: an invisible bar widget that watches idle time and shows full-screen QML animations, one per display. Any key or mouse movement closes it.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "HankoScreensaver.qml"
+  },
+  "barWidget": {
+    "displayName": "Hanko screensaver",
+    "category": "System",
+    "allowMultiple": false,
+    "defaultSection": "right",
+    "defaults": { "delay": 150 },
+    "schema": [
+      { "key": "delay", "type": "number", "label": "Délai avant l'écran de veille (secondes, 0 = jamais)" }
+    ]
+  }
+}
