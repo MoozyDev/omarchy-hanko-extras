@@ -79,6 +79,86 @@ Item {
     return skin.blur && skin.wallpaper && skin.wallpaper.ready
   })
 
+  // ── Live HANKO title, same as the desktop ──────────────────────────────
+  // With the 01 / 02 HANKO wallpapers the desktop draws the title live (sized
+  // for the screen, Moozy logo behind it). Draw the same here so the lock
+  // matches, instead of the fixed 16:9 picture.
+  property bool liveWallpaper: true
+  property string themeName: ""
+  FileView {
+    path: skin.home + "/.local/state/omarchy/current/theme.name"
+    onLoaded: skin.themeName = text().trim()
+  }
+  readonly property var fondByTheme: ({
+    "hanko-vermillon": "#e8431c",
+    "hanko-cramoisi": "#c8102e",
+    "hanko-vert-billard": "#0d6b3e"
+  })
+  readonly property color fond: fondByTheme[themeName] || accent
+  readonly property string backgroundName: lockView ? String(lockView.backgroundPath).split("/").pop() : ""
+  readonly property bool liveTitle: liveWallpaper && /^0[12]-hanko/.test(backgroundName) && themeName.indexOf("hanko-") === 0
+
+  Rectangle {
+    id: liveBg
+    anchors.fill: parent
+    visible: skin.liveTitle
+    color: skin.fond
+
+    readonly property real logoD: skin.vertical ? skin.width * 0.70 : skin.height * 0.52
+    Image {
+      width: liveBg.logoD
+      height: width
+      x: (skin.width - width) / 2 + width * 0.03
+      y: skin.height * (skin.vertical ? 0.42 : 0.50) - height / 2
+      source: Qt.resolvedUrl("logo-noir.svg")
+      sourceSize: Qt.size(Math.ceil(width), Math.ceil(height))
+      fillMode: Image.PreserveAspectFit
+      smooth: true
+    }
+
+    TextMetrics {
+      id: refLine
+      font.family: "Anton"
+      font.pixelSize: 100
+      text: skin.vertical ? "HAN" : "HANKO"
+    }
+    readonly property real capRef: Math.max(1, -refLine.tightBoundingRect.y)
+    readonly property real widthRef: Math.max(1, refLine.tightBoundingRect.width)
+    readonly property real titlePx: skin.vertical
+      ? 100 * Math.min(skin.width * 0.80 / widthRef, skin.height * 0.20 / capRef)
+      : 100 * Math.min(skin.width * 0.78 / widthRef, skin.height * 0.46 / capRef)
+    readonly property real capPx: capRef * titlePx / 100
+
+    Text {
+      visible: !skin.vertical
+      text: "HANKO"
+      color: skin.creme
+      font.family: "Anton"
+      font.pixelSize: liveBg.titlePx
+      renderType: Text.CurveRendering
+      x: (skin.width - contentWidth) / 2
+      y: skin.height * 0.41 + liveBg.capPx / 2 - baselineOffset
+    }
+    Column {
+      visible: skin.vertical
+      anchors.horizontalCenter: parent.horizontalCenter
+      y: skin.height * 0.42 - height / 2
+      spacing: liveBg.capPx * 0.12
+      Repeater {
+        model: ["HAN", "KO"]
+        Text {
+          anchors.horizontalCenter: parent.horizontalCenter
+          text: modelData
+          color: skin.creme
+          font.family: "Anton"
+          font.pixelSize: liveBg.titlePx
+          renderType: Text.CurveRendering
+          lineHeight: 0.82
+        }
+      }
+    }
+  }
+
   Rectangle {
     anchors.fill: parent
     color: "black"
