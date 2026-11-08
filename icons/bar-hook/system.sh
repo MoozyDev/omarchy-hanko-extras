@@ -17,6 +17,8 @@ case "${1:-}" in
     install -d -m 755 "$LIB" /etc/pacman.d/hooks
     install -m 755 "$HERE/icons-patch.sh" "$LIB/icons-patch.sh"
     install -m 644 "$HERE/hanko-icons.hook" "$HOOK"
+    # Re-apply from scratch so an older version of the hook is replaced.
+    "$LIB/icons-patch.sh" restore
     "$LIB/icons-patch.sh" apply
     ;;
   uninstall)
