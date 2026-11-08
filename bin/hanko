@@ -277,6 +277,49 @@ remove_widget_plugin() {
   shell_ok && omarchy-shell shell rescanPlugins >/dev/null || true
 }
 
+# ───────────────────────────────────────────────────────────────── bar style
+# Active workspace as an accent pill, clock in capitals (specs/barre). Hook in
+# two Omarchy widgets (sudo once); then on/off just writes a flag file.
+cmd_barstyle() {
+  local action="${1:-status}" flag="$CONFIG/omarchy/hanko/bar-style"
+  case "$action" in
+    install)
+      bold "Style de la barre (bureau actif, horloge)"
+      info "Le bureau actif et l'horloge sont dessinés par deux widgets système d'Omarchy."
+      info "Hanko y ajoute une accroche ; un hook pacman la remet après chaque mise à jour."
+      ask "Installer cette accroche (sudo requis) ?" || { warn "style de la barre ignoré"; return 0; }
+      sudo bash "$EXTRAS/bar/system.sh" install
+      mkdir -p "$(dirname -- "$flag")"
+      echo on >"$flag"
+      omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
+      ok "bureau actif en pastille accent, horloge en capitales"
+      ;;
+    on)
+      mkdir -p "$(dirname -- "$flag")"
+      echo on >"$flag"
+      [[ -x /usr/local/lib/hanko/barstyle-patch.sh ]] || warn "point d'accroche absent : lance d'abord hanko barstyle install"
+      ok "style Hanko de la barre activé"
+      ;;
+    off)
+      mkdir -p "$(dirname -- "$flag")"
+      echo off >"$flag"
+      ok "bureau actif et horloge d'Omarchy (l'accroche reste, inactive)"
+      ;;
+    uninstall)
+      rm -f "$flag"
+      sudo bash "$EXTRAS/bar/system.sh" uninstall
+      shell_ok && omarchy-restart-shell >/dev/null 2>&1 || true
+      ok "widgets d'origine remis et hook pacman supprimé"
+      ;;
+    status)
+      local patch="absent"
+      [[ -x /usr/local/lib/hanko/barstyle-patch.sh ]] && patch=$(/usr/local/lib/hanko/barstyle-patch.sh status)
+      echo "point d'accroche : $patch ; style : $(cat "$flag" 2>/dev/null || echo off)"
+      ;;
+    *) die "usage : hanko barstyle install|on|off|status|uninstall" ;;
+  esac
+}
+
 # ───────────────────────────────────────────────────────────────── look'n'feel
 # Windows (looknfeel.md): 3 px borders, square corners, gaps 8/16, opacity
 # 0.94/0.90, light blur, one "dry" curve for every animation. Written as a
@@ -339,7 +382,7 @@ EOF
       ' "$LNF_FILE" >"$tmp" && mv -f "$tmp" "$LNF_FILE"
       ;;
     status)
-      grep -qxF "$LNF_BEGIN" "$LNF_FILE" 2>/dev/null && echo actif || echo inactif
+      grep -qxF -- "$LNF_BEGIN" "$LNF_FILE" 2>/dev/null && echo actif || echo inactif
       ;;
     *) die "usage : hanko looknfeel on|off|status" ;;
   esac
@@ -592,6 +635,7 @@ cmd_install() {
     cmd_widgets on
     cmd_screensaver on
     cmd_icons install
+    cmd_barstyle install
     cmd_lock install
     cmd_boot on
     cmd_cursor on
@@ -625,6 +669,7 @@ cmd_uninstall() {
   cmd_looknfeel off
   cmd_cursor off
   if [[ -x /usr/local/lib/hanko/icons-patch.sh ]]; then cmd_icons uninstall; else rm -rf "$CONFIG/omarchy/hanko/bar-icons"; fi
+  if [[ -x /usr/local/lib/hanko/barstyle-patch.sh ]]; then cmd_barstyle uninstall; fi
   cmd_widgets off
   cmd_screensaver off
   if [[ -x /usr/local/lib/hanko/lock-patch.sh ]]; then cmd_lock uninstall; else rm -rf "$CONFIG/omarchy/lock-skin"; fi
@@ -647,6 +692,7 @@ cmd_doctor() {
   echo "  widgets bureau  : $(cmd_widgets status)"
   echo "  fenêtres        : $(cmd_looknfeel status)"
   echo "  icônes barre    : $(cmd_icons status)"
+  echo "  style barre     : $(cmd_barstyle status)"
   echo "  écran de veille : $([[ -f $STATE/screensaver-on ]] && echo actif || echo inactif)"
   echo "  verrouillage    : $(cmd_lock status)"
   echo "  shell Omarchy   : $(shell_ok && echo répond || echo 'ne répond pas')"
@@ -662,6 +708,7 @@ hanko — thème Hanko pour Omarchy 4
   hanko bar on|off|status                          barre qui s'agrandit au survol
   hanko menu on|off|status                         menu large et bas
   hanko icons install|on|off|status|uninstall      icônes Hanko dans la barre
+  hanko barstyle install|on|off|status|uninstall   bureau actif en pastille, horloge en capitales
   hanko widgets on|off|status                      horloge, météo, musique sur le bureau
   hanko screensaver on|off|test [animation]        écran de veille Hanko
   hanko lock install|on|off|edit|status|uninstall  écran de verrouillage Hanko
@@ -684,6 +731,7 @@ main() {
     bar) cmd_bar "$@" ;;
     menu) cmd_menu "$@" ;;
     icons) cmd_icons "$@" ;;
+    barstyle) cmd_barstyle "$@" ;;
     widgets) cmd_widgets "$@" ;;
     screensaver) cmd_screensaver "$@" ;;
     lock) cmd_lock "$@" ;;

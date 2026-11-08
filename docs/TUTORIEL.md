@@ -88,6 +88,39 @@ Son, micro, Wi-Fi, réseau, Bluetooth, batterie, écran, météo, Ne pas dérang
 
 > Comment : Omarchy dessine toutes les icônes de la barre avec un seul composant système. `hanko icons install` y ajoute un point d'accroche qui affiche ton SVG à la place du caractère, dans la même couleur ; un hook pacman le remet après chaque mise à jour. Les widgets gardent toutes leurs fonctions.
 
+### Bureau actif et horloge
+
+```bash
+hanko barstyle install     # une seule fois (demande sudo)
+hanko barstyle on          # pastille accent + horloge en capitales
+hanko barstyle off         # style Omarchy (sans sudo)
+hanko barstyle uninstall   # tout retirer (demande sudo)
+```
+
+Le bureau actif devient son numéro en noir sur une pastille de la couleur accent ; l'horloge passe en capitales.
+
+> Comment : accroche dans les deux widgets système d'Omarchy (Bureaux et Horloge), remise par un hook pacman après chaque mise à jour. `on`/`off` changent un simple fichier, à chaud.
+
+### Fenêtres
+
+```bash
+hanko looknfeel on
+hanko looknfeel off
+```
+
+Bordures de 3 px (crème sur la fenêtre active, noires sinon), angles droits, espaces de 8 et 16 px, légère transparence, flou, animations sèches sans rebond.
+
+> Comment : un bloc marqué dans ton `~/.config/hypr/looknfeel.lua` ; les couleurs des bordures viennent du thème.
+
+### Curseur
+
+```bash
+hanko cursor on      # installe Bibata-Modern-Classic (AUR, demande sudo)
+hanko cursor off
+```
+
+Complet après la prochaine connexion.
+
 ### Menu large et bas
 
 ```bash
@@ -106,7 +139,7 @@ hanko widgets on
 hanko widgets off
 ```
 
-En bas à gauche : horloge, date, météo. En bas à droite : la musique en cours (seulement quand quelque chose joue).
+En bas à gauche : horloge, date, météo. En bas à droite : la musique en cours (seulement quand quelque chose joue). Un son joue à chaque notification (sauf en « Ne pas déranger »).
 Quand le fond **01** ou **02** est choisi, le titre HANKO est redessiné à la taille exacte de ton écran : jamais coupé, jamais sous l'horloge.
 
 Réglages :
@@ -130,7 +163,7 @@ hanko screensaver test            # en lancer une tout de suite
 hanko screensaver test orbite     # une animation précise
 ```
 
-Animations : `eclipse`, `orbite`, `onde`, `balayage`, `defilement`, `phases`. Une au hasard à chaque fois. Elle se ferme au moindre mouvement de souris ou appui sur une touche (les touches média ne la ferment pas).
+Animations : `eclipse`, `orbite`, `onde`, `balayage`, `defilement`, `phases`, `phases3`, `maree`, `frequence`, `trame`, `vinyle` (seulement quand une musique joue). Une au hasard à chaque fois. Elle se ferme au moindre mouvement de souris ou appui sur une touche (les touches média ne la ferment pas).
 
 Changer le délai (en secondes, `0` = jamais) :
 

@@ -16,6 +16,8 @@ import QtQuick.Effects
 import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
+import Quickshell.Services.Mpris
+import QtQuick.Shapes
 
 Item {
   id: root
@@ -89,12 +91,35 @@ Item {
     "onde": onde,
     "balayage": balayage,
     "defilement": defilement,
-    "phases": phases
+    "phases": phases,
+    "phases3": phases3,
+    "maree": maree,
+    "frequence": frequence,
+    "trame": trame,
+    "vinyle": vinyle
   })
 
+  // The two "phases" variants never follow each other; "vinyle" needs a track.
   function pickAnimation() {
-    var ids = Object.keys(animations).filter(function(k) { return k !== root.previous })
+    var lastWasPhases = root.previous === "phases" || root.previous === "phases3"
+    var ids = Object.keys(animations).filter(function(k) {
+      if (k === root.previous) return false
+      if (lastWasPhases && (k === "phases" || k === "phases3")) return false
+      if (k === "vinyle" && !root.player) return false
+      return true
+    })
     return ids[Math.floor(Math.random() * ids.length)]
+  }
+
+  // Media player for "vinyle": the playing one, else one with a track.
+  readonly property var player: {
+    var list = Mpris.players.values
+    var fallback = null
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].isPlaying) return list[i]
+      if (!fallback && list[i].trackTitle) fallback = list[i]
+    }
+    return fallback
   }
 
   // ── Lifecycle ──────────────────────────────────────────────────────────
@@ -643,6 +668,426 @@ Item {
         loops: Animation.Infinite
         ScriptAction { script: { s.reverse = Math.random() < 0.5; s.tilt = (Math.random() * 2 - 1) * 10; s.t = 0 } }
         NumberAnimation { target: s; property: "t"; to: 1; duration: 48000; easing.type: Easing.InOutSine }
+      }
+    }
+  }
+
+  // PHASES (6d-3) — a darker disc moves behind a hole cut in a plate of the
+  // background colour: it is only seen through the hole.
+  Component {
+    id: phases3
+    Rectangle {
+      id: s
+      color: root.noir
+      readonly property bool vertical: height > width
+      readonly property real d: vertical ? width * 0.70 : height * 0.52
+      readonly property real mx: width / 2
+      readonly property real my: height * (vertical ? 0.42 : 0.44)
+      readonly property color fondDark: Qt.darker(root.fond, 1.18)
+      property real t: 0
+      property bool reverse: false
+      property real tilt: 0
+      Drift {
+        anchors.fill: parent
+        Item {
+          width: s.width; height: s.height
+          Disc {
+            diameter: s.d
+            color: s.fondDark
+            readonly property real off: (s.reverse ? -1 : 1) * (-1.6 + 3.2 * s.t) * s.d
+            x: s.mx - s.d / 2 + off
+            y: s.my - s.d / 2 + off * Math.tan(s.tilt * Math.PI / 180)
+          }
+          // Plate with a round hole (odd-even fill: rectangle minus circle).
+          Shape {
+            anchors.fill: parent
+            preferredRendererType: Shape.CurveRenderer
+            ShapePath {
+              fillColor: root.fond
+              strokeColor: "transparent"
+              fillRule: ShapePath.OddEvenFill
+              PathRectangle { x: -s.width; y: -s.height; width: s.width * 3; height: s.height * 3 }
+              PathAngleArc { centerX: s.mx; centerY: s.my; radiusX: s.d / 2; radiusY: s.d / 2; startAngle: 0; sweepAngle: 360; moveToStart: true }
+            }
+          }
+          Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: s.height * (s.vertical ? 0.70 : 0.76) - height / 2
+            text: root.word
+            color: root.creme
+            font.family: root.display
+            font.pixelSize: s.vertical ? s.width * 0.15 : s.height * 0.10
+            renderType: Text.CurveRendering
+          }
+        }
+      }
+      SequentialAnimation {
+        running: true
+        loops: Animation.Infinite
+        ScriptAction { script: { s.reverse = Math.random() < 0.5; s.tilt = (Math.random() * 2 - 1) * 10; s.t = 0 } }
+        NumberAnimation { target: s; property: "t"; to: 1; duration: 48000; easing.type: Easing.InOutSine }
+      }
+    }
+  }
+
+  // MARÉE — a black tide with an irregular wave rises and falls; the word is
+  // black above the water and cream below it; an accent line marks the surface.
+  Component {
+    id: maree
+    Rectangle {
+      id: s
+      color: root.fond
+      readonly property bool vertical: height > width
+      readonly property real unit: vertical ? width : height
+      readonly property real amp: height * 0.019
+      readonly property real loopW: 1200 * height / 1080
+      property real phase: 0
+      property real level: 0.72
+      property var ph: [Math.random() * 6.28, Math.random() * 6.28, Math.random() * 6.28]
+      function waveY(x) {
+        var k = 2 * Math.PI / s.loopW, u = x + s.phase * s.loopW
+        return s.height * s.level + s.amp * (0.55 * Math.sin(k * u + s.ph[0]) + 0.30 * Math.sin(2 * k * u + s.ph[1]) + 0.15 * Math.sin(3 * k * u + s.ph[2]))
+      }
+      readonly property var wavePoints: {
+        var pts = [], step = Math.max(8, s.width / 120)
+        for (var x = -s.width * 0.04; x <= s.width * 1.04 + step; x += step) pts.push(Qt.point(x, waveY(x)))
+        return pts
+      }
+      readonly property var tidePoints: {
+        var pts = s.wavePoints.slice()
+        pts.push(Qt.point(s.width * 1.04 + 20, s.height + 20), Qt.point(-s.width * 0.04, s.height + 20))
+        return pts
+      }
+      readonly property string label: vertical ? "HAN\nKO" : root.word
+      readonly property real wordPx: vertical ? width * 0.37 : height * 0.46
+
+      Drift {
+        anchors.fill: parent
+        Item {
+          width: s.width; height: s.height
+          Text {
+            id: wordA
+            anchors.centerIn: parent
+            text: s.label
+            horizontalAlignment: Text.AlignHCenter
+            lineHeight: 0.9
+            color: root.noir
+            font.family: root.display
+            font.pixelSize: s.wordPx
+            renderType: Text.CurveRendering
+          }
+          Shape {
+            anchors.fill: parent
+            ShapePath { fillColor: root.noir; strokeColor: "transparent"; PathPolyline { path: s.tidePoints } }
+          }
+          Item {
+            id: wordBLayer
+            anchors.fill: parent
+            visible: false
+            layer.enabled: true
+            Text {
+              anchors.centerIn: parent
+              text: s.label
+              horizontalAlignment: Text.AlignHCenter
+              lineHeight: 0.9
+              color: root.creme
+              font: wordA.font
+              renderType: Text.CurveRendering
+            }
+          }
+          Item {
+            id: tideMask
+            anchors.fill: parent
+            visible: false
+            layer.enabled: true
+            Shape {
+              anchors.fill: parent
+              ShapePath { fillColor: "white"; strokeColor: "transparent"; PathPolyline { path: s.tidePoints } }
+            }
+          }
+          MultiEffect { anchors.fill: parent; source: wordBLayer; maskEnabled: true; maskSource: tideMask }
+          Shape {
+            anchors.fill: parent
+            ShapePath { fillColor: "transparent"; strokeColor: root.accent; strokeWidth: Math.max(2, s.unit * 0.0023); PathPolyline { path: s.wavePoints } }
+          }
+        }
+      }
+      NumberAnimation on phase { from: 0; to: 1; duration: 40000; loops: Animation.Infinite }
+      SequentialAnimation {
+        running: true
+        loops: Animation.Infinite
+        // New wave shape each cycle (levels stay 28 % / 72 %: an animation cannot be
+        // retargeted while its group runs).
+        ScriptAction { script: s.ph = [Math.random() * 6.28, Math.random() * 6.28, Math.random() * 6.28] }
+        NumberAnimation { target: s; property: "level"; to: 0.28; duration: 20000; easing.type: Easing.InOutSine }
+        NumberAnimation { target: s; property: "level"; to: 0.72; duration: 20000; easing.type: Easing.InOutSine }
+      }
+    }
+  }
+
+  // FRÉQUENCE — the letters drift up and down like a signal, then line up again.
+  Component {
+    id: frequence
+    Rectangle {
+      id: s
+      color: root.noir
+      readonly property bool vertical: height > width
+      readonly property var letters: root.word.split("")
+      readonly property real px: vertical ? width * 0.25 : height * 0.43
+      property var offA: []
+      property var offB: []
+      property real k: 0          // 0 aligned, 1 at offsets A, 2 at offsets B
+      property real back: 1       // 1 then 0 while returning to the line
+      function draw() {
+        var a = [], b = [], sign = Math.random() < 0.5 ? 1 : -1
+        for (var i = 0; i < letters.length; i++) {
+          a.push(sign * (0.2 + Math.random() * 0.5))
+          b.push(-sign * (0.2 + Math.random() * 0.5))
+          sign = -sign
+        }
+        offA = a; offB = b
+      }
+      Component.onCompleted: draw()
+      function offset(i) {
+        if (offA.length <= i) return 0
+        if (k <= 1) return offA[i] * k
+        return offA[i] + (offB[i] - offA[i]) * Math.min(1, k - 1)
+      }
+      Drift {
+        anchors.fill: parent
+        Item {
+          width: s.width; height: s.height
+          Row {
+            visible: !s.vertical
+            anchors.centerIn: parent
+            spacing: s.px * 0.04
+            Repeater {
+              model: s.letters
+              Text {
+                required property int index
+                required property string modelData
+                text: modelData
+                color: root.creme
+                font.family: root.display
+                font.pixelSize: s.px
+                renderType: Text.CurveRendering
+                transform: Translate { y: s.offset(index) * s.back * s.px }
+              }
+            }
+          }
+          Column {
+            visible: s.vertical
+            anchors.centerIn: parent
+            Repeater {
+              model: s.letters
+              Text {
+                required property int index
+                required property string modelData
+                text: modelData
+                color: root.creme
+                font.family: root.display
+                font.pixelSize: s.px
+                renderType: Text.CurveRendering
+                transform: Translate { x: s.offset(index) * s.back * s.px * 0.6 }
+              }
+            }
+          }
+          Rectangle {
+            id: line
+            color: root.accent
+            width: s.vertical ? 2 : s.width * 0.70
+            height: s.vertical ? s.height * 0.82 : 2
+            x: s.vertical ? s.width * 0.18 : (s.width - width) / 2
+            y: s.vertical ? (s.height - height) / 2 : s.height / 2 + s.px * 0.62
+          }
+        }
+      }
+      SequentialAnimation {
+        running: true
+        loops: Animation.Infinite
+        ScriptAction { script: { s.draw(); s.k = 0; s.back = 1 } }
+        PauseAnimation { duration: 6000 }
+        ParallelAnimation {
+          NumberAnimation { target: s; property: "k"; to: 1; duration: 8000; easing.type: Easing.InOutCubic }
+          NumberAnimation { target: line; property: "opacity"; to: 0; duration: 2400 }
+        }
+        NumberAnimation { target: s; property: "k"; to: 2; duration: 10000; easing.type: Easing.InOutCubic }
+        ParallelAnimation {
+          NumberAnimation { target: s; property: "back"; to: 0; duration: 8000; easing.type: Easing.InOutCubic }
+          SequentialAnimation {
+            PauseAnimation { duration: 6800 }
+            NumberAnimation { target: line; property: "opacity"; to: 1; duration: 2400 }
+          }
+        }
+        PauseAnimation { duration: 8000 }
+      }
+    }
+  }
+
+  // TRAME — a grid of dots; a wave breathes diagonally across it; the dots in
+  // a disc around the centre are accent, the others cream.
+  Component {
+    id: trame
+    Rectangle {
+      id: s
+      color: root.noir
+      readonly property bool vertical: height > width
+      readonly property int cols: vertical ? 12 : 32
+      readonly property int rows: vertical ? 21 : 18
+      readonly property real cellW: width / cols
+      readonly property real cellH: height / rows
+      readonly property real dotD: (vertical ? width : height) * 0.017
+      readonly property real discR: vertical ? 4.8 : 5.6
+      property real cx: (cols - 1) / 2
+      property real cy: (rows - 1) / 2
+      property int dir: 0
+      property real t: 0          // seconds
+      NumberAnimation on t { from: 0; to: 600; duration: 600000; loops: Animation.Infinite }
+      Timer {
+        interval: 60000; running: true; repeat: true
+        onTriggered: {
+          s.dir = Math.floor(Math.random() * 4)
+          s.cx = (s.cols - 1) / 2 + (Math.random() * 6 - 3)
+          s.cy = (s.rows - 1) / 2 + (Math.random() * 6 - 3)
+        }
+      }
+      Drift {
+        anchors.fill: parent
+        Item {
+          width: s.width; height: s.height
+          Repeater {
+            model: s.cols * s.rows
+            Rectangle {
+              required property int index
+              readonly property int c: index % s.cols
+              readonly property int r: Math.floor(index / s.cols)
+              readonly property int cc: (s.dir & 1) ? s.cols - 1 - c : c
+              readonly property int rr: (s.dir & 2) ? s.rows - 1 - r : r
+              readonly property real v: 0.5 - 0.5 * Math.cos(2 * Math.PI * ((s.t - (cc + rr) * 0.22) / 10))
+              width: s.dotD; height: s.dotD; radius: s.dotD / 2
+              x: (c + 0.5) * s.cellW - width / 2
+              y: (r + 0.5) * s.cellH - height / 2
+              color: Math.hypot(c - s.cx, r - s.cy) <= s.discR ? root.accent : root.creme
+              scale: 0.3 + 0.7 * v
+              opacity: 0.35 + 0.65 * v
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // VINYLE — the playing track as a spinning record (MPRIS). The controls show
+  // the player state; media keys drive it without closing the screensaver.
+  Component {
+    id: vinyle
+    Rectangle {
+      id: s
+      color: root.fond
+      readonly property bool vertical: height > width
+      readonly property var p: root.player
+      readonly property real d: vertical ? width * 0.84 : height * 0.67
+      readonly property real cy: height * (vertical ? 0.38 : 0.42)
+      readonly property real coverD: vertical ? width * 0.34 : height * 0.28
+      readonly property real u: vertical ? width : height
+      readonly property string ringText: "HANKO · HANKO · HANKO · "
+      property real angle: Math.random() * 360
+      property real speed: (p && p.isPlaying) ? 1 : 0
+      Behavior on speed { NumberAnimation { duration: 1200; easing.type: Easing.OutCubic } }
+      Timer {
+        interval: 16; running: true; repeat: true
+        onTriggered: s.angle = (s.angle + s.speed * 360 * interval / 20000) % 360
+      }
+      Drift {
+        anchors.fill: parent
+        Item {
+          width: s.width; height: s.height
+          Item {
+            width: s.d; height: s.d
+            x: (s.width - s.d) / 2
+            y: s.cy - s.d / 2
+            rotation: s.angle
+            Disc { diameter: s.d; color: root.noir }
+            Repeater {
+              model: 7
+              Rectangle {
+                required property int index
+                readonly property real dd: s.d * (0.46 + index * 0.075)
+                width: dd; height: dd; radius: dd / 2
+                x: (s.d - dd) / 2; y: (s.d - dd) / 2
+                color: "transparent"; border.color: root.creme; border.width: 1; opacity: 0.14
+              }
+            }
+            Repeater {
+              model: s.ringText.length
+              Text {
+                required property int index
+                readonly property real a: index / s.ringText.length * 2 * Math.PI
+                readonly property real rr: s.d * 0.433
+                text: s.ringText[index]
+                color: root.creme
+                font.family: root.mono
+                font.bold: true
+                font.pixelSize: s.u * 0.028
+                x: s.d / 2 + Math.sin(a) * rr - width / 2
+                y: s.d / 2 - Math.cos(a) * rr - height / 2
+                rotation: a * 180 / Math.PI
+              }
+            }
+            Disc {
+              diameter: s.coverD
+              x: (s.d - s.coverD) / 2; y: (s.d - s.coverD) / 2
+              color: root.accent
+            }
+            Image {
+              id: cover
+              width: s.coverD; height: s.coverD
+              x: (s.d - s.coverD) / 2; y: (s.d - s.coverD) / 2
+              source: s.p && s.p.trackArtUrl ? s.p.trackArtUrl : ""
+              fillMode: Image.PreserveAspectCrop
+              visible: false
+              layer.enabled: true
+            }
+            Item {
+              id: coverMask
+              width: s.coverD; height: s.coverD
+              x: cover.x; y: cover.y
+              visible: false
+              layer.enabled: true
+              Disc { diameter: s.coverD; color: "white" }
+            }
+            MultiEffect {
+              x: cover.x; y: cover.y; width: s.coverD; height: s.coverD
+              visible: cover.status === Image.Ready
+              source: cover; maskEnabled: true; maskSource: coverMask
+            }
+          }
+          Text {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: s.height * (s.vertical ? 0.68 : 0.81)
+            width: s.width * 0.8
+            horizontalAlignment: Text.AlignHCenter
+            elide: Text.ElideRight
+            text: s.p ? (String(s.p.trackTitle) + (s.p.trackArtist ? " — " + s.p.trackArtist : "")).toUpperCase() : ""
+            color: root.creme
+            font.family: root.mono
+            font.bold: true
+            font.pixelSize: s.u * 0.022
+            font.letterSpacing: s.u * 0.022 * 0.2
+          }
+          Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            y: s.height * (s.vertical ? 0.76 : 0.87)
+            spacing: s.u * 0.04
+            Text { anchors.verticalCenter: parent.verticalCenter; text: "⏮"; color: root.noir; font.pixelSize: s.u * 0.035 }
+            Rectangle {
+              width: s.u * 0.096; height: width; radius: width / 2
+              color: root.creme
+              Text { anchors.centerIn: parent; text: s.p && s.p.isPlaying ? "⏸" : "▶"; color: root.noir; font.pixelSize: s.u * 0.04 }
+            }
+            Text { anchors.verticalCenter: parent.verticalCenter; text: "⏭"; color: root.noir; font.pixelSize: s.u * 0.035 }
+          }
+        }
       }
     }
   }
