@@ -1,0 +1,14 @@
+# Hanko — re-add the notification and OSD hook after Omarchy updates those files.
+# Installed by `hanko ui install` to /etc/pacman.d/hooks/hanko-ui.hook.
+
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Path
+Target = usr/share/omarchy/shell/plugins/notifications/Toast.qml
+Target = usr/share/omarchy/shell/plugins/osd/Osd.qml
+
+[Action]
+Description = Hanko: re-applying the notification and OSD hook...
+When = PostTransaction
+Exec = /bin/sh -c '/usr/local/lib/hanko/ui-patch.sh restore && /usr/local/lib/hanko/ui-patch.sh apply'

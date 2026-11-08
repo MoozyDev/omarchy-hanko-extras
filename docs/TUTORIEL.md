@@ -71,7 +71,7 @@ hanko bar on
 hanko bar off
 ```
 
-La barre du haut grandit de 18 px quand la souris passe dessus. Les fenêtres ne bougent pas : la barre passe par-dessus.
+La barre du haut fait 32 px, avec un filet de 1 px sous elle, et grandit de 18 px quand la souris passe dessus. Ses widgets sont rangés dans l'ordre Hanko (`hanko bar layout` pour les remettre en ordre). Les fenêtres ne bougent pas : la barre passe par-dessus.
 
 > Comment : Hanko fait une copie officielle de la barre d'Omarchy (`omarchy plugin clone omarchy.bar`) et y change 4 lignes marquées `HANKO-BAR`. `off` remet la barre d'origine.
 
@@ -100,6 +100,19 @@ hanko barstyle uninstall   # tout retirer (demande sudo)
 Le bureau actif devient son numéro en noir sur une pastille de la couleur accent ; l'horloge passe en capitales.
 
 > Comment : accroche dans les deux widgets système d'Omarchy (Bureaux et Horloge), remise par un hook pacman après chaque mise à jour. `on`/`off` changent un simple fichier, à chaud.
+
+### Notifications et jauge volume / luminosité
+
+```bash
+hanko ui install     # une seule fois (demande sudo)
+hanko ui on
+hanko ui off
+hanko ui uninstall
+```
+
+Notifications : nom de l'application en tête, en accent foncé ; bandeau accent sur les notifications urgentes ; elles glissent depuis la droite. Jauge (OSD) : en bas de l'écran, fond noir, barre fine accent pour le volume et crème pour la luminosité.
+
+> Comment : accroche dans les deux fichiers système d'Omarchy, remise par un hook pacman ; `on`/`off` changent `~/.config/omarchy/hanko/ui.json`.
 
 ### Fenêtres
 

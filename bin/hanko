@@ -183,6 +183,25 @@ cmd_extras() {
 # ───────────────────────────────────────────────────────────────── bar
 bar_file() { echo "$PLUGINS/${USER:-$(id -un)}.bar/Bar.qml"; }
 
+# Widget order from icons/bar/correspondance.md:
+#   left: menu, workspaces · centre: indicators, clock, keyboard, weather,
+#   microphone, media, updates · right: tray, Tailscale, AI, Bluetooth,
+#   network, audio, display, power. Widgets that are not installed are skipped;
+#   Elsewhen (not in the spec) stays right after the weather.
+bar_layout() {
+  backup "$SHELL_JSON"
+  local i=0 id
+  omarchy-plugin-enable omarchy.microphone --section centerEnd >/dev/null 2>&1 || true
+  omarchy-plugin-enable omarchy.media --section centerEnd >/dev/null 2>&1 || true
+  for id in omarchy.keyboard-layout omarchy.weather omarchy.elsewhen omarchy.microphone omarchy.media omarchy.system-update; do
+    omarchy-bar move "$id" --section centerEnd --index "$i" >/dev/null 2>&1 && i=$((i + 1))
+  done
+  i=0
+  for id in omarchy.tray omarchy.tailscale omarchy.agents omarchy.bluetooth omarchy.network omarchy.audio omarchy.monitor omarchy.power; do
+    omarchy-bar move "$id" --section right --index "$i" >/dev/null 2>&1 && i=$((i + 1))
+  done
+}
+
 cmd_bar() {
   local action="${1:-on}" file
   file=$(bar_file)
@@ -199,8 +218,16 @@ cmd_bar() {
       # Patch after the switch: saving the file makes the shell reload the bar
       # once it is in use, which also fills in its widgets.
       sleep 1
+      # Restore first so an older version of the patch is replaced.
+      bash "$EXTRAS/bar/bar-patch.sh" restore "$file" >/dev/null
       bash "$EXTRAS/bar/bar-patch.sh" apply "$file" "$BAR_GROW"
+      bar_layout
       ok "barre active : survole-la pour la voir grandir (+${BAR_GROW} px)"
+      ;;
+    layout)
+      need_omarchy
+      bar_layout
+      ok "widgets rangés dans l'ordre Hanko"
       ;;
     off)
       [[ -f $file ]] && bash "$EXTRAS/bar/bar-patch.sh" restore "$file"
@@ -210,7 +237,7 @@ cmd_bar() {
     status)
       [[ -f $file ]] && bash "$EXTRAS/bar/bar-patch.sh" status "$file" || echo "absent"
       ;;
-    *) die "usage : hanko bar on|off|status" ;;
+    *) die "usage : hanko bar on|off|layout|status" ;;
   esac
 }
 
@@ -325,6 +352,55 @@ cmd_barstyle() {
       echo "point d'accroche : $patch ; style : $(cat "$flag" 2>/dev/null || echo off)"
       ;;
     *) die "usage : hanko barstyle install|on|off|status|uninstall" ;;
+  esac
+}
+
+# ───────────────────────────────────────────────────────────────── notifications + OSD
+# specs/notifications and specs/osd: hook in Omarchy's Toast.qml and Osd.qml
+# (sudo once); on/off write ~/.config/omarchy/hanko/ui.json.
+accent_dark() {
+  case "$(current_variant)" in
+    cramoisi) echo "#a50d26" ;;
+    vert-billard) echo "#0a5a33" ;;
+    *) echo "#c2340f" ;;
+  esac
+}
+
+cmd_ui() {
+  local action="${1:-status}" file="$CONFIG/omarchy/hanko/ui.json"
+  case "$action" in
+    install)
+      bold "Notifications et jauge volume / luminosité"
+      info "Omarchy dessine les notifications et la jauge (OSD) avec deux fichiers système."
+      info "Hanko y ajoute une accroche ; un hook pacman la remet après chaque mise à jour."
+      ask "Installer cette accroche (sudo requis) ?" || { warn "notifications et OSD inchangés"; return 0; }
+      sudo bash "$EXTRAS/ui/system.sh" install
+      cmd_ui on
+      omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
+      ;;
+    on)
+      mkdir -p "$(dirname -- "$file")"
+      printf '{ "on": true, "accentDark": "%s" }\n' "$(accent_dark)" >"$file"
+      [[ -x /usr/local/lib/hanko/ui-patch.sh ]] || warn "point d'accroche absent : lance d'abord hanko ui install"
+      ok "notifications (en-tête, bandeau critique, glissement) et jauge Hanko"
+      ;;
+    off)
+      mkdir -p "$(dirname -- "$file")"
+      printf '{ "on": false }\n' >"$file"
+      ok "notifications et jauge d'Omarchy (l'accroche reste, inactive)"
+      ;;
+    uninstall)
+      rm -f "$file"
+      sudo bash "$EXTRAS/ui/system.sh" uninstall
+      shell_ok && omarchy-restart-shell >/dev/null 2>&1 || true
+      ok "fichiers d'origine remis et hook pacman supprimé"
+      ;;
+    status)
+      local patch="absent"
+      [[ -x /usr/local/lib/hanko/ui-patch.sh ]] && patch=$(/usr/local/lib/hanko/ui-patch.sh status)
+      echo "point d'accroche : $patch ; style : $(grep -q '"on": true' "$file" 2>/dev/null && echo on || echo off)"
+      ;;
+    *) die "usage : hanko ui install|on|off|status|uninstall" ;;
   esac
 }
 
@@ -650,6 +726,7 @@ cmd_install() {
     cmd_screensaver on
     cmd_icons install
     cmd_barstyle install
+    cmd_ui install
     cmd_lock install
     cmd_boot on
     # The shell compiled LockView.qml and the plugins at startup: restart it
@@ -683,6 +760,7 @@ cmd_uninstall() {
   cmd_cursor off
   if [[ -x /usr/local/lib/hanko/icons-patch.sh ]]; then cmd_icons uninstall; else rm -rf "$CONFIG/omarchy/hanko/bar-icons"; fi
   if [[ -x /usr/local/lib/hanko/barstyle-patch.sh ]]; then cmd_barstyle uninstall; fi
+  if [[ -x /usr/local/lib/hanko/ui-patch.sh ]]; then cmd_ui uninstall; fi
   cmd_widgets off
   cmd_screensaver off
   if [[ -x /usr/local/lib/hanko/lock-patch.sh ]]; then cmd_lock uninstall; else rm -rf "$CONFIG/omarchy/lock-skin"; fi
@@ -738,6 +816,7 @@ cmd_doctor() {
   echo "  fenêtres        : $(cmd_looknfeel status)"
   echo "  icônes barre    : $(cmd_icons status)"
   echo "  style barre     : $(cmd_barstyle status)"
+  echo "  notifs + jauge  : $(cmd_ui status)"
   echo "  écran de veille : $([[ -f $STATE/screensaver-on ]] && echo actif || echo inactif)"
   echo "  verrouillage    : $(cmd_lock status)"
   echo "  shell Omarchy   : $(shell_ok && echo répond || echo 'ne répond pas')"
@@ -754,6 +833,7 @@ hanko — thème Hanko pour Omarchy 4
   hanko menu on|off|status                         menu large et bas
   hanko icons install|on|off|status|uninstall      icônes Hanko dans la barre
   hanko barstyle install|on|off|status|uninstall   bureau actif en pastille, horloge en capitales
+  hanko ui install|on|off|status|uninstall         notifications et jauge volume / luminosité
   hanko widgets on|off|status                      horloge, météo, musique sur le bureau
   hanko screensaver on|off|test [animation]        écran de veille Hanko
   hanko lock install|on|off|edit|status|uninstall  écran de verrouillage Hanko
@@ -777,6 +857,7 @@ main() {
     menu) cmd_menu "$@" ;;
     icons) cmd_icons "$@" ;;
     barstyle) cmd_barstyle "$@" ;;
+    ui) cmd_ui "$@" ;;
     widgets) cmd_widgets "$@" ;;
     screensaver) cmd_screensaver "$@" ;;
     lock) cmd_lock "$@" ;;

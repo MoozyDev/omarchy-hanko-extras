@@ -18,11 +18,11 @@ Comparaison entre les maquettes et fiches de `specs/` et ce que l'installation f
 ## Bureau
 | Élément | Source | État |
 |---|---|---|
-| Barre : hauteur, couleurs, police | `specs/barre` | 🟡 couleurs et police via le thème ; hauteur 32 px et filet bas de 1 px non réglés |
+| Barre : hauteur 32 px, fond noir 92 %, filet bas de 1 px, police | `specs/barre` | ✅ |
 | Barre : grandit au survol | demande | ✅ |
 | Barre : icônes Hanko, bouton menu Moozy | Icônes de la barre | ✅ (Elsewhen, veilleuse, rappel : pas d'icône Hanko) |
 | Barre : bureau actif en pastille accent, horloge en capitales | `specs/barre` | ✅ (espacement des lettres +8 % : non réglable) |
-| Barre : ordre des widgets | Barre complète, dans ton ordre | ⬜ ordre d'Omarchy conservé |
+| Barre : ordre des widgets | Barre complète, dans ton ordre | ✅ (`hanko bar layout` ; Elsewhen, absent de la maquette, reste après la météo) |
 | Widgets : horloge, date, météo, musique (1 écran) | `specs/widgets-bureau` | ✅ (musique non vérifiée : pas de lecteur dans la VM) |
 | Widgets : rôles par écran (écran vertical : horloge, À FAIRE, jauges CPU/RAM/GPU/NET ; 4ᵉ écran : MOOZY) | `specs/widgets-bureau` | 🟡 horloge verticale codée, non vérifiée ; À FAIRE, jauges et 4ᵉ écran ⬜ |
 | Fond différent par écran (05-papier-vertical sur le vertical, 04-moozy sur le 4ᵉ) | `specs/fond-par-ecran` | ⬜ |
@@ -33,10 +33,10 @@ Comparaison entre les maquettes et fiches de `specs/` et ce que l'installation f
 | Élément | Source | État |
 |---|---|---|
 | Menu et lanceur larges et bas, 6 lignes, couleurs | `specs/lanceur` · 11f | ✅ (icônes d'applis 28 px non vérifiées) |
-| Notifications : carte crème, texte noir | `specs/notifications` | 🟡 couleurs ✅ ; en-tête de l'appli en accent foncé, bandeau critique, glissement d'entrée ⬜ |
+| Notifications : carte crème, texte noir, en-tête de l'appli en accent foncé, bandeau critique 4 px, glissement d'entrée | `specs/notifications` | ✅ (`hanko ui`) |
 | Son de notification | Sons | ✅ (joue en VM, non écouté) |
 | Son de verrouillage | Sons | ✅ |
-| Jauge volume / luminosité (OSD) | `specs/osd` · 11c | ⬜ couleurs d'Omarchy ; taille, position et jauge non réglables sans accroche |
+| Jauge volume / luminosité (OSD) | `specs/osd` · 11c | 🟡 `hanko ui` : fond noir, 8 % du bas, jauge 4 px sur fond #3a3330, accent (volume) / crème (luminosité) ; taille exacte 360 × 44, « MUET » et icône Hanko ⬜ |
 | Capture d'écran : cadre accent | Ce qui pourrait encore suivre | ⬜ |
 
 ## Verrouillage, veille, démarrage
@@ -46,11 +46,14 @@ Comparaison entre les maquettes et fiches de `specs/` et ce que l'installation f
 | Verrouillage : titre HANKO + logo comme le bureau | demande | ✅ |
 | Verrouillage : rôles par écran (vertical / horizontal) | `specs/verrouillage` | 🟡 codé, non vérifié (un seul écran dans la VM) |
 | Veille : 11 animations | `specs/ecran-de-veille` | ✅ 10 vérifiées ; Vinyle ❔ (pas de lecteur) |
-| Écran de déverrouillage du disque : couleurs et logo | Démarrage | ✅ couleurs et logo ; champ carré, puces carrées, barre de 2 px ⬜ |
-| Limine : couleurs du menu de démarrage | Démarrage · `boot/limine.conf` | ⬜ |
+| Écran de déverrouillage du disque : couleurs, logo, champ | Démarrage | ✅ (vu au redémarrage) |
+| Limine : couleurs du menu de démarrage | Démarrage · `boot/limine.conf` | ✅ (vu au redémarrage) |
 | Logo « À propos » et fastfetch | about.txt | ✅ |
 
 ## Applications
+
+À faire sur le PC principal (applications installées, deux écrans) : thèmes d'applis, rôles et fonds par écran, Twitch.
+
 | Élément | Source | État |
 |---|---|---|
 | Spotify (Spicetify) | 11e · `apps-themes/spicetify` | ⬜ fichiers dans le thème, non installés |
