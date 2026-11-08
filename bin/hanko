@@ -803,7 +803,10 @@ cmd_uninstall() {
   if [[ $(current_theme) == hanko-* ]]; then
     omarchy-theme-set tokyo-night >/dev/null 2>&1 || warn "repasse sur un autre thème : omarchy-theme-set tokyo-night"
   fi
-  rm -rf "$CONFIG"/omarchy/themes/hanko-* "$CONFIG"/omarchy/backgrounds/hanko-*
+  # Omarchy also remembers the last wallpaper per theme; without this a
+  # reinstall comes back on that one instead of the default 01-hanko.
+  rm -rf "$CONFIG"/omarchy/themes/hanko-* "$CONFIG"/omarchy/backgrounds/hanko-* \
+    "${XDG_STATE_HOME:-$HOME/.local/state}"/omarchy/theme-backgrounds/hanko-*
   ok "thèmes Hanko supprimés"
   for id in "$user.bar" "$user.menu"; do
     [[ -d $PLUGINS/$id ]] || continue
