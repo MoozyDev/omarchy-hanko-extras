@@ -25,7 +25,7 @@ Il pose deux questions et demande ton mot de passe (`sudo`) pour l'écran de ver
 curl -fsSL https://raw.githubusercontent.com/MoozyDev/omarchy-hanko-extras/main/install.sh | bash -s vermillon essentiel
 ```
 
-Installe : couleurs, fonds d'écran, icônes des dossiers et des applications, police Anton, logo ASCII, fastfetch.
+Installe : couleurs, fonds d'écran, icônes des dossiers et des applications, polices Anton et Space Mono Nerd, curseur Bibata, bordures et animations des fenêtres, logo ASCII, fastfetch.
 Ne touche pas à la barre, au menu, à la veille ni au verrouillage. Pas de `sudo`.
 
 ### Le thème seul — couleurs et fonds
@@ -115,11 +115,11 @@ Bordures de 3 px (crème sur la fenêtre active, noires sinon), angles droits, e
 ### Curseur
 
 ```bash
-hanko cursor on      # installe Bibata-Modern-Classic (AUR, demande sudo)
+hanko cursor on      # installe Bibata-Modern-Classic (fourni avec Hanko, sans sudo)
 hanko cursor off
 ```
 
-Complet après la prochaine connexion.
+Complet après la prochaine connexion. La police Space Mono Nerd et le curseur sont fournis avec Hanko (licences dans `third-party/`) : rien à installer en plus.
 
 ### Menu large et bas
 

@@ -68,7 +68,7 @@ hanko update · hanko uninstall
 
 Screensaver delay: `omarchy bar set hanko.screensaver delay 300` (seconds, 0 = never).
 
-Why it is built this way (what Omarchy lets a theme do, and the lock screen): [docs/architecture.md](docs/architecture.md).
+Why it is built this way (what Omarchy lets a theme do, and the lock screen): [docs/architecture.md](docs/architecture.md). What is done versus the mockups: [docs/ETAT.md](docs/ETAT.md).
 
 ## What is in this repo
 - `install.sh`, `bin/hanko` — installer and command.

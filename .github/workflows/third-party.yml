@@ -1,0 +1,80 @@
+# Weekly check of the third-party files in third-party/ (Bibata cursor,
+# Space Mono Nerd Font). When upstream publishes a new release, this downloads
+# the new archive and licence, and opens a pull request. If a licence text
+# changed, the pull request says so in its title: read it before merging.
+#
+# Needs: Settings > Actions > General > Workflow permissions >
+#        "Allow GitHub Actions to create and approve pull requests".
+
+name: Third-party updates
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check upstream releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          current() { grep "^$1=" third-party/VERSIONS | cut -d= -f2; }
+
+          bibata_old=$(current bibata)
+          bibata_new=$(gh api repos/ful1e5/Bibata_Cursor/releases/latest --jq .tag_name)
+          nerd_old=$(current nerd-fonts)
+          nerd_new=$(gh api repos/ryanoasis/nerd-fonts/releases/latest --jq .tag_name)
+
+          changes=""
+          licence_changed=0
+
+          if [[ $bibata_new != "$bibata_old" ]]; then
+            curl -fsSL -o third-party/bibata/Bibata-Modern-Classic.tar.xz \
+              "https://github.com/ful1e5/Bibata_Cursor/releases/download/$bibata_new/Bibata-Modern-Classic.tar.xz"
+            curl -fsSL -o /tmp/bibata-LICENSE "https://raw.githubusercontent.com/ful1e5/Bibata_Cursor/$bibata_new/LICENSE"
+            cmp -s /tmp/bibata-LICENSE third-party/bibata/LICENSE || licence_changed=1
+            cp /tmp/bibata-LICENSE third-party/bibata/LICENSE
+            sed -i "s/^bibata=.*/bibata=$bibata_new/" third-party/VERSIONS
+            changes+="- Bibata cursor: $bibata_old → $bibata_new"$'\n'
+          fi
+
+          if [[ $nerd_new != "$nerd_old" ]]; then
+            curl -fsSL -o third-party/space-mono-nerd/SpaceMono.tar.xz \
+              "https://github.com/ryanoasis/nerd-fonts/releases/download/$nerd_new/SpaceMono.tar.xz"
+            mkdir -p /tmp/sm && tar -xJf third-party/space-mono-nerd/SpaceMono.tar.xz -C /tmp/sm OFL.txt
+            curl -fsSL -o /tmp/nf-LICENSE "https://raw.githubusercontent.com/ryanoasis/nerd-fonts/$nerd_new/LICENSE"
+            cmp -s /tmp/sm/OFL.txt third-party/space-mono-nerd/OFL.txt || licence_changed=1
+            cmp -s /tmp/nf-LICENSE third-party/space-mono-nerd/NERD-FONTS-LICENSE || licence_changed=1
+            cp /tmp/sm/OFL.txt third-party/space-mono-nerd/OFL.txt
+            cp /tmp/nf-LICENSE third-party/space-mono-nerd/NERD-FONTS-LICENSE
+            sed -i "s/^nerd-fonts=.*/nerd-fonts=$nerd_new/" third-party/VERSIONS
+            changes+="- Space Mono Nerd Font: $nerd_old → $nerd_new"$'\n'
+          fi
+
+          if [[ -z $changes ]]; then
+            echo "Everything is up to date."
+            exit 0
+          fi
+
+          branch="third-party-$(date +%Y%m%d)"
+          title="Third-party update"
+          (( licence_changed )) && title="Third-party update — LICENCE CHANGED, review before merging"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add third-party
+          git commit -m "$title" -m "$changes"
+          git push -u origin "$branch"
+          gh pr create --base main --head "$branch" --title "$title" \
+            --body "$(printf 'Automatic check of third-party/ (see third-party/README.md).\n\n%s\nLicence text changed: %s' "$changes" "$([[ $licence_changed == 1 ]] && echo yes || echo no)")"
