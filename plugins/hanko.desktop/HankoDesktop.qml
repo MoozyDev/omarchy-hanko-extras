@@ -178,11 +178,11 @@ Item {
   }
 
   // ── Live title wallpaper ───────────────────────────────────────────────
-  // The HANKO title wallpapers (01-hanko, 02-hanko-plein) are fixed 16:9
-  // pictures: cropped on other screen shapes, and their title either runs
-  // into the clock or sits too small. When one of them is selected, this
-  // plugin draws it live instead, sized for the actual screen and keeping
-  // the bottom strip free for the widgets. Any other wallpaper shows as is.
+  // The HANKO title wallpaper (01-hanko) is a fixed 16:9 picture rendered
+  // from this very drawing: cropped on other screen shapes. When it is
+  // selected, this plugin draws it live instead, sized for the actual screen
+  // and keeping the bottom strip free for the widgets. Any other wallpaper
+  // shows as is. (02-hanko-plein, from older theme versions, also matches.)
   readonly property bool liveWallpaper: setting("liveWallpaper", true)
   property string backgroundName: ""
   readonly property bool liveTitle: liveWallpaper && /^0[12]-hanko/.test(backgroundName) && themeName.indexOf("hanko-") === 0
