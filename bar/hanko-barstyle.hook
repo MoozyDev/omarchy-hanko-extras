@@ -1,0 +1,14 @@
+# Hanko — re-add the bar style hook after Omarchy updates its workspace or clock widget.
+# Installed by `hanko barstyle install` to /etc/pacman.d/hooks/hanko-barstyle.hook.
+
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Path
+Target = usr/share/omarchy/shell/plugins/bar/widgets/Workspaces.qml
+Target = usr/share/omarchy/shell/plugins/panels/clock/BarWidget.qml
+
+[Action]
+Description = Hanko: re-applying the bar style hook...
+When = PostTransaction
+Exec = /bin/sh -c '/usr/local/lib/hanko/barstyle-patch.sh restore && /usr/local/lib/hanko/barstyle-patch.sh apply'

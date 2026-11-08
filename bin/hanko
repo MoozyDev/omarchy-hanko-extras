@@ -163,7 +163,7 @@ cmd_extras() {
 
   # Screensaver / about text, fastfetch.
   mkdir -p "$CONFIG/omarchy/branding" "$CONFIG/fastfetch"
-  for f in screensaver.txt about.txt; do
+  for f in screensaver.txt about.txt about-grand.txt; do
     backup "$CONFIG/omarchy/branding/$f"
     cp -f "$EXTRAS/branding/$f" "$CONFIG/omarchy/branding/$f"
   done
@@ -275,6 +275,146 @@ remove_widget_plugin() {
   omarchy-plugin-disable "$id" >/dev/null 2>&1 || true
   rm -rf "${PLUGINS:?}/$id"
   shell_ok && omarchy-shell shell rescanPlugins >/dev/null || true
+}
+
+# ───────────────────────────────────────────────────────────────── bar style
+# Active workspace as an accent pill, clock in capitals (specs/barre). Hook in
+# two Omarchy widgets (sudo once); then on/off just writes a flag file.
+cmd_barstyle() {
+  local action="${1:-status}" flag="$CONFIG/omarchy/hanko/bar-style"
+  case "$action" in
+    install)
+      bold "Style de la barre (bureau actif, horloge)"
+      info "Le bureau actif et l'horloge sont dessinés par deux widgets système d'Omarchy."
+      info "Hanko y ajoute une accroche ; un hook pacman la remet après chaque mise à jour."
+      ask "Installer cette accroche (sudo requis) ?" || { warn "style de la barre ignoré"; return 0; }
+      sudo bash "$EXTRAS/bar/system.sh" install
+      mkdir -p "$(dirname -- "$flag")"
+      echo on >"$flag"
+      omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
+      ok "bureau actif en pastille accent, horloge en capitales"
+      ;;
+    on)
+      mkdir -p "$(dirname -- "$flag")"
+      echo on >"$flag"
+      [[ -x /usr/local/lib/hanko/barstyle-patch.sh ]] || warn "point d'accroche absent : lance d'abord hanko barstyle install"
+      ok "style Hanko de la barre activé"
+      ;;
+    off)
+      mkdir -p "$(dirname -- "$flag")"
+      echo off >"$flag"
+      ok "bureau actif et horloge d'Omarchy (l'accroche reste, inactive)"
+      ;;
+    uninstall)
+      rm -f "$flag"
+      sudo bash "$EXTRAS/bar/system.sh" uninstall
+      shell_ok && omarchy-restart-shell >/dev/null 2>&1 || true
+      ok "widgets d'origine remis et hook pacman supprimé"
+      ;;
+    status)
+      local patch="absent"
+      [[ -x /usr/local/lib/hanko/barstyle-patch.sh ]] && patch=$(/usr/local/lib/hanko/barstyle-patch.sh status)
+      echo "point d'accroche : $patch ; style : $(cat "$flag" 2>/dev/null || echo off)"
+      ;;
+    *) die "usage : hanko barstyle install|on|off|status|uninstall" ;;
+  esac
+}
+
+# ───────────────────────────────────────────────────────────────── look'n'feel
+# Windows (looknfeel.md): 3 px borders, square corners, gaps 8/16, opacity
+# 0.94/0.90, light blur, one "dry" curve for every animation. Written as a
+# marked block in the user's own ~/.config/hypr/looknfeel.lua (Lua there is
+# the user's, so Omarchy runs it). Border colours come from the theme.
+LNF_FILE="$CONFIG/hypr/looknfeel.lua"
+LNF_BEGIN="-- HANKO-LOOKNFEEL BEGIN (remove with: hanko looknfeel off)"
+LNF_END="-- HANKO-LOOKNFEEL END"
+
+cmd_looknfeel() {
+  local action="${1:-on}"
+  case "$action" in
+    on)
+      bold "Fenêtres Hanko"
+      [[ -f $LNF_FILE ]] || die "$LNF_FILE introuvable (Omarchy 4 requis)"
+      backup "$LNF_FILE"
+      cmd_looknfeel strip
+      cat >>"$LNF_FILE" <<'EOF'
+
+-- HANKO-LOOKNFEEL BEGIN (remove with: hanko looknfeel off)
+hl.config({
+  general = { border_size = 3, gaps_in = 8, gaps_out = 16 },
+  decoration = {
+    rounding = 0,
+    active_opacity = 0.94,
+    inactive_opacity = 0.90,
+    shadow = { enabled = false },
+    blur = { enabled = true, size = 8, passes = 2, vibrancy = 0 },
+  },
+})
+-- One curve, no bounce: fast start, soft stop. Speeds are tenths of a second.
+hl.curve("hanko", { type = "bezier", points = { { 0.16, 1 }, { 0.3, 1 } } })
+hl.animation({ leaf = "windowsIn", enabled = true, speed = 2.2, bezier = "hanko", style = "popin 85%" })
+hl.animation({ leaf = "windowsOut", enabled = true, speed = 1.5, bezier = "hanko", style = "popin 90%" })
+hl.animation({ leaf = "workspaces", enabled = true, speed = 2.6, bezier = "hanko", style = "slide" })
+hl.animation({ leaf = "border", enabled = true, speed = 1.8, bezier = "hanko" })
+hl.animation({ leaf = "fade", enabled = true, speed = 1.8, bezier = "hanko" })
+hl.animation({ leaf = "fadeIn", enabled = true, speed = 1.8, bezier = "hanko" })
+hl.animation({ leaf = "fadeOut", enabled = true, speed = 1.8, bezier = "hanko" })
+hl.animation({ leaf = "layers", enabled = true, speed = 1.8, bezier = "hanko" })
+-- HANKO-LOOKNFEEL END
+EOF
+      hyprctl reload >/dev/null 2>&1 || true
+      ok "bordures 3 px, angles droits, espaces 8/16, opacité, flou, animations sèches"
+      ;;
+    off)
+      cmd_looknfeel strip
+      hyprctl reload >/dev/null 2>&1 || true
+      ok "apparence des fenêtres Omarchy remise"
+      ;;
+    strip)
+      [[ -f $LNF_FILE ]] || return 0
+      local tmp
+      tmp=$(mktemp "$LNF_FILE.hanko.XXXXXX")
+      awk -v b="$LNF_BEGIN" -v e="$LNF_END" '
+        $0 == b { skip = 1; next }
+        skip && $0 == e { skip = 0; next }
+        !skip { lines[++n] = $0 }
+        END { while (n > 0 && lines[n] == "") n--; for (i = 1; i <= n; i++) print lines[i] }
+      ' "$LNF_FILE" >"$tmp" && mv -f "$tmp" "$LNF_FILE"
+      ;;
+    status)
+      grep -qxF -- "$LNF_BEGIN" "$LNF_FILE" 2>/dev/null && echo actif || echo inactif
+      ;;
+    *) die "usage : hanko looknfeel on|off|status" ;;
+  esac
+}
+
+# ───────────────────────────────────────────────────────────────── cursor
+# Bibata-Modern-Classic, size 24 (looknfeel.md), from the AUR.
+CURSOR_THEME="Bibata-Modern-Classic"
+cmd_cursor() {
+  local action="${1:-on}" env="$CONFIG/uwsm/env.d/60-hanko-cursor"
+  case "$action" in
+    on)
+      bold "Curseur Bibata"
+      if [[ ! -d /usr/share/icons/$CURSOR_THEME && ! -d $HOME/.local/share/icons/$CURSOR_THEME ]]; then
+        ask "Installer bibata-cursor-theme-bin depuis l'AUR (sudo requis) ?" || { warn "curseur inchangé"; return 0; }
+        omarchy-pkg-aur-add bibata-cursor-theme-bin
+      fi
+      mkdir -p "$(dirname -- "$env")"
+      printf '# Hanko: Bibata cursor (remove with `hanko cursor off`).\nexport XCURSOR_THEME=%s\nexport XCURSOR_SIZE=24\n' "$CURSOR_THEME" >"$env"
+      gsettings set org.gnome.desktop.interface cursor-theme "$CURSOR_THEME" 2>/dev/null || true
+      gsettings set org.gnome.desktop.interface cursor-size 24 2>/dev/null || true
+      hyprctl setcursor "$CURSOR_THEME" 24 >/dev/null 2>&1 || true
+      ok "curseur $CURSOR_THEME (complet après la prochaine connexion)"
+      ;;
+    off)
+      rm -f "$env"
+      gsettings reset org.gnome.desktop.interface cursor-theme 2>/dev/null || true
+      gsettings reset org.gnome.desktop.interface cursor-size 2>/dev/null || true
+      ok "curseur d'origine à la prochaine connexion"
+      ;;
+    *) die "usage : hanko cursor on|off" ;;
+  esac
 }
 
 # ───────────────────────────────────────────────────────────────── bar icons
@@ -473,7 +613,7 @@ cmd_lock() {
 # ───────────────────────────────────────────────────────────────── all
 # Three levels:
 #   totale     theme + extras + bar + menu + widgets + screensaver + lock + boot
-#   essentiel  theme + extras (Anton font, app icons, ASCII logo, fastfetch)
+#   essentiel  theme + extras (Anton font, app icons, ASCII logo, fastfetch) + window look
 #   theme      theme only (colours, wallpapers, folder icons)
 cmd_install() {
   local variant="${1:-vermillon}" level="${2:-totale}"
@@ -489,6 +629,7 @@ cmd_install() {
   cmd_theme "$variant"
   if [[ $level == totale || $level == essentiel ]]; then
     cmd_extras
+    cmd_looknfeel on
   fi
   if [[ $level == totale ]]; then
     cmd_bar on
@@ -496,8 +637,10 @@ cmd_install() {
     cmd_widgets on
     cmd_screensaver on
     cmd_icons install
+    cmd_barstyle install
     cmd_lock install
     cmd_boot on
+    cmd_cursor on
     # The shell compiled LockView.qml and the plugins at startup: restart it
     # so everything above is live without logging out (the bar blinks once).
     omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
@@ -525,7 +668,10 @@ cmd_uninstall() {
   bold "Désinstallation de Hanko"
   cmd_bar off
   cmd_menu off
+  cmd_looknfeel off
+  cmd_cursor off
   if [[ -x /usr/local/lib/hanko/icons-patch.sh ]]; then cmd_icons uninstall; else rm -rf "$CONFIG/omarchy/hanko/bar-icons"; fi
+  if [[ -x /usr/local/lib/hanko/barstyle-patch.sh ]]; then cmd_barstyle uninstall; fi
   cmd_widgets off
   cmd_screensaver off
   if [[ -x /usr/local/lib/hanko/lock-patch.sh ]]; then cmd_lock uninstall; else rm -rf "$CONFIG/omarchy/lock-skin"; fi
@@ -546,7 +692,9 @@ cmd_doctor() {
   echo "  barre           : $(cmd_bar status)"
   echo "  menu            : $(cmd_menu status)"
   echo "  widgets bureau  : $(cmd_widgets status)"
+  echo "  fenêtres        : $(cmd_looknfeel status)"
   echo "  icônes barre    : $(cmd_icons status)"
+  echo "  style barre     : $(cmd_barstyle status)"
   echo "  écran de veille : $([[ -f $STATE/screensaver-on ]] && echo actif || echo inactif)"
   echo "  verrouillage    : $(cmd_lock status)"
   echo "  shell Omarchy   : $(shell_ok && echo répond || echo 'ne répond pas')"
@@ -562,10 +710,13 @@ hanko — thème Hanko pour Omarchy 4
   hanko bar on|off|status                          barre qui s'agrandit au survol
   hanko menu on|off|status                         menu large et bas
   hanko icons install|on|off|status|uninstall      icônes Hanko dans la barre
+  hanko barstyle install|on|off|status|uninstall   bureau actif en pastille, horloge en capitales
   hanko widgets on|off|status                      horloge, météo, musique sur le bureau
   hanko screensaver on|off|test [animation]        écran de veille Hanko
   hanko lock install|on|off|edit|status|uninstall  écran de verrouillage Hanko
   hanko boot on|off                                écran de déverrouillage du disque
+  hanko looknfeel on|off|status                    bordures, espaces, animations des fenêtres
+  hanko cursor on|off                              curseur Bibata
   hanko update                                     mettre Hanko à jour
   hanko doctor                                     état de chaque élément
   hanko uninstall                                  tout retirer
@@ -582,10 +733,13 @@ main() {
     bar) cmd_bar "$@" ;;
     menu) cmd_menu "$@" ;;
     icons) cmd_icons "$@" ;;
+    barstyle) cmd_barstyle "$@" ;;
     widgets) cmd_widgets "$@" ;;
     screensaver) cmd_screensaver "$@" ;;
     lock) cmd_lock "$@" ;;
     boot) cmd_boot "$@" ;;
+    looknfeel) cmd_looknfeel "$@" ;;
+    cursor) cmd_cursor "$@" ;;
     update) cmd_update ;;
     uninstall) cmd_uninstall ;;
     doctor|status) cmd_doctor ;;

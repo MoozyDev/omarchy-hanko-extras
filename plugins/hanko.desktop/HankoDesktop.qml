@@ -146,6 +146,37 @@ Item {
     onTriggered: if (root.player) root.player.positionChanged()
   }
 
+  // ── Notification sound (specs/notifications) ───────────────────────────
+  // Omarchy has no notification sound. Watch the session bus for new
+  // notifications and play sounds/notification.wav, at most once per 0.8 s,
+  // and never while Omarchy's "do not disturb" is on.
+  readonly property bool notificationSound: setting("notificationSound", true)
+  readonly property string notifySound: home + "/.local/share/hanko/extras/sounds/notification.wav"
+  property bool doNotDisturb: false
+  property real lastSoundAt: 0
+  FileView {
+    path: root.home + "/.local/state/omarchy/notifications/quiet.json"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: { try { root.doNotDisturb = !!JSON.parse(text()).dnd } catch (e) { root.doNotDisturb = false } }
+  }
+  Process {
+    running: root.primary && root.notificationSound
+    command: ["dbus-monitor", "--session", "type='method_call',interface='org.freedesktop.Notifications',member='Notify'"]
+    stdout: SplitParser {
+      onRead: function(line) { if (line.indexOf("member=Notify") >= 0) root.playNotifySound() }
+    }
+  }
+  Process { id: notifySoundProc; command: ["pw-play", root.notifySound] }
+  function playNotifySound() {
+    var t = Date.now()
+    if (root.doNotDisturb || t - root.lastSoundAt < 800) return
+    root.lastSoundAt = t
+    notifySoundProc.running = false
+    notifySoundProc.running = true
+  }
+
   // ── Live title wallpaper ───────────────────────────────────────────────
   // The HANKO title wallpapers (01-hanko, 02-hanko-plein) are fixed 16:9
   // pictures: cropped on other screen shapes, and their title either runs
