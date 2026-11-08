@@ -277,6 +277,50 @@ remove_widget_plugin() {
   shell_ok && omarchy-shell shell rescanPlugins >/dev/null || true
 }
 
+# ───────────────────────────────────────────────────────────────── bar icons
+cmd_icons() {
+  local action="${1:-status}"
+  local dir="$CONFIG/omarchy/hanko/bar-icons"
+  case "$action" in
+    install)
+      bold "Icônes Hanko dans la barre"
+      info "Omarchy dessine chaque icône de la barre avec un composant système"
+      info "(/usr/share/omarchy/shell/Ui/BarIconButton.qml). Hanko y ajoute un point"
+      info "d'accroche qui affiche tes icônes à la place ; les widgets ne changent pas."
+      info "Un hook pacman le remet après chaque mise à jour d'Omarchy."
+      ask "Installer ce point d'accroche (sudo requis) ?" || { warn "icônes de barre ignorées"; return 0; }
+      sudo bash "$EXTRAS/icons/bar-hook/system.sh" install
+      cmd_icons on
+      ;;
+    on)
+      need_omarchy
+      mkdir -p "$dir"
+      cp -f "$EXTRAS"/icons/bar/*.svg "$dir/"
+      cp -f "$EXTRAS/icons/bar-hook/map.json" "$dir/map.json"
+      [[ -x /usr/local/lib/hanko/icons-patch.sh ]] || warn "point d'accroche absent : lance d'abord hanko icons install"
+      # BarIconButton is compiled once per shell start.
+      omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
+      ok "icônes Hanko dans la barre (son, réseau, Bluetooth, batterie, écran, météo, menu…)"
+      ;;
+    off)
+      rm -rf "$dir"
+      ok "icônes Omarchy d'origine (le point d'accroche reste, inactif)"
+      ;;
+    uninstall)
+      rm -rf "$dir"
+      sudo bash "$EXTRAS/icons/bar-hook/system.sh" uninstall
+      shell_ok && omarchy-restart-shell >/dev/null 2>&1 || true
+      ok "icônes d'origine et hook pacman supprimé"
+      ;;
+    status)
+      local patch="absent"
+      [[ -x /usr/local/lib/hanko/icons-patch.sh ]] && patch=$(/usr/local/lib/hanko/icons-patch.sh status)
+      echo "point d'accroche : $patch ; icônes : $([[ -f $dir/map.json ]] && echo actives || echo inactives)"
+      ;;
+    *) die "usage : hanko icons install|on|off|status|uninstall" ;;
+  esac
+}
+
 # ───────────────────────────────────────────────────────────────── boot unlock
 # The disk-unlock screen (Plymouth) and the login screen, via Omarchy's own
 # `omarchy plymouth set`. Colours come from the variant's boot/plymouth.md.
@@ -449,6 +493,7 @@ cmd_install() {
     cmd_menu on
     cmd_widgets on
     cmd_screensaver on
+    cmd_icons install
     cmd_lock install
     cmd_boot on
     # The shell compiled LockView.qml and the plugins at startup: restart it
@@ -467,6 +512,7 @@ cmd_update() {
   [[ -f $(bar_file) ]] && cmd_bar on
   [[ -f $(menu_file) ]] && cmd_menu on
   [[ -d $PLUGINS/hanko.desktop ]] && cmd_widgets on
+  [[ -f $CONFIG/omarchy/hanko/bar-icons/map.json ]] && cmd_icons on
   [[ -f $STATE/screensaver-on ]] && cmd_screensaver on
   [[ -f $CONFIG/omarchy/lock-skin/Skin.qml ]] && cmd_lock on
   omarchy-theme-update >/dev/null 2>&1 || true
@@ -477,6 +523,7 @@ cmd_uninstall() {
   bold "Désinstallation de Hanko"
   cmd_bar off
   cmd_menu off
+  if [[ -x /usr/local/lib/hanko/icons-patch.sh ]]; then cmd_icons uninstall; else rm -rf "$CONFIG/omarchy/hanko/bar-icons"; fi
   cmd_widgets off
   cmd_screensaver off
   if [[ -x /usr/local/lib/hanko/lock-patch.sh ]]; then cmd_lock uninstall; else rm -rf "$CONFIG/omarchy/lock-skin"; fi
@@ -497,6 +544,7 @@ cmd_doctor() {
   echo "  barre           : $(cmd_bar status)"
   echo "  menu            : $(cmd_menu status)"
   echo "  widgets bureau  : $(cmd_widgets status)"
+  echo "  icônes barre    : $(cmd_icons status)"
   echo "  écran de veille : $([[ -f $STATE/screensaver-on ]] && echo actif || echo inactif)"
   echo "  verrouillage    : $(cmd_lock status)"
   echo "  shell Omarchy   : $(shell_ok && echo répond || echo 'ne répond pas')"
@@ -511,6 +559,7 @@ hanko — thème Hanko pour Omarchy 4
   hanko extras                                     police, icônes, fastfetch, logo
   hanko bar on|off|status                          barre qui s'agrandit au survol
   hanko menu on|off|status                         menu large et bas
+  hanko icons install|on|off|status|uninstall      icônes Hanko dans la barre
   hanko widgets on|off|status                      horloge, météo, musique sur le bureau
   hanko screensaver on|off|test [animation]        écran de veille Hanko
   hanko lock install|on|off|edit|status|uninstall  écran de verrouillage Hanko
@@ -530,6 +579,7 @@ main() {
     extras) cmd_extras ;;
     bar) cmd_bar "$@" ;;
     menu) cmd_menu "$@" ;;
+    icons) cmd_icons "$@" ;;
     widgets) cmd_widgets "$@" ;;
     screensaver) cmd_screensaver "$@" ;;
     lock) cmd_lock "$@" ;;
