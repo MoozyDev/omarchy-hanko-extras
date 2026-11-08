@@ -1,0 +1,14 @@
+# Hanko — re-add the bar icon hook after Omarchy updates its BarIconButton.qml.
+# Installed by `hanko icons install` to /etc/pacman.d/hooks/hanko-icons.hook.
+# Remove with `hanko icons uninstall`.
+
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Path
+Target = usr/share/omarchy/shell/Ui/BarIconButton.qml
+
+[Action]
+Description = Hanko: re-applying the bar icon hook...
+When = PostTransaction
+Exec = /usr/local/lib/hanko/icons-patch.sh apply

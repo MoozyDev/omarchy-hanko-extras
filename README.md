@@ -41,6 +41,7 @@ What it sets up:
 | Theme (colours, wallpapers, icons) | `omarchy theme install` of the variant repo |
 | Anton font, app / web-app icons, ASCII logo, fastfetch | copied, your previous files kept in `~/.local/share/hanko/backup` |
 | Bar that grows on hover | your clone of Omarchy's bar (`omarchy plugin clone omarchy.bar`) + a small marked patch |
+| Hanko bar icons | a hook in Omarchy's `BarIconButton.qml` mapping each icon character to your SVG; re-applied by a pacman hook |
 | Wide and low menu (choice B) | your clone of Omarchy's menu + a small marked patch |
 | Screensaver (6 animations) | shell plugin `hanko.screensaver`, replaces Omarchy's ASCII one |
 | Lock screen (clock, field position, no blur) | a hook in Omarchy's `LockView.qml` that loads `~/.config/omarchy/lock-skin/Skin.qml`; re-applied by a pacman hook after each Omarchy update |
@@ -57,6 +58,7 @@ omarchy theme install https://github.com/MoozyDev/omarchy-hanko-vermillon-theme
 hanko doctor                                  state of every part
 hanko theme <variant>                         switch variant
 hanko bar on|off · hanko menu on|off          bar and menu patches
+hanko icons install|on|off|uninstall          Hanko SVG icons in the bar (sudo once)
 hanko widgets on|off                          desktop widgets + live HANKO wallpaper
 hanko boot on|off                             disk-unlock screen
 hanko screensaver on|off|test [animation]     eclipse orbite onde balayage defilement phases

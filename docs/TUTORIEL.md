@@ -75,6 +75,19 @@ La barre du haut grandit de 18 px quand la souris passe dessus. Les fenêtres ne
 
 > Comment : Hanko fait une copie officielle de la barre d'Omarchy (`omarchy plugin clone omarchy.bar`) et y change 4 lignes marquées `HANKO-BAR`. `off` remet la barre d'origine.
 
+### Icônes Hanko dans la barre
+
+```bash
+hanko icons install     # une seule fois (demande sudo)
+hanko icons on          # icônes Hanko
+hanko icons off         # icônes Omarchy d'origine (sans sudo)
+hanko icons uninstall   # tout retirer (demande sudo)
+```
+
+Son, micro, Wi-Fi, réseau, Bluetooth, batterie, écran, météo, Ne pas déranger, enregistrement, IA, mises à jour, et le bouton menu avec le logo Moozy en couleur accent. Une icône sans équivalent Hanko reste celle d'Omarchy.
+
+> Comment : Omarchy dessine toutes les icônes de la barre avec un seul composant système. `hanko icons install` y ajoute un point d'accroche qui affiche ton SVG à la place du caractère, dans la même couleur ; un hook pacman le remet après chaque mise à jour. Les widgets gardent toutes leurs fonctions.
+
 ### Menu large et bas
 
 ```bash
