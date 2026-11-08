@@ -31,6 +31,11 @@ N3='          height: root.hankoOn ? 4 : Math.max(Style.space(6), Style.spacing.
 O4='          color: Util.alpha(Commons.Color.popups.text, 0.45)'
 N4='          color: root.hankoOn ? "#3a3330" : Util.alpha(Commons.Color.popups.text, 0.45) // '"$MARK"
 O5='            color: Commons.Color.accent'
+# Exact Toast lines: the card's text block also counts the Hanko header.
+T1='      headline.height + (hasBody ? column.spacing + bodyBox.height : 0)'
+U1='      card.hankoHeaderBlock + headline.height + (hasBody ? column.spacing + bodyBox.height : 0) // '"$MARK"
+T2='      headline.height + (hasBody ? column.spacing + bodyBox.restHeight : 0)'
+U2='      card.hankoHeaderBlock + headline.height + (hasBody ? column.spacing + bodyBox.restHeight : 0) // '"$MARK"
 N5='            color: (root.hankoOn && (root.iconKey === "brightness" || root.iconKey === "display")) ? Commons.Color.foreground : Commons.Color.accent // '"$MARK"
 
 flag_block() {
@@ -85,6 +90,7 @@ apply() {
   once "  // The keyboard's card is tinted with the theme's hover fill, buttons and all." "$TOAST" || die "ancre de la carte absente (notifications) — rien modifié"
   once '        // Title, marks, and when it arrived.' "$TOAST" || die "ancre du titre absente (notifications) — rien modifié"
   once '  id: root' "$OSD" || die "ancre 'id: root' absente (OSD) — rien modifié"
+  for l in "$T1" "$T2"; do once "$l" "$TOAST" || die "ligne attendue absente (notifications) — rien modifié : ${l:0:60}…"; done
   for l in "$O1" "$O2" "$O3" "$O4" "$O5"; do once "$l" "$OSD" || die "ligne attendue absente (OSD) — rien modifié : ${l:0:60}…"; done
 
   insert "$TOAST" '
@@ -92,6 +98,9 @@ apply() {
     $0 == "  transformOrigin: Item.Top" {
       print
       print flag
+      print "  readonly property string hankoHeaderText: String(card.row.source || card.row.app || \"\").toUpperCase() // " mark
+      print "  readonly property bool hankoHeaderShown: card.hankoOn && !card.anonymous && hankoHeaderText !== \"\" // " mark
+      print "  readonly property real hankoHeaderBlock: hankoHeaderShown ? hankoHeader.implicitHeight + column.spacing : 0 // " mark
       print "  property real hankoSlide: 0 // " mark
       print "  transform: Translate { x: card.hankoSlide } // " mark
       print "  NumberAnimation { id: hankoSlideAnim; target: card; property: \"hankoSlide\"; from: 24; to: 0; duration: 180; easing.type: Easing.OutCubic } // " mark
@@ -109,11 +118,12 @@ apply() {
     }
     $0 == "        // Title, marks, and when it arrived." {
       print "        Text { // " mark
-      print "          visible: card.hankoOn && !card.anonymous && text !== \"\" // " mark
+      print "          id: hankoHeader // " mark
+      print "          visible: card.hankoHeaderShown // " mark
       print "          width: parent.width // " mark
       print "          elide: Text.ElideRight // " mark
       print "          textFormat: Text.PlainText // " mark
-      print "          text: String(card.row.source || card.row.app || \"\").toUpperCase() // " mark
+      print "          text: card.hankoHeaderText // " mark
       print "          color: card.hankoAccentDark // " mark
       print "          font.family: \"SpaceMono Nerd Font\" // " mark
       print "          font.pixelSize: 11 // " mark
@@ -130,12 +140,14 @@ apply() {
     $0 == "  id: root" { print; print flag; next }
     { print }
   ' root
+  rewrite "$TOAST" "$T1" "$U1" "$T2" "$U2"
   rewrite "$OSD" "$O1" "$N1" "$O2" "$N2" "$O3" "$N3" "$O4" "$N4" "$O5" "$N5"
   echo "hanko-ui: appliqué"
 }
 
 restore() {
   local f tmp
+  rewrite "$TOAST" "$U1" "$T1" "$U2" "$T2"
   rewrite "$OSD" "$N1" "$O1" "$N2" "$O2" "$N3" "$O3" "$N4" "$O4" "$N5" "$O5"
   for f in "$TOAST" "$OSD"; do
     grep -q "$MARK" "$f" || continue

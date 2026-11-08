@@ -34,10 +34,10 @@ Comparaison entre les maquettes et fiches de `specs/` et ce que l'installation f
 |---|---|---|
 | Menu et lanceur larges et bas, 6 lignes, couleurs | `specs/lanceur` · 11f | ✅ (icônes d'applis 28 px non vérifiées) |
 | Notifications : carte crème, texte noir, en-tête de l'appli en accent foncé, bandeau critique 4 px, glissement d'entrée | `specs/notifications` | ✅ (`hanko ui`) |
-| Son de notification | Sons | ✅ (joue en VM, non écouté) |
+| Son de notification | Sons | ✅ (`pw-play` lancé à chaque notification, sortie audio à 100 % ; non écouté) |
 | Son de verrouillage | Sons | ✅ |
-| Jauge volume / luminosité (OSD) | `specs/osd` · 11c | 🟡 `hanko ui` : fond noir, 8 % du bas, jauge 4 px sur fond #3a3330, accent (volume) / crème (luminosité) ; taille exacte 360 × 44, « MUET » et icône Hanko ⬜ |
-| Capture d'écran : cadre accent | Ce qui pourrait encore suivre | ⬜ |
+| Jauge volume / luminosité (OSD) | `specs/osd` · 11c | 🟡 `hanko ui` : fond noir, 8 % du bas, jauge 4 px sur fond #3a3330, accent (volume) / crème (luminosité) ✅ ; taille exacte 360 × 44, « MUET » et icône Hanko ⬜ |
+| Capture d'écran / enregistrement : cadre accent 2 px, écran assombri | Ce qui pourrait encore suivre | ✅ (`hanko ui`, après reconnexion) |
 
 ## Verrouillage, veille, démarrage
 | Élément | Source | État |

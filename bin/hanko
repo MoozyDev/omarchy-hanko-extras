@@ -366,6 +366,19 @@ accent_dark() {
   esac
 }
 
+# Screenshot / recording frame: Omarchy calls `slurp` by name, so a wrapper
+# first on the session PATH adds the accent colours (no system file touched).
+CAPTURE_ENV="$CONFIG/uwsm/env.d/55-hanko-capture"
+capture_on() {
+  install -Dm755 "$EXTRAS/ui/slurp" "$HANKO_HOME/bin/slurp"
+  mkdir -p "$(dirname -- "$CAPTURE_ENV")"
+  printf '# Hanko: capture frame in the accent (remove with `hanko ui off`).\nexport PATH="%s:$PATH"\n' "$HANKO_HOME/bin" >"$CAPTURE_ENV"
+  ok "cadre de capture d'écran en accent (après la prochaine connexion)"
+}
+capture_off() {
+  rm -f "$CAPTURE_ENV" "$HANKO_HOME/bin/slurp"
+}
+
 cmd_ui() {
   local action="${1:-status}" file="$CONFIG/omarchy/hanko/ui.json"
   case "$action" in
@@ -383,14 +396,17 @@ cmd_ui() {
       printf '{ "on": true, "accentDark": "%s" }\n' "$(accent_dark)" >"$file"
       [[ -x /usr/local/lib/hanko/ui-patch.sh ]] || warn "point d'accroche absent : lance d'abord hanko ui install"
       ok "notifications (en-tête, bandeau critique, glissement) et jauge Hanko"
+      capture_on
       ;;
     off)
       mkdir -p "$(dirname -- "$file")"
       printf '{ "on": false }\n' >"$file"
-      ok "notifications et jauge d'Omarchy (l'accroche reste, inactive)"
+      capture_off
+      ok "notifications, jauge et cadre de capture d'Omarchy (l'accroche reste, inactive)"
       ;;
     uninstall)
       rm -f "$file"
+      capture_off
       sudo bash "$EXTRAS/ui/system.sh" uninstall
       shell_ok && omarchy-restart-shell >/dev/null 2>&1 || true
       ok "fichiers d'origine remis et hook pacman supprimé"
@@ -797,7 +813,7 @@ cmd_uninstall() {
   fc-cache -f >/dev/null 2>&1 || true
   # The cursor folder is Hanko's only if Hanko unpacked it (it put LICENSE there).
   [[ -f $HOME/.local/share/icons/$CURSOR_THEME/LICENSE ]] && rm -rf "$HOME/.local/share/icons/$CURSOR_THEME"
-  rm -rf "$CONFIG/omarchy/hanko" "$CONFIG/omarchy/lock-skin" "$STATE" "$CONFIG/uwsm/env.d/50-hanko" "$CONFIG/uwsm/env.d/60-hanko-cursor"
+  rm -rf "$CONFIG/omarchy/hanko" "$CONFIG/omarchy/lock-skin" "$STATE" "$CONFIG/uwsm/env.d/50-hanko" "$CONFIG/uwsm/env.d/55-hanko-capture" "$CONFIG/uwsm/env.d/60-hanko-cursor"
   ok "polices, curseur et réglages Hanko supprimés"
   if ask "Remettre aussi l'écran de démarrage d'Omarchy (sudo) ?"; then omarchy-plymouth-reset || true; fi
   shell_ok && omarchy-restart-shell >/dev/null 2>&1 || true

@@ -101,7 +101,7 @@ Le bureau actif devient son numéro en noir sur une pastille de la couleur accen
 
 > Comment : accroche dans les deux widgets système d'Omarchy (Bureaux et Horloge), remise par un hook pacman après chaque mise à jour. `on`/`off` changent un simple fichier, à chaud.
 
-### Notifications et jauge volume / luminosité
+### Notifications, jauge volume / luminosité, cadre de capture
 
 ```bash
 hanko ui install     # une seule fois (demande sudo)
@@ -110,9 +110,9 @@ hanko ui off
 hanko ui uninstall
 ```
 
-Notifications : nom de l'application en tête, en accent foncé ; bandeau accent sur les notifications urgentes ; elles glissent depuis la droite. Jauge (OSD) : en bas de l'écran, fond noir, barre fine accent pour le volume et crème pour la luminosité.
+Notifications : nom de l'application en tête, en accent foncé ; bandeau accent sur les notifications urgentes ; elles glissent depuis la droite. Jauge (OSD) : en bas de l'écran, fond noir, barre fine accent pour le volume et crème pour la luminosité. Capture d'écran et enregistrement : la zone choisie est encadrée en accent, le reste de l'écran assombri (à partir de la prochaine connexion).
 
-> Comment : accroche dans les deux fichiers système d'Omarchy, remise par un hook pacman ; `on`/`off` changent `~/.config/omarchy/hanko/ui.json`.
+> Comment : accroche dans les deux fichiers système d'Omarchy, remise par un hook pacman ; `on`/`off` changent `~/.config/omarchy/hanko/ui.json`. Le cadre de capture est une petite enveloppe autour de `slurp` (l'outil de sélection d'Omarchy), placée en tête du PATH de la session ; elle lit la couleur accent du thème actif à chaque capture et ne fait rien avec un autre thème.
 
 ### Fenêtres
 
