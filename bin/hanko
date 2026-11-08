@@ -297,6 +297,8 @@ cmd_icons() {
       mkdir -p "$dir"
       cp -f "$EXTRAS"/icons/bar/*.svg "$dir/"
       cp -f "$EXTRAS/icons/bar-hook/map.json" "$dir/map.json"
+      # The bar version of the Moozy logo (wider slits, made for ~14 px).
+      cp -f "$EXTRAS/logo/moozy-barre-24.svg" "$dir/menu-bar.svg"
       [[ -x /usr/local/lib/hanko/icons-patch.sh ]] || warn "point d'accroche absent : lance d'abord hanko icons install"
       # BarIconButton is compiled once per shell start.
       omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"

@@ -61,7 +61,13 @@
  "󰻂": "screen-record.svg",
  "󱚣": "ai.svg",
  "": {
-  "file": "menu.svg",
-  "color": "accent"
- }
+  "file": "menu-bar.svg",
+  "color": "accent",
+  "scale": 1.3
+ },
+ "󰏤": "media-pause.svg",
+ "󰐊": "media-play.svg",
+ "󰒭": "media-next.svg",
+ "󰒮": "media-prev.svg",
+ "󰝚": "music.svg"
 }
