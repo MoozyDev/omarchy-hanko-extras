@@ -47,8 +47,12 @@ session_env() {
 
 ask() {
   # ask "question" → 0 for yes. Without a terminal the answer is no.
+  # The question is written straight to the terminal: `read -p` writes it to
+  # stderr, which must not be silenced along with the "no terminal" error.
   local reply
-  { read -r -p "  $1 [o/N] " reply </dev/tty; } 2>/dev/null || return 1
+  { : </dev/tty; } 2>/dev/null || return 1
+  printf '  \e[1m? %s\e[0m  [o = oui · n = non] : ' "$1" >/dev/tty
+  read -r reply </dev/tty || return 1
   [[ $reply =~ ^[oOyY] ]]
 }
 
