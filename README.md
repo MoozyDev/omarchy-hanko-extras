@@ -68,7 +68,7 @@ hanko update · hanko uninstall
 
 Screensaver delay: `omarchy bar set hanko.screensaver delay 300` (seconds, 0 = never).
 
-Why it is built this way (what Omarchy lets a theme do, and the lock screen): [docs/architecture.md](docs/architecture.md).
+Why it is built this way (what Omarchy lets a theme do, and the lock screen): [docs/architecture.md](docs/architecture.md). What is done versus the mockups: [docs/ETAT.md](docs/ETAT.md).
 
 ## What is in this repo
 - `install.sh`, `bin/hanko` — installer and command.
@@ -85,7 +85,7 @@ Why it is built this way (what Omarchy lets a theme do, and the lock screen): [d
 - `presentation/` — banners, comparison image, avatars.
 
 ## Status
-**1.1.0.** Done: installer (3 levels), bar on hover, wide menu, desktop widgets, live HANKO wallpaper, lock screen skin, boot screen, 6 of the 11 screensaver animations. Not yet: Marée, Vinyle, Fréquence, Trame, Phases 6d-3; window look'n'feel; OSD and notification styling.
+Done: installer (3 levels), bar (32 px, grows on hover, Hanko icons, accent workspace pill, widget order), wide menu, desktop widgets, live HANKO wallpaper, lock screen skin, boot screen, the 11 screensaver animations, window look'n'feel, cursor and font, notification / OSD styling, accent capture frame. Not yet: app themes (Spotify, Vesktop, Obsidian, Steam), per-screen roles and wallpapers, Twitch badge. Detailed status against the mockups: `docs/ETAT.md`.
 
 ---
 

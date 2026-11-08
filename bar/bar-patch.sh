@@ -40,6 +40,15 @@ apply() {
       print "      property real hankoGrow: hankoHover.hovered && !root.barHidden ? " grow " : 0"
       print "      Behavior on hankoGrow { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }"
       print "      HoverHandler { id: hankoHover }"
+      print "      // 1 px line on the edge facing the windows (specs/barre: filet #3a3330)."
+      print "      Rectangle {"
+      print "        z: 2"
+      print "        color: \"#3a3330\""
+      print "        width: root.vertical ? 1 : parent.width"
+      print "        height: root.vertical ? parent.height : 1"
+      print "        x: root.position === \"left\" ? parent.width - 1 : 0"
+      print "        y: root.position === \"top\" ? parent.height - 1 : 0"
+      print "      }"
       print "      // " mark " END"
       print "      x: root.position === \"right\" ? parent.width - barWindow.thickness - hankoGrow : 0 // " mark
       next

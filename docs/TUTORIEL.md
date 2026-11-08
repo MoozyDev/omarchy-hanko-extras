@@ -25,7 +25,7 @@ Il pose deux questions et demande ton mot de passe (`sudo`) pour l'écran de ver
 curl -fsSL https://raw.githubusercontent.com/MoozyDev/omarchy-hanko-extras/main/install.sh | bash -s vermillon essentiel
 ```
 
-Installe : couleurs, fonds d'écran, icônes des dossiers et des applications, police Anton, logo ASCII, fastfetch.
+Installe : couleurs, fonds d'écran, icônes des dossiers et des applications, polices Anton et Space Mono Nerd, curseur Bibata, bordures et animations des fenêtres, logo ASCII, fastfetch.
 Ne touche pas à la barre, au menu, à la veille ni au verrouillage. Pas de `sudo`.
 
 ### Le thème seul — couleurs et fonds
@@ -71,7 +71,7 @@ hanko bar on
 hanko bar off
 ```
 
-La barre du haut grandit de 18 px quand la souris passe dessus. Les fenêtres ne bougent pas : la barre passe par-dessus.
+La barre du haut fait 32 px, avec un filet de 1 px sous elle, et grandit de 18 px quand la souris passe dessus. Ses widgets sont rangés dans l'ordre Hanko (`hanko bar layout` pour les remettre en ordre). Les fenêtres ne bougent pas : la barre passe par-dessus.
 
 > Comment : Hanko fait une copie officielle de la barre d'Omarchy (`omarchy plugin clone omarchy.bar`) et y change 4 lignes marquées `HANKO-BAR`. `off` remet la barre d'origine.
 
@@ -101,6 +101,19 @@ Le bureau actif devient son numéro en noir sur une pastille de la couleur accen
 
 > Comment : accroche dans les deux widgets système d'Omarchy (Bureaux et Horloge), remise par un hook pacman après chaque mise à jour. `on`/`off` changent un simple fichier, à chaud.
 
+### Notifications, jauge volume / luminosité, cadre de capture
+
+```bash
+hanko ui install     # une seule fois (demande sudo)
+hanko ui on
+hanko ui off
+hanko ui uninstall
+```
+
+Notifications : nom de l'application en tête, en accent foncé ; bandeau accent sur les notifications urgentes ; elles glissent depuis la droite. Jauge (OSD) : en bas de l'écran, fond noir, barre fine accent pour le volume et crème pour la luminosité. Capture d'écran et enregistrement : la zone choisie est encadrée en accent, le reste de l'écran assombri (à partir de la prochaine connexion).
+
+> Comment : accroche dans les deux fichiers système d'Omarchy, remise par un hook pacman ; `on`/`off` changent `~/.config/omarchy/hanko/ui.json`. Le cadre de capture est une petite enveloppe autour de `slurp` (l'outil de sélection d'Omarchy), placée en tête du PATH de la session ; elle lit la couleur accent du thème actif à chaque capture et ne fait rien avec un autre thème.
+
 ### Fenêtres
 
 ```bash
@@ -115,11 +128,11 @@ Bordures de 3 px (crème sur la fenêtre active, noires sinon), angles droits, e
 ### Curseur
 
 ```bash
-hanko cursor on      # installe Bibata-Modern-Classic (AUR, demande sudo)
+hanko cursor on      # installe Bibata-Modern-Classic (fourni avec Hanko, sans sudo)
 hanko cursor off
 ```
 
-Complet après la prochaine connexion.
+Complet après la prochaine connexion. La police Space Mono Nerd et le curseur sont fournis avec Hanko (licences dans `third-party/`) : rien à installer en plus.
 
 ### Menu large et bas
 

@@ -3,3 +3,6 @@
 *.png binary
 *.ttf binary
 *.wav binary
+*.tar.xz binary
+# Third-party files are kept byte for byte (licence comparisons in CI).
+third-party/** -text

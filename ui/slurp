@@ -1,0 +1,37 @@
+#!/bin/bash
+# Hanko — screenshot / recording selection frame in the theme's accent.
+#
+# Omarchy's capture scripts call `slurp` by name. `hanko ui on` puts this file
+# in ~/.local/share/hanko/bin, which ~/.config/uwsm/env.d/55-hanko-capture puts
+# first on the session PATH (from the next login). It adds Hanko's colours and
+# hands over to the real slurp; options given by the caller come after ours, so
+# they still win. `exec` keeps the process name "slurp", which Omarchy's
+# pgrep/pkill rely on.
+#
+# Colours are read from the active theme at each call, so they follow
+# `hanko theme <variant>`: accent frame 2 px, screen dimmed with the theme's
+# black at 45 %, window boxes tinted with the accent at 12 %.
+
+REAL=/usr/bin/slurp
+COLORS="${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/current/theme/colors.toml"
+
+hex() {
+  # hex <key> → rrggbb, from a line such as: accent = "#ff4a1c"
+  sed -nE "s/^$1[[:space:]]*=[[:space:]]*\"#([0-9a-fA-F]{6})\".*/\1/p" "$COLORS" 2>/dev/null | head -1
+}
+
+theme=$(cat "${XDG_STATE_HOME:-$HOME/.local/state}/omarchy/current/theme.name" 2>/dev/null)
+accent=$(hex accent)
+background=$(hex background)
+
+# Another theme, or colours not found: plain slurp.
+[[ $theme == hanko-* && -n $accent && -n $background ]] || exec "$REAL" "$@"
+
+exec "$REAL" \
+  -c "#${accent}ff" \
+  -b "#${background}73" \
+  -s "#00000000" \
+  -B "#${accent}1f" \
+  -w 2 \
+  -F "SpaceMono Nerd Font" \
+  "$@"

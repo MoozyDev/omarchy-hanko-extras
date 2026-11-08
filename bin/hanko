@@ -143,9 +143,17 @@ cmd_extras() {
   cp -f "$EXTRAS/fonts/Anton-Regular.ttf" "$EXTRAS/fonts/Anton-OFL.txt" "$HOME/.local/share/fonts/hanko/"
   fc-cache -f "$HOME/.local/share/fonts/hanko" >/dev/null 2>&1 || true
   ok "police Anton"
+  # Space Mono Nerd Font (OFL 1.1 + Nerd Fonts terms, third-party/), unless the
+  # system already has it (ttf-space-mono-nerd).
   if ! fc-list | grep -qi "SpaceMono Nerd"; then
-    warn "SpaceMono Nerd Font absente — installe-la : omarchy pkg add ttf-space-mono-nerd"
+    local tmpf
+    tmpf=$(mktemp -d)
+    tar -xJf "$EXTRAS/third-party/space-mono-nerd/SpaceMono.tar.xz" -C "$tmpf"       SpaceMonoNerdFont-Regular.ttf SpaceMonoNerdFont-Bold.ttf SpaceMonoNerdFont-Italic.ttf SpaceMonoNerdFont-BoldItalic.ttf
+    cp -f "$tmpf"/*.ttf "$EXTRAS/third-party/space-mono-nerd/OFL.txt" "$HOME/.local/share/fonts/hanko/"
+    rm -rf "$tmpf"
+    fc-cache -f "$HOME/.local/share/fonts/hanko" >/dev/null 2>&1 || true
   fi
+  ok "police Space Mono Nerd"
 
   # App and web-app icons from the variant (Omarchy reads them from here).
   if [[ -d $theme_dir ]]; then
@@ -175,6 +183,25 @@ cmd_extras() {
 # ───────────────────────────────────────────────────────────────── bar
 bar_file() { echo "$PLUGINS/${USER:-$(id -un)}.bar/Bar.qml"; }
 
+# Widget order from icons/bar/correspondance.md:
+#   left: menu, workspaces · centre: indicators, clock, keyboard, weather,
+#   microphone, media, updates · right: tray, Tailscale, AI, Bluetooth,
+#   network, audio, display, power. Widgets that are not installed are skipped;
+#   Elsewhen (not in the spec) stays right after the weather.
+bar_layout() {
+  backup "$SHELL_JSON"
+  local i=0 id
+  omarchy-plugin-enable omarchy.microphone --section centerEnd >/dev/null 2>&1 || true
+  omarchy-plugin-enable omarchy.media --section centerEnd >/dev/null 2>&1 || true
+  for id in omarchy.keyboard-layout omarchy.weather omarchy.elsewhen omarchy.microphone omarchy.media omarchy.system-update; do
+    omarchy-bar move "$id" --section centerEnd --index "$i" >/dev/null 2>&1 && i=$((i + 1))
+  done
+  i=0
+  for id in omarchy.tray omarchy.tailscale omarchy.agents omarchy.bluetooth omarchy.network omarchy.audio omarchy.monitor omarchy.power; do
+    omarchy-bar move "$id" --section right --index "$i" >/dev/null 2>&1 && i=$((i + 1))
+  done
+}
+
 cmd_bar() {
   local action="${1:-on}" file
   file=$(bar_file)
@@ -191,8 +218,16 @@ cmd_bar() {
       # Patch after the switch: saving the file makes the shell reload the bar
       # once it is in use, which also fills in its widgets.
       sleep 1
+      # Restore first so an older version of the patch is replaced.
+      bash "$EXTRAS/bar/bar-patch.sh" restore "$file" >/dev/null
       bash "$EXTRAS/bar/bar-patch.sh" apply "$file" "$BAR_GROW"
+      bar_layout
       ok "barre active : survole-la pour la voir grandir (+${BAR_GROW} px)"
+      ;;
+    layout)
+      need_omarchy
+      bar_layout
+      ok "widgets rangés dans l'ordre Hanko"
       ;;
     off)
       [[ -f $file ]] && bash "$EXTRAS/bar/bar-patch.sh" restore "$file"
@@ -202,7 +237,7 @@ cmd_bar() {
     status)
       [[ -f $file ]] && bash "$EXTRAS/bar/bar-patch.sh" status "$file" || echo "absent"
       ;;
-    *) die "usage : hanko bar on|off|status" ;;
+    *) die "usage : hanko bar on|off|layout|status" ;;
   esac
 }
 
@@ -320,6 +355,71 @@ cmd_barstyle() {
   esac
 }
 
+# ───────────────────────────────────────────────────────────────── notifications + OSD
+# specs/notifications and specs/osd: hook in Omarchy's Toast.qml and Osd.qml
+# (sudo once); on/off write ~/.config/omarchy/hanko/ui.json.
+accent_dark() {
+  case "$(current_variant)" in
+    cramoisi) echo "#a50d26" ;;
+    vert-billard) echo "#0a5a33" ;;
+    *) echo "#c2340f" ;;
+  esac
+}
+
+# Screenshot / recording frame: Omarchy calls `slurp` by name, so a wrapper
+# first on the session PATH adds the accent colours (no system file touched).
+CAPTURE_ENV="$CONFIG/uwsm/env.d/55-hanko-capture"
+capture_on() {
+  install -Dm755 "$EXTRAS/ui/slurp" "$HANKO_HOME/bin/slurp"
+  mkdir -p "$(dirname -- "$CAPTURE_ENV")"
+  printf '# Hanko: capture frame in the accent (remove with `hanko ui off`).\nexport PATH="%s:$PATH"\n' "$HANKO_HOME/bin" >"$CAPTURE_ENV"
+  ok "cadre de capture d'écran en accent (après la prochaine connexion)"
+}
+capture_off() {
+  rm -f "$CAPTURE_ENV" "$HANKO_HOME/bin/slurp"
+}
+
+cmd_ui() {
+  local action="${1:-status}" file="$CONFIG/omarchy/hanko/ui.json"
+  case "$action" in
+    install)
+      bold "Notifications et jauge volume / luminosité"
+      info "Omarchy dessine les notifications et la jauge (OSD) avec deux fichiers système."
+      info "Hanko y ajoute une accroche ; un hook pacman la remet après chaque mise à jour."
+      ask "Installer cette accroche (sudo requis) ?" || { warn "notifications et OSD inchangés"; return 0; }
+      sudo bash "$EXTRAS/ui/system.sh" install
+      cmd_ui on
+      omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
+      ;;
+    on)
+      mkdir -p "$(dirname -- "$file")"
+      printf '{ "on": true, "accentDark": "%s" }\n' "$(accent_dark)" >"$file"
+      [[ -x /usr/local/lib/hanko/ui-patch.sh ]] || warn "point d'accroche absent : lance d'abord hanko ui install"
+      ok "notifications (en-tête, bandeau critique, glissement) et jauge Hanko"
+      capture_on
+      ;;
+    off)
+      mkdir -p "$(dirname -- "$file")"
+      printf '{ "on": false }\n' >"$file"
+      capture_off
+      ok "notifications, jauge et cadre de capture d'Omarchy (l'accroche reste, inactive)"
+      ;;
+    uninstall)
+      rm -f "$file"
+      capture_off
+      sudo bash "$EXTRAS/ui/system.sh" uninstall
+      shell_ok && omarchy-restart-shell >/dev/null 2>&1 || true
+      ok "fichiers d'origine remis et hook pacman supprimé"
+      ;;
+    status)
+      local patch="absent"
+      [[ -x /usr/local/lib/hanko/ui-patch.sh ]] && patch=$(/usr/local/lib/hanko/ui-patch.sh status)
+      echo "point d'accroche : $patch ; style : $(grep -q '"on": true' "$file" 2>/dev/null && echo on || echo off)"
+      ;;
+    *) die "usage : hanko ui install|on|off|status|uninstall" ;;
+  esac
+}
+
 # ───────────────────────────────────────────────────────────────── look'n'feel
 # Windows (looknfeel.md): 3 px borders, square corners, gaps 8/16, opacity
 # 0.94/0.90, light blur, one "dry" curve for every animation. Written as a
@@ -389,16 +489,19 @@ EOF
 }
 
 # ───────────────────────────────────────────────────────────────── cursor
-# Bibata-Modern-Classic, size 24 (looknfeel.md), from the AUR.
+# Bibata-Modern-Classic, size 24 (looknfeel.md), shipped in third-party/.
 CURSOR_THEME="Bibata-Modern-Classic"
 cmd_cursor() {
   local action="${1:-on}" env="$CONFIG/uwsm/env.d/60-hanko-cursor"
   case "$action" in
     on)
       bold "Curseur Bibata"
+      # Shipped in third-party/bibata (GPL-3.0), unpacked in the home folder:
+      # no sudo, no AUR. A system-wide Bibata is used as is.
       if [[ ! -d /usr/share/icons/$CURSOR_THEME && ! -d $HOME/.local/share/icons/$CURSOR_THEME ]]; then
-        ask "Installer bibata-cursor-theme-bin depuis l'AUR (sudo requis) ?" || { warn "curseur inchangé"; return 0; }
-        omarchy-pkg-aur-add bibata-cursor-theme-bin
+        mkdir -p "$HOME/.local/share/icons"
+        tar -xJf "$EXTRAS/third-party/bibata/Bibata-Modern-Classic.tar.xz" -C "$HOME/.local/share/icons"
+        cp -f "$EXTRAS/third-party/bibata/LICENSE" "$HOME/.local/share/icons/$CURSOR_THEME/LICENSE"
       fi
       mkdir -p "$(dirname -- "$env")"
       printf '# Hanko: Bibata cursor (remove with `hanko cursor off`).\nexport XCURSOR_THEME=%s\nexport XCURSOR_SIZE=24\n' "$CURSOR_THEME" >"$env"
@@ -613,7 +716,7 @@ cmd_lock() {
 # ───────────────────────────────────────────────────────────────── all
 # Three levels:
 #   totale     theme + extras + bar + menu + widgets + screensaver + lock + boot
-#   essentiel  theme + extras (Anton font, app icons, ASCII logo, fastfetch) + window look
+#   essentiel  theme + extras (fonts, app icons, ASCII logo, fastfetch) + window look + cursor
 #   theme      theme only (colours, wallpapers, folder icons)
 cmd_install() {
   local variant="${1:-vermillon}" level="${2:-totale}"
@@ -630,6 +733,7 @@ cmd_install() {
   if [[ $level == totale || $level == essentiel ]]; then
     cmd_extras
     cmd_looknfeel on
+    cmd_cursor on
   fi
   if [[ $level == totale ]]; then
     cmd_bar on
@@ -638,9 +742,9 @@ cmd_install() {
     cmd_screensaver on
     cmd_icons install
     cmd_barstyle install
+    cmd_ui install
     cmd_lock install
     cmd_boot on
-    cmd_cursor on
     # The shell compiled LockView.qml and the plugins at startup: restart it
     # so everything above is live without logging out (the bar blinks once).
     omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
@@ -672,6 +776,7 @@ cmd_uninstall() {
   cmd_cursor off
   if [[ -x /usr/local/lib/hanko/icons-patch.sh ]]; then cmd_icons uninstall; else rm -rf "$CONFIG/omarchy/hanko/bar-icons"; fi
   if [[ -x /usr/local/lib/hanko/barstyle-patch.sh ]]; then cmd_barstyle uninstall; fi
+  if [[ -x /usr/local/lib/hanko/ui-patch.sh ]]; then cmd_ui uninstall; fi
   cmd_widgets off
   cmd_screensaver off
   if [[ -x /usr/local/lib/hanko/lock-patch.sh ]]; then cmd_lock uninstall; else rm -rf "$CONFIG/omarchy/lock-skin"; fi
@@ -682,7 +787,39 @@ cmd_uninstall() {
     done
     ok "fichiers d'origine remis depuis $BACKUP"
   fi
-  info "Le thème reste installé ; change-le avec Super+Ctrl+Maj+Espace."
+  if [[ ${1:-} != --all ]]; then
+    info "Le thème reste installé ; change-le avec Super+Ctrl+Maj+Espace."
+    info "Pour effacer aussi le thème, les copies de barre/menu et la commande hanko : hanko uninstall --all"
+    return 0
+  fi
+
+  # --all: leave no trace of Hanko (for a clean reinstall).
+  bold "Effacement complet"
+  local user="${USER:-$(id -un)}" id
+  if [[ $(current_theme) == hanko-* ]]; then
+    omarchy-theme-set tokyo-night >/dev/null 2>&1 || warn "repasse sur un autre thème : omarchy-theme-set tokyo-night"
+  fi
+  rm -rf "$CONFIG"/omarchy/themes/hanko-* "$CONFIG"/omarchy/backgrounds/hanko-*
+  ok "thèmes Hanko supprimés"
+  for id in "$user.bar" "$user.menu"; do
+    [[ -d $PLUGINS/$id ]] || continue
+    omarchy-plugin-disable "$id" >/dev/null 2>&1 || true
+    rm -rf "${PLUGINS:?}/$id"
+  done
+  omarchy-bar reset >/dev/null 2>&1 || true
+  shell_ok && omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
+  ok "copies de la barre et du menu supprimées"
+  rm -rf "$HOME/.local/share/fonts/hanko"
+  fc-cache -f >/dev/null 2>&1 || true
+  # The cursor folder is Hanko's only if Hanko unpacked it (it put LICENSE there).
+  [[ -f $HOME/.local/share/icons/$CURSOR_THEME/LICENSE ]] && rm -rf "$HOME/.local/share/icons/$CURSOR_THEME"
+  rm -rf "$CONFIG/omarchy/hanko" "$CONFIG/omarchy/lock-skin" "$STATE" "$CONFIG/uwsm/env.d/50-hanko" "$CONFIG/uwsm/env.d/55-hanko-capture" "$CONFIG/uwsm/env.d/60-hanko-cursor"
+  ok "polices, curseur et réglages Hanko supprimés"
+  if ask "Remettre aussi l'écran de démarrage d'Omarchy (sudo) ?"; then omarchy-plymouth-reset || true; fi
+  shell_ok && omarchy-restart-shell >/dev/null 2>&1 || true
+  rm -f "$HOME/.local/bin/hanko"
+  rm -rf "$HANKO_HOME"
+  ok "commande hanko supprimée — Hanko est entièrement retiré"
 }
 
 cmd_doctor() {
@@ -695,6 +832,7 @@ cmd_doctor() {
   echo "  fenêtres        : $(cmd_looknfeel status)"
   echo "  icônes barre    : $(cmd_icons status)"
   echo "  style barre     : $(cmd_barstyle status)"
+  echo "  notifs + jauge  : $(cmd_ui status)"
   echo "  écran de veille : $([[ -f $STATE/screensaver-on ]] && echo actif || echo inactif)"
   echo "  verrouillage    : $(cmd_lock status)"
   echo "  shell Omarchy   : $(shell_ok && echo répond || echo 'ne répond pas')"
@@ -711,6 +849,7 @@ hanko — thème Hanko pour Omarchy 4
   hanko menu on|off|status                         menu large et bas
   hanko icons install|on|off|status|uninstall      icônes Hanko dans la barre
   hanko barstyle install|on|off|status|uninstall   bureau actif en pastille, horloge en capitales
+  hanko ui install|on|off|status|uninstall         notifications et jauge volume / luminosité
   hanko widgets on|off|status                      horloge, météo, musique sur le bureau
   hanko screensaver on|off|test [animation]        écran de veille Hanko
   hanko lock install|on|off|edit|status|uninstall  écran de verrouillage Hanko
@@ -719,7 +858,7 @@ hanko — thème Hanko pour Omarchy 4
   hanko cursor on|off                              curseur Bibata
   hanko update                                     mettre Hanko à jour
   hanko doctor                                     état de chaque élément
-  hanko uninstall                                  tout retirer
+  hanko uninstall [--all]                          tout retirer (--all : aussi le thème et hanko)
 EOF
 }
 
@@ -734,6 +873,7 @@ main() {
     menu) cmd_menu "$@" ;;
     icons) cmd_icons "$@" ;;
     barstyle) cmd_barstyle "$@" ;;
+    ui) cmd_ui "$@" ;;
     widgets) cmd_widgets "$@" ;;
     screensaver) cmd_screensaver "$@" ;;
     lock) cmd_lock "$@" ;;
@@ -741,7 +881,7 @@ main() {
     looknfeel) cmd_looknfeel "$@" ;;
     cursor) cmd_cursor "$@" ;;
     update) cmd_update ;;
-    uninstall) cmd_uninstall ;;
+    uninstall) cmd_uninstall "$@" ;;
     doctor|status) cmd_doctor ;;
     help|-h|--help) usage ;;
     *) usage; exit 2 ;;
