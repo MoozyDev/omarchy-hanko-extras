@@ -36,7 +36,7 @@ Comparaison entre les maquettes et fiches de `specs/` et ce que l'installation f
 | Notifications : carte crème, texte noir, en-tête de l'appli en accent foncé, bandeau critique 4 px, glissement d'entrée | `specs/notifications` | ✅ (`hanko ui`) |
 | Son de notification | Sons | ✅ (`pw-play` lancé à chaque notification, sortie audio à 100 % ; non écouté) |
 | Son de verrouillage | Sons | ✅ |
-| Jauge volume / luminosité (OSD) | `specs/osd` · 11c | 🟡 `hanko ui` : fond noir, 8 % du bas, jauge 4 px sur fond #3a3330, accent (volume) / crème (luminosité) ✅ ; taille exacte 360 × 44, « MUET » et icône Hanko ⬜ |
+| Jauge volume / luminosité (OSD) | `specs/osd` · 11c | ✅ `hanko ui` : carte 360 × 44 (à l'échelle de l'écran), coins carrés, 8 % du bas, icônes Hanko, jauge 4 px sur #3a3330, accent (volume) / crème (luminosité), chiffre Space Mono, « MUET » et icône en accent (volume et micro coupés), 1,5 s, montée de 8 px. Fondu de sortie 200 ms : non (Omarchy ferme la fenêtre d'un coup) |
 | Capture d'écran / enregistrement : cadre accent 2 px, écran assombri | Ce qui pourrait encore suivre | ✅ (`hanko ui`, après reconnexion) |
 
 ## Verrouillage, veille, démarrage

@@ -3,8 +3,11 @@
 #
 # Notifications (specs/notifications): application name as a small header in
 #   the dark accent, a 4 px accent band on critical ones, a 24 px slide in.
-# OSD, the volume / brightness gauge (specs/osd): 8 % from the bottom, black
-#   card, 4 px gauge on a dark track, accent for volume and cream for brightness.
+# OSD, the volume / brightness gauge (specs/osd): a square black 360 × 44 card
+#   (scaled from 1080p) 8 % from the bottom, Hanko icon, 4 px gauge on a dark
+#   track (accent for volume, cream for brightness), Space Mono figure, MUET in
+#   accent when sound or microphone is muted. Messages without a gauge keep
+#   Omarchy's card.
 #
 # Both are package files (owned by root). The marked lines only take effect
 # while ~/.config/omarchy/hanko/ui.json says {"on": true}, so `hanko ui on|off`
@@ -37,6 +40,117 @@ U1='      card.hankoHeaderBlock + headline.height + (hasBody ? column.spacing + 
 T2='      headline.height + (hasBody ? column.spacing + bodyBox.restHeight : 0)'
 U2='      card.hankoHeaderBlock + headline.height + (hasBody ? column.spacing + bodyBox.restHeight : 0) // '"$MARK"
 N5='            color: (root.hankoOn && (root.iconKey === "brightness" || root.iconKey === "display")) ? Commons.Color.foreground : Commons.Color.accent // '"$MARK"
+# The Hanko card (specs/osd, mockup 11c): 360 × 44 at 1080p, square, no border.
+O6='      width: card.borderLeft + root.pad + root.contentWidth + root.pad + card.borderRight'
+N6='      width: root.hankoCard ? Math.round(360 * root.hankoScale) : card.borderLeft + root.pad + root.contentWidth + root.pad + card.borderRight // '"$MARK"
+O7='      height: card.borderTop + root.pad + Style.font.displayLarge + root.pad + card.borderBottom'
+N7='      height: root.hankoCard ? Math.round(44 * root.hankoScale) : card.borderTop + root.pad + Style.font.displayLarge + root.pad + card.borderBottom // '"$MARK"
+O8='      borderSpec: Border.surfaceSpec("popups", "border", Commons.Color.popups.border, Math.max(1, Style.space(2)))'
+N8='      borderSpec: root.hankoCard ? Border.none() : Border.surfaceSpec("popups", "border", Commons.Color.popups.border, Math.max(1, Style.space(2))) // '"$MARK"
+O9='      radius: Style.cornerRadius'
+N9='      radius: root.hankoCard ? 0 : Style.cornerRadius // '"$MARK"
+# Shown 1.5 s unless the caller asked for a duration.
+O10='    duration = next.duration'
+N10='    duration = (root.hankoOn && String(rawDuration) === "") ? 1500 : next.duration // '"$MARK"
+# Bumped when the OSD part changes, so `apply` replaces an older version.
+VERSION="hanko-ui-v2"
+
+osd_props() {
+  # Root properties of the Hanko card (one statement per line: each gets the mark).
+  cat <<'EOF'
+  readonly property real hankoScale: panel.height > 0 ? panel.height / 1080 : 1
+  readonly property bool hankoMicMuted: ["microphone-muted", "microphone-off", "mic-muted", "mic-off"].indexOf(root.iconKey) >= 0
+  readonly property bool hankoMuted: root.hankoMicMuted || ["volume-muted", "volume-mute", "muted", "mute"].indexOf(root.iconKey) >= 0
+  readonly property bool hankoCard: root.hankoOn && (root.hasProgress || root.hankoMicMuted)
+  readonly property bool hankoLight: ["brightness", "display", "keyboard"].indexOf(root.iconKey) >= 0
+  readonly property int hankoPercent: Math.round(root.value * 100 / Math.max(1, root.maxValue))
+  readonly property string hankoIconDir: (Quickshell.env("XDG_CONFIG_HOME") || (Quickshell.env("HOME") + "/.config")) + "/omarchy/hanko/bar-icons"
+  readonly property string hankoIconFile: root.hankoMicMuted ? "mic-off.svg" : root.hankoMuted ? "volume-mute.svg" : (root.iconKey === "brightness" || root.iconKey === "display") ? "display.svg" : root.iconKey === "keyboard" ? "keyboard.svg" : root.iconKey.indexOf("volume") === 0 ? (root.hankoPercent <= 0 ? "volume-mute.svg" : root.hankoPercent <= 33 ? "volume-low.svg" : root.hankoPercent <= 66 ? "volume-medium.svg" : "volume-high.svg") : ""
+EOF
+}
+
+osd_card() {
+  # The Hanko card's content, put just before Omarchy's row (hidden meanwhile).
+  cat <<'EOF'
+      transform: Translate {
+        y: (root.hankoCard && !root.opened) ? Math.round(8 * root.hankoScale) : 0
+        Behavior on y { NumberAnimation { duration: 120; easing.type: Easing.OutCubic } }
+      }
+      Row {
+        visible: root.hankoCard
+        anchors.fill: parent
+        anchors.leftMargin: Math.round(16 * root.hankoScale)
+        anchors.rightMargin: Math.round(16 * root.hankoScale)
+        spacing: Math.round(14 * root.hankoScale)
+        Item {
+          id: hankoOsdIcon
+          width: Math.round(18 * root.hankoScale)
+          height: parent.height
+          readonly property color tint: root.hankoMuted ? Commons.Color.accent : Commons.Color.foreground
+          Image {
+            id: hankoOsdSvg
+            anchors.centerIn: parent
+            width: parent.width
+            height: width
+            sourceSize: Qt.size(width * 2, height * 2)
+            source: root.hankoIconFile !== "" ? "file://" + root.hankoIconDir + "/" + root.hankoIconFile : ""
+            fillMode: Image.PreserveAspectFit
+            visible: false
+            layer.enabled: true
+          }
+          Rectangle {
+            id: hankoOsdTint
+            anchors.fill: hankoOsdSvg
+            visible: false
+            layer.enabled: true
+            color: hankoOsdIcon.tint
+          }
+          MultiEffect {
+            anchors.fill: hankoOsdSvg
+            visible: hankoOsdSvg.status === Image.Ready
+            source: hankoOsdTint
+            maskEnabled: true
+            maskSource: hankoOsdSvg
+          }
+          Text {
+            visible: hankoOsdSvg.status !== Image.Ready
+            anchors.centerIn: parent
+            textFormat: Text.PlainText
+            text: root.icon
+            color: hankoOsdIcon.tint
+            font.family: Style.font.family
+            font.pixelSize: Math.round(18 * root.hankoScale)
+          }
+        }
+        Rectangle {
+          width: parent.width - hankoOsdIcon.width - hankoOsdValue.width - 2 * parent.spacing
+          height: Math.max(2, Math.round(4 * root.hankoScale))
+          anchors.verticalCenter: parent.verticalCenter
+          color: "#3a3330"
+          Rectangle {
+            visible: !root.hankoMuted
+            anchors.left: parent.left
+            height: parent.height
+            width: parent.width * Math.min(1, root.value / Math.max(1, root.maxValue))
+            color: root.hankoLight ? Commons.Color.foreground : Commons.Color.accent
+            Behavior on width { enabled: root.opened; NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
+          }
+        }
+        Text {
+          id: hankoOsdValue
+          width: Math.round((root.hankoMuted ? 46 : 30) * root.hankoScale)
+          anchors.verticalCenter: parent.verticalCenter
+          horizontalAlignment: Text.AlignRight
+          textFormat: Text.PlainText
+          text: root.hankoMuted ? "MUET" : String(root.hankoPercent)
+          color: (root.hankoMuted || root.hankoPercent > 100) ? Commons.Color.accent : Commons.Color.foreground
+          font.family: "SpaceMono Nerd Font"
+          font.bold: true
+          font.pixelSize: Math.round(15 * root.hankoScale)
+        }
+      }
+EOF
+}
 
 flag_block() {
   # flag_block <id of the root item>
@@ -73,16 +187,20 @@ rewrite() {
 
 insert() {
   # insert <file> <awk program>  (variables: mark, flag)
-  local file="$1" prog="$2" root="$3" tmp
+  local file="$1" prog="$2" root="$3" tmp props cardf
   tmp=$(mktemp "${file}.hanko.XXXXXX")
-  awk -v mark="$MARK" -v flag="$(flag_block "$root")" "$prog" "$file" >"$tmp"
+  props=$(mktemp); cardf=$(mktemp)
+  osd_props >"$props"; osd_card >"$cardf"
+  awk -v mark="$MARK" -v flag="$(flag_block "$root")" -v osdprops="$props" -v osdcard="$cardf" "$prog" "$file" >"$tmp"
   install -m 644 "$tmp" "$file"
-  rm -f "$tmp"
+  rm -f "$tmp" "$props" "$cardf"
 }
 
 apply() {
   [[ -f $TOAST && -f $OSD ]] || die "fichiers Omarchy introuvables (Omarchy 4 requis)"
-  if grep -q "$MARK" "$TOAST" && grep -q "$MARK" "$OSD"; then echo "hanko-ui: déjà appliqué"; return 0; fi
+  if grep -q "$MARK" "$TOAST" && grep -qF "$VERSION" "$OSD"; then echo "hanko-ui: déjà appliqué"; return 0; fi
+  # An older Hanko version is replaced: put the originals back first.
+  if grep -q "$MARK" "$TOAST" && grep -q "$MARK" "$OSD"; then restore >/dev/null; fi
   if grep -q "$MARK" "$TOAST" || grep -q "$MARK" "$OSD"; then die "fichiers à moitié modifiés — lance d'abord : $0 restore"; fi
 
   once 'import Quickshell' "$TOAST" || die "ancre 'import Quickshell' absente (notifications) — rien modifié"
@@ -90,8 +208,10 @@ apply() {
   once "  // The keyboard's card is tinted with the theme's hover fill, buttons and all." "$TOAST" || die "ancre de la carte absente (notifications) — rien modifié"
   once '        // Title, marks, and when it arrived.' "$TOAST" || die "ancre du titre absente (notifications) — rien modifié"
   once '  id: root' "$OSD" || die "ancre 'id: root' absente (OSD) — rien modifié"
+  once 'import QtQuick' "$OSD" || die "ancre 'import QtQuick' absente (OSD) — rien modifié"
+  once '      Row {' "$OSD" || die "ancre 'Row' absente (OSD) — rien modifié"
   for l in "$T1" "$T2"; do once "$l" "$TOAST" || die "ligne attendue absente (notifications) — rien modifié : ${l:0:60}…"; done
-  for l in "$O1" "$O2" "$O3" "$O4" "$O5"; do once "$l" "$OSD" || die "ligne attendue absente (OSD) — rien modifié : ${l:0:60}…"; done
+  for l in "$O1" "$O2" "$O3" "$O4" "$O5" "$O6" "$O7" "$O8" "$O9" "$O10"; do once "$l" "$OSD" || die "ligne attendue absente (OSD) — rien modifié : ${l:0:60}…"; done
 
   insert "$TOAST" '
     $0 == "import Quickshell" { print; print "import Quickshell.Io // " mark; next }
@@ -137,18 +257,33 @@ apply() {
   ' card
 
   insert "$OSD" '
-    $0 == "  id: root" { print; print flag; next }
+    $0 == "import QtQuick" { print; print "import QtQuick.Effects // " mark; next }
+    $0 == "  id: root" {
+      print
+      print "  // " mark " '"$VERSION"'"
+      print flag
+      while ((getline l < osdprops) > 0) print l " // " mark
+      next
+    }
+    $0 == "      Row {" {
+      while ((getline l < osdcard) > 0) print l " // " mark
+      print
+      print "        visible: !root.hankoCard // " mark
+      next
+    }
     { print }
   ' root
   rewrite "$TOAST" "$T1" "$U1" "$T2" "$U2"
-  rewrite "$OSD" "$O1" "$N1" "$O2" "$N2" "$O3" "$N3" "$O4" "$N4" "$O5" "$N5"
+  rewrite "$OSD" "$O1" "$N1" "$O2" "$N2" "$O3" "$N3" "$O4" "$N4" "$O5" "$N5" \
+    "$O6" "$N6" "$O7" "$N7" "$O8" "$N8" "$O9" "$N9" "$O10" "$N10"
   echo "hanko-ui: appliqué"
 }
 
 restore() {
   local f tmp
   rewrite "$TOAST" "$U1" "$T1" "$U2" "$T2"
-  rewrite "$OSD" "$N1" "$O1" "$N2" "$O2" "$N3" "$O3" "$N4" "$O4" "$N5" "$O5"
+  rewrite "$OSD" "$N1" "$O1" "$N2" "$O2" "$N3" "$O3" "$N4" "$O4" "$N5" "$O5" \
+    "$N6" "$O6" "$N7" "$O7" "$N8" "$O8" "$N9" "$O9" "$N10" "$O10"
   for f in "$TOAST" "$OSD"; do
     grep -q "$MARK" "$f" || continue
     tmp=$(mktemp "${f}.hanko.XXXXXX")
