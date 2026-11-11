@@ -40,10 +40,17 @@ SL='        LeftModules {'
 SC='        CenterModules {'
 SR='        RightModules {'
 SS='        CenterSections {'
+# Where the center group reaches on each side of the middle (asymmetric: its
+# begin and end lists hang off the centered box), and where the horizontal
+# bar's own Item starts, to compute a scale that never overlaps.
+CSB='    property bool besideRight: false'
+CMS='    CenterSections {'
+CMG='    CenterGestureArea { anchors.fill: parent }'
+FILL='        anchors.fill: parent'
 
 apply() {
   if grep -q "$MARK" "$FILE"; then echo "hanko-bar: déjà appliqué"; return 0; fi
-  for l in "$L1" "$L2" "$L3" "$L4" "$HB" "$VB"; do
+  for l in "$L1" "$L2" "$L3" "$L4" "$HB" "$VB" "$CSB" "$CMS" "$CMG"; do
     [[ $(grep -cxF -- "$l" "$FILE" || true) == 1 ]] || die "ligne attendue absente (Omarchy a changé la barre) — rien modifié : $l"
   done
   for l in "$SL" "$SC" "$SR"; do
@@ -51,19 +58,53 @@ apply() {
   done
   local tmp; tmp=$(mktemp "${FILE}.hanko.XXXXXX")
   awk -v mark="$MARK" -v grow="$GROW" -v l1="$L1" -v l2="$L2" -v l3="$L3" -v l4="$L4" \
-      -v hb="$HB" -v vb="$VB" -v sl="$SL" -v sc="$SC" -v sr="$SR" -v ss="$SS" '
-    function scaled(origin) {
+      -v hb="$HB" -v vb="$VB" -v sl="$SL" -v sc="$SC" -v sr="$SR" -v ss="$SS" \
+      -v csb="$CSB" -v cms="$CMS" -v cmg="$CMG" -v fill="$FILL" '
+    function scaled(origin, id) {
       print
-      print "          scale: barStrip.hankoScale // " mark
+      if (id != "") print "          id: " id " // " mark
+      print "          scale: parent.hankoFit // " mark
       print "          transformOrigin: Item." origin " // " mark
       done++
     }
-    $0 == hb { inH = 1 }
+    # CenterSections component: how far the center group reaches from the middle.
+    $0 == csb {
+      print
+      print "    readonly property real hankoLeftReach: centerBox.width / 2 + beginList.width // " mark
+      print "    readonly property real hankoRightReach: centerBox.width / 2 + endList.width // " mark
+      reach++
+      next
+    }
+    # CenterModules component: pass the reach of its CenterSections up.
+    $0 == cmg {
+      print
+      print "    readonly property real hankoLeftReach: hankoCenterSections.hankoLeftReach // " mark
+      print "    readonly property real hankoRightReach: hankoCenterSections.hankoRightReach // " mark
+      reach++
+      next
+    }
+    $0 == cms { print; print "      id: hankoCenterSections // " mark; reach++; next }
+    $0 == hb { inH = 1; fit = 0 }
     $0 == vb { inH = 0 }
-    inH && $0 == sl { scaled("Left"); next }
-    inH && $0 == sc { scaled("Center"); next }
-    inH && $0 == sr { scaled("Right"); next }
-    inH && $0 == ss { scaled("Right"); next }
+    # The horizontal bar Item: the scale its sections use. It is the hover scale,
+    # capped so the left and right sections never reach the center group, and
+    # below 1 when even the normal size would overlap (a long title, the tray
+    # drawer open, a narrow screen).
+    inH && !fit && $0 == fill {
+      print
+      print "        // " mark ": grow with the strip, but only as far as it fits"
+      print "        readonly property real hankoHalf: width / 2 - Style.space(8) - Style.space(12) // " mark
+      print "        readonly property real hankoFitLeft: hankoLeftList.width + hankoCenterList.hankoLeftReach > 0 ? hankoHalf / (hankoLeftList.width + hankoCenterList.hankoLeftReach) : 99 // " mark
+      print "        readonly property real hankoFitRight: rightModules.width + hankoCenterList.hankoRightReach > 0 ? hankoHalf / (rightModules.width + hankoCenterList.hankoRightReach) : 99 // " mark
+      print "        readonly property real hankoFit: Math.max(0.5, Math.min(barStrip.hankoScale, hankoFitLeft, hankoFitRight)) // " mark
+      fit = 1
+      reach++
+      next
+    }
+    inH && $0 == sl { scaled("Left", "hankoLeftList"); next }
+    inH && $0 == sc { scaled("Center", "hankoCenterList"); next }
+    inH && $0 == sr { scaled("Right", ""); next }
+    inH && $0 == ss { scaled("Right", ""); next }
     $0 == l1 {
       print "      // " mark " BEGIN — the strip grows while hovered; the reserved zone does not"
       print "      property real hankoGrow: hankoHover.hovered && !root.barHidden ? " grow " : 0"
@@ -88,7 +129,7 @@ apply() {
     $0 == l3 { print "      width: root.vertical ? barWindow.thickness + hankoGrow : parent.width // " mark; next }
     $0 == l4 { print "      height: root.vertical ? parent.height : barWindow.thickness + hankoGrow // " mark; next }
     { print }
-    END { if (done < 3) exit 3 }
+    END { if (done < 3 || reach < 4) exit 3 }
   ' "$FILE" > "$tmp" || { rm -f "$tmp"; die "sections de la barre horizontale introuvables (Omarchy a changé la barre) — rien modifié"; }
   cp -f "$FILE" "$FILE.hanko-orig"
   mv -f "$tmp" "$FILE"
