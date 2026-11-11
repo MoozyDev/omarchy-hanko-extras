@@ -1,0 +1,17 @@
+{
+  "schemaVersion": 1,
+  "id": "hanko.background",
+  "name": "Hanko Background",
+  "version": "1.0.0",
+  "author": "MoozyDev",
+  "description": "Omarchy's background renderer with one wallpaper per screen: a new background only changes the screen it was chosen on; a theme switch resets every screen.",
+  "kinds": [
+    "service"
+  ],
+  "entryPoints": {
+    "service": "Background.qml"
+  },
+  "omarchy": {
+    "clonedFrom": "omarchy.background"
+  }
+}
