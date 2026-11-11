@@ -17,6 +17,7 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Services.Mpris
+import "Registry.js" as Registry
 
 Item {
   id: root
@@ -32,9 +33,14 @@ Item {
   implicitWidth: 0
   implicitHeight: 0
 
-  // One copy of this widget per bar (per screen); only the first screen's copy works.
-  readonly property string myScreen: (Window.window && Window.window.screen) ? Window.window.screen.name : ""
-  readonly property bool primary: Quickshell.screens.length === 0 || myScreen === "" || myScreen === Quickshell.screens[0].name
+  // One copy of this widget per bar (per screen). The bar host does not tell a
+  // copy its screen (Window.window is null for it), so the old "first
+  // screen's copy" test let every copy through: three windows drawn on top of
+  // each other, the weather fetched three times. The first copy to claim the
+  // shared Registry works; the others draw nothing.
+  property bool primary: false
+  Component.onCompleted: primary = Registry.claim(root)
+  Component.onDestruction: Registry.release(root)
 
   function setting(key, fallback) {
     var v = root.settings ? root.settings[key] : undefined
@@ -78,6 +84,25 @@ Item {
     watchChanges: true
     onFileChanged: reload()
     onLoaded: root.themeName = text().trim()
+  }
+
+  // ── One background per screen: keep hanko.background enabled ──────────
+  // Its "enabled" flag lives in shell.json, which other tools rewrite; once
+  // dropped, the next login silently falls back to Omarchy's single
+  // background (portrait screen cropped, per-screen choices ignored). The
+  // plugin folder is only there while `hanko fonds on` is wanted (`hanko fonds
+  // off` removes it), so a folder that is present but disabled is an accident:
+  // re-enable it once, at start, from this widget (which always loads).
+  Process {
+    id: backgroundGuard
+    running: root.primary
+    command: ["sh", "-c",
+      "d=\"$HOME/.config/omarchy/plugins/hanko.background\"; [ -d \"$d\" ] || exit 0; " +
+      "omarchy-plugin-list --json 2>/dev/null | jq -e 'any(.[]; .id == \"hanko.background\" and .enabled == true)' >/dev/null && exit 0; " +
+      "omarchy-plugin-enable hanko.background >/dev/null 2>&1 && echo reenabled"]
+    stdout: StdioCollector {
+      onStreamFinished: if (text.indexOf("reenabled") !== -1) console.info("hanko.desktop: hanko.background was disabled, re-enabled")
+    }
   }
 
   // ── Time ───────────────────────────────────────────────────────────────
