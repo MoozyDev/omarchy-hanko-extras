@@ -1,0 +1,92 @@
+      // HANKO-ICONS BEGIN — optional icon set: ~/.config/omarchy/hanko/bar-icons/map.json
+      // The SVG is drawn as itself, recoloured in its text (currentColor and the
+      // root fill set to the wanted colour), so Qt's SVG renderer antialiases
+      // every edge. It is drawn at the size it was designed for (the bar's icon
+      // canvas, 16 px) and rasterised at exactly the pixels it covers on screen
+      // (display scale times every ancestor's scale, e.g. the bar growing on
+      // hover), like a font glyph: never resampled, so never soft. It sits on
+      // whole pixels. An entry { "file", "accent" } draws a second SVG on top in
+      // the accent colour (the slash of bluetooth-off, the cross of volume-mute).
+      Item {
+        id: hankoIcon
+        anchors.fill: parent
+        readonly property string dir: (Quickshell.env("XDG_CONFIG_HOME") || (Quickshell.env("HOME") + "/.config")) + "/omarchy/hanko/bar-icons"
+        property var map: null
+        readonly property var entry: (root.iconComponent === null && map && root.text) ? map[root.text] : null
+        readonly property string file: !entry ? "" : (typeof entry === "string" ? entry : (entry.file || ""))
+        readonly property string accentFile: (entry && typeof entry !== "string" && entry.accent) ? entry.accent : ""
+        readonly property real size: root.opticalSize * ((entry && entry.scale) ? entry.scale : 1)
+        // On-screen pixels per logical pixel: the display's ratio times the scale
+        // of every ancestor (the bar sections grow on hover). Reading each
+        // parent's scale here makes the binding follow them.
+        readonly property real pixelScale: {
+          var s = Screen.devicePixelRatio > 0 ? Screen.devicePixelRatio : 1
+          for (var p = hankoIcon.parent; p; p = p.parent) s *= (p.scale > 0 ? p.scale : 1)
+          return s
+        }
+        readonly property color tint: (entry && entry.color === "accent") ? HankoCommons.Color.accent : (root.active && root.useActiveColor ? root.activeColor : root.foreground)
+        property string svgText: ""
+        property string accentText: ""
+        readonly property bool ready: file !== "" && svgText !== "" && hankoSvg.status === Image.Ready
+        visible: ready
+        rotation: root.textRotation
+
+        function hex(c) {
+          var part = function(v) { return ("0" + Math.round(v * 255).toString(16)).slice(-2) }
+          return "#" + part(c.r) + part(c.g) + part(c.b)
+        }
+        // The SVG text in one colour, as a data URL Qt rasterises itself.
+        function painted(svg, colour) {
+          if (!svg) return ""
+          var h = hex(colour)
+          var s = svg.replace(/<metadata>[\s\S]*?<\/metadata>/g, "").replace(/currentColor/g, h)
+          s = s.replace(/<svg\b([^>]*)>/, function(tag, attrs) {
+            return /\sfill=/.test(attrs) ? tag : "<svg fill=\"" + h + "\"" + attrs + ">"
+          })
+          return "data:image/svg+xml;utf8," + encodeURIComponent(s)
+        }
+
+        FileView {
+          path: hankoIcon.dir + "/map.json"
+          watchChanges: true
+          onFileChanged: reload()
+          onLoaded: { try { hankoIcon.map = JSON.parse(text()) } catch (e) { hankoIcon.map = null } }
+          onLoadFailed: hankoIcon.map = null
+        }
+        FileView {
+          path: hankoIcon.file !== "" ? hankoIcon.dir + "/" + hankoIcon.file : ""
+          watchChanges: true
+          onFileChanged: reload()
+          onLoaded: hankoIcon.svgText = text()
+          onLoadFailed: hankoIcon.svgText = ""
+        }
+        FileView {
+          path: hankoIcon.accentFile !== "" ? hankoIcon.dir + "/" + hankoIcon.accentFile : ""
+          watchChanges: true
+          onFileChanged: reload()
+          onLoaded: hankoIcon.accentText = text()
+          onLoadFailed: hankoIcon.accentText = ""
+        }
+        Image {
+          id: hankoSvg
+          // Centred on whole pixels: half a pixel off would blur every edge.
+          x: Math.round((hankoIcon.width - width) / 2)
+          y: Math.round((hankoIcon.height - height) / 2)
+          width: Math.round(hankoIcon.size)
+          height: width
+          sourceSize: Qt.size(Math.round(width * hankoIcon.pixelScale), Math.round(height * hankoIcon.pixelScale))
+          source: hankoIcon.painted(hankoIcon.svgText, hankoIcon.tint)
+          fillMode: Image.PreserveAspectFit
+          smooth: true
+        }
+        Image {
+          anchors.fill: hankoSvg
+          visible: hankoIcon.accentFile !== "" && hankoIcon.accentText !== ""
+          sourceSize: hankoSvg.sourceSize
+          source: visible ? hankoIcon.painted(hankoIcon.accentText, HankoCommons.Color.accent) : ""
+          fillMode: Image.PreserveAspectFit
+          smooth: true
+        }
+      }
+      // HANKO-ICONS END
+
