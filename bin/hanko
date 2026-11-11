@@ -658,7 +658,14 @@ cmd_fonds() {
       ok "tous les écrans reprennent le même fond"
       ;;
     status)
-      [[ -d $PLUGINS/hanko.background ]] && echo "actif (un fond par écran)" || echo "inactif (fond unique)"
+      if [[ ! -d $PLUGINS/hanko.background ]]; then
+        echo "inactif (fond unique)"
+      elif omarchy-plugin-list --json 2>/dev/null | jq -e 'any(.[]; .id == "hanko.background" and .enabled == true)' >/dev/null; then
+        echo "actif (un fond par écran)"
+      else
+        # shell.json lost the flag; hanko.desktop re-enables it at the next start.
+        echo "installé mais désactivé — à réparer : hanko fonds on"
+      fi
       ;;
     *) die "usage : hanko fonds on|off|reset|status" ;;
   esac

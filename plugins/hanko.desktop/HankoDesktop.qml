@@ -80,6 +80,25 @@ Item {
     onLoaded: root.themeName = text().trim()
   }
 
+  // ── One background per screen: keep hanko.background enabled ──────────
+  // Its "enabled" flag lives in shell.json, which other tools rewrite; once
+  // dropped, the next login silently falls back to Omarchy's single
+  // background (portrait screen cropped, per-screen choices ignored). The
+  // plugin folder is only there while `hanko fonds on` is wanted (`hanko fonds
+  // off` removes it), so a folder that is present but disabled is an accident:
+  // re-enable it once, at start, from this widget (which always loads).
+  Process {
+    id: backgroundGuard
+    running: root.primary
+    command: ["sh", "-c",
+      "d=\"$HOME/.config/omarchy/plugins/hanko.background\"; [ -d \"$d\" ] || exit 0; " +
+      "omarchy-plugin-list --json 2>/dev/null | jq -e 'any(.[]; .id == \"hanko.background\" and .enabled == true)' >/dev/null && exit 0; " +
+      "omarchy-plugin-enable hanko.background >/dev/null 2>&1 && echo reenabled"]
+    stdout: StdioCollector {
+      onStreamFinished: if (text.indexOf("reenabled") !== -1) console.info("hanko.desktop: hanko.background was disabled, re-enabled")
+    }
+  }
+
   // ── Time ───────────────────────────────────────────────────────────────
   property date now: new Date()
   Timer {
