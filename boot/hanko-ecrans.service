@@ -1,0 +1,12 @@
+[Unit]
+Description=Hanko : rallume les écrans secondaires après le déverrouillage du disque
+# Après l'écran Plymouth, avant le gestionnaire de connexion (SDDM, Hyprland).
+After=plymouth-quit.service
+Before=display-manager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/lib/hanko/ecrans-rallumer.sh
+
+[Install]
+WantedBy=graphical.target
