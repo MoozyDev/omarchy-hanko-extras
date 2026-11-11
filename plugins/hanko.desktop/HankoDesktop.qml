@@ -415,8 +415,8 @@ Item {
         Column {
           id: verticalClock
           visible: canvas.vertical && canvas.clockHere
-          // 20 px further right than the old 7 % margin (Moozy, 2026-11-11).
-          x: canvas.cw * 0.07 + 20
+          // 40 px further right than the old 7 % margin (Moozy, 2026-11-11).
+          x: canvas.cw * 0.07 + 40
           anchors.verticalCenter: parent.verticalCenter
           spacing: 0
           readonly property real digitsWidth: Math.max(hoursText.width, minutesText.width)
