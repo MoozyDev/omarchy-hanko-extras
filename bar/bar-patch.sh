@@ -8,6 +8,12 @@
 # bar height, and the extra height slides over them while the pointer is on
 # the bar.
 #
+# The content grows with the strip: on a horizontal bar the left, center and
+# right sections are scaled by (thickness + grow) / thickness, each from its own
+# side (left edge, middle, right edge), so icons, text and buttons get bigger
+# and stay readable. Scaling is a transform, so clicks, tooltips and panels
+# follow it; icons are drawn at twice their size and stay sharp.
+#
 #   bar-patch.sh apply   <Bar.qml> [grow-px]
 #   bar-patch.sh restore <Bar.qml>
 #   bar-patch.sh status  <Bar.qml>
@@ -27,17 +33,42 @@ L1='      x: root.position === "right" ? parent.width - barWindow.thickness : 0'
 L2='      y: root.position === "bottom" ? parent.height - barWindow.thickness : 0'
 L3='      width: root.vertical ? barWindow.thickness : parent.width'
 L4='      height: root.vertical ? parent.height : barWindow.thickness'
+# The horizontal bar's sections, scaled with the strip (see the header).
+HB='      id: horizontalBar'
+VB='      id: verticalBar'
+SL='        LeftModules {'
+SC='        CenterModules {'
+SR='        RightModules {'
+SS='        CenterSections {'
 
 apply() {
   if grep -q "$MARK" "$FILE"; then echo "hanko-bar: déjà appliqué"; return 0; fi
-  for l in "$L1" "$L2" "$L3" "$L4"; do
+  for l in "$L1" "$L2" "$L3" "$L4" "$HB" "$VB"; do
     [[ $(grep -cxF -- "$l" "$FILE" || true) == 1 ]] || die "ligne attendue absente (Omarchy a changé la barre) — rien modifié : $l"
   done
+  for l in "$SL" "$SC" "$SR"; do
+    [[ $(grep -cxF -- "$l" "$FILE" || true) -ge 1 ]] || die "section attendue absente (Omarchy a changé la barre) — rien modifié : $l"
+  done
   local tmp; tmp=$(mktemp "${FILE}.hanko.XXXXXX")
-  awk -v mark="$MARK" -v grow="$GROW" -v l1="$L1" -v l2="$L2" -v l3="$L3" -v l4="$L4" '
+  awk -v mark="$MARK" -v grow="$GROW" -v l1="$L1" -v l2="$L2" -v l3="$L3" -v l4="$L4" \
+      -v hb="$HB" -v vb="$VB" -v sl="$SL" -v sc="$SC" -v sr="$SR" -v ss="$SS" '
+    function scaled(origin) {
+      print
+      print "          scale: barStrip.hankoScale // " mark
+      print "          transformOrigin: Item." origin " // " mark
+      done++
+    }
+    $0 == hb { inH = 1 }
+    $0 == vb { inH = 0 }
+    inH && $0 == sl { scaled("Left"); next }
+    inH && $0 == sc { scaled("Center"); next }
+    inH && $0 == sr { scaled("Right"); next }
+    inH && $0 == ss { scaled("Right"); next }
     $0 == l1 {
       print "      // " mark " BEGIN — the strip grows while hovered; the reserved zone does not"
       print "      property real hankoGrow: hankoHover.hovered && !root.barHidden ? " grow " : 0"
+      print "      // The sections of a horizontal bar grow with the strip, from their own side."
+      print "      readonly property real hankoScale: root.vertical || barWindow.thickness <= 0 ? 1 : (barWindow.thickness + hankoGrow) / barWindow.thickness"
       print "      Behavior on hankoGrow { NumberAnimation { duration: 180; easing.type: Easing.OutCubic } }"
       print "      HoverHandler { id: hankoHover }"
       print "      // 1 px line on the edge facing the windows (specs/barre: filet #3a3330)."
@@ -57,7 +88,8 @@ apply() {
     $0 == l3 { print "      width: root.vertical ? barWindow.thickness + hankoGrow : parent.width // " mark; next }
     $0 == l4 { print "      height: root.vertical ? parent.height : barWindow.thickness + hankoGrow // " mark; next }
     { print }
-  ' "$FILE" > "$tmp"
+    END { if (done < 3) exit 3 }
+  ' "$FILE" > "$tmp" || { rm -f "$tmp"; die "sections de la barre horizontale introuvables (Omarchy a changé la barre) — rien modifié"; }
   cp -f "$FILE" "$FILE.hanko-orig"
   mv -f "$tmp" "$FILE"
   echo "hanko-bar: appliqué (+${GROW} px au survol)"

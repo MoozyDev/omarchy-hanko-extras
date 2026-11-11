@@ -1,5 +1,8 @@
 # Changelog
 
+## Non publié
+- Barre qui grandit au survol : le contenu grandit aussi (icônes, textes, boutons). Les sections gauche, centre et droite d'une barre horizontale sont agrandies du même rapport que la barre (32 → 50 px, soit ×1,56), chacune depuis son côté ; clics, info-bulles et panneaux suivent. `hanko bar on` remplace l'ancienne version du patch.
+
 ## 1.2.0 — 2026-11-11
 - Un fond d'écran par écran (`hanko fonds`, plugin `hanko.background`, copie de `omarchy.background`) : un double-clic sur le bureau, le sélecteur de fonds ou « fond suivant » ne changent que l'écran choisi (celui du double-clic, sinon celui qui a le focus). Un changement de thème remet le fond du thème partout. Choix gardés dans `~/.local/state/hanko/backgrounds.json`.
 - Écran vertical : la version `vertical/NN-nom-vertical.png` du fond est affichée quand le thème la fournit.
