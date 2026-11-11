@@ -2,9 +2,11 @@
       // The SVG is drawn as itself, recoloured in its text (currentColor and the
       // root fill set to the wanted colour), so Qt's SVG renderer antialiases
       // every edge. It is drawn at the size it was designed for (the bar's icon
-      // canvas, 16 px) and rasterised at 4x, so it stays sharp when the bar grows
-      // on hover. An entry { "file", "accent" } draws a second SVG on top in the
-      // accent colour (the slash of bluetooth-off, the cross of volume-mute).
+      // canvas, 16 px) and rasterised at exactly the pixels it covers on screen
+      // (display scale times every ancestor's scale, e.g. the bar growing on
+      // hover), like a font glyph: never resampled, so never soft. It sits on
+      // whole pixels. An entry { "file", "accent" } draws a second SVG on top in
+      // the accent colour (the slash of bluetooth-off, the cross of volume-mute).
       Item {
         id: hankoIcon
         anchors.fill: parent
@@ -14,6 +16,14 @@
         readonly property string file: !entry ? "" : (typeof entry === "string" ? entry : (entry.file || ""))
         readonly property string accentFile: (entry && typeof entry !== "string" && entry.accent) ? entry.accent : ""
         readonly property real size: root.opticalSize * ((entry && entry.scale) ? entry.scale : 1)
+        // On-screen pixels per logical pixel: the display's ratio times the scale
+        // of every ancestor (the bar sections grow on hover). Reading each
+        // parent's scale here makes the binding follow them.
+        readonly property real pixelScale: {
+          var s = Screen.devicePixelRatio > 0 ? Screen.devicePixelRatio : 1
+          for (var p = hankoIcon.parent; p; p = p.parent) s *= (p.scale > 0 ? p.scale : 1)
+          return s
+        }
         readonly property color tint: (entry && entry.color === "accent") ? HankoCommons.Color.accent : (root.active && root.useActiveColor ? root.activeColor : root.foreground)
         property string svgText: ""
         property string accentText: ""
@@ -59,14 +69,15 @@
         }
         Image {
           id: hankoSvg
-          anchors.centerIn: parent
-          width: hankoIcon.size
+          // Centred on whole pixels: half a pixel off would blur every edge.
+          x: Math.round((hankoIcon.width - width) / 2)
+          y: Math.round((hankoIcon.height - height) / 2)
+          width: Math.round(hankoIcon.size)
           height: width
-          sourceSize: Qt.size(Math.ceil(width * 4), Math.ceil(height * 4))
+          sourceSize: Qt.size(Math.round(width * hankoIcon.pixelScale), Math.round(height * hankoIcon.pixelScale))
           source: hankoIcon.painted(hankoIcon.svgText, hankoIcon.tint)
           fillMode: Image.PreserveAspectFit
           smooth: true
-          mipmap: true
         }
         Image {
           anchors.fill: hankoSvg
@@ -75,7 +86,6 @@
           source: visible ? hankoIcon.painted(hankoIcon.accentText, HankoCommons.Color.accent) : ""
           fillMode: Image.PreserveAspectFit
           smooth: true
-          mipmap: true
         }
       }
       // HANKO-ICONS END

@@ -46,6 +46,7 @@ apply() {
       }
       print
       if ($0 == "import qs.Commons") {
+        print "import QtQuick.Window // " mark
         print "import Quickshell.Io // " mark
         print "import qs.Commons as HankoCommons // " mark
       }
