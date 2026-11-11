@@ -16,6 +16,7 @@ case "${1:-}" in
   install)
     install -d -m 755 "$LIB" /etc/pacman.d/hooks
     install -m 755 "$HERE/icons-patch.sh" "$LIB/icons-patch.sh"
+    install -m 644 "$HERE/hanko-icon.qml.part" "$LIB/hanko-icon.qml.part"
     install -m 644 "$HERE/hanko-icons.hook" "$HOOK"
     # Re-apply from scratch so an older version of the hook is replaced.
     "$LIB/icons-patch.sh" restore
@@ -23,7 +24,7 @@ case "${1:-}" in
     ;;
   uninstall)
     if [[ -x $LIB/icons-patch.sh ]]; then "$LIB/icons-patch.sh" restore; else bash "$HERE/icons-patch.sh" restore; fi
-    rm -f "$HOOK" "$LIB/icons-patch.sh"
+    rm -f "$HOOK" "$LIB/icons-patch.sh" "$LIB/hanko-icon.qml.part"
     rmdir "$LIB" 2>/dev/null || true
     echo "hanko-icons: désinstallé"
     ;;

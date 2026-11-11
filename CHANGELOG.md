@@ -1,6 +1,7 @@
 # Changelog
 
 ## Non publié
+- Icônes de barre nettes : dessinées directement en SVG dans leur couleur (bords lissés) au lieu d'un pochoir sans lissage, à leur taille de dessin (16 px au lieu de 12), rendues en 4× pour rester nettes au survol. Bloc QML dans `icons/bar-hook/hanko-icon.qml.part`.
 - Barre qui grandit au survol : le contenu grandit aussi (icônes, textes, boutons). Les sections gauche, centre et droite d'une barre horizontale sont agrandies du même rapport que la barre (32 → 50 px, soit ×1,56), chacune depuis son côté ; clics, info-bulles et panneaux suivent. `hanko bar on` remplace l'ancienne version du patch.
 - … sans jamais se chevaucher : la taille est plafonnée à ce qui tient entre la gauche, le centre et la droite (calcul en continu). Si même la taille normale ne tient pas (écran étroit ou vertical, titre de musique long, icônes cachées dépliées), le contenu est réduit (jusqu'à ×0,5) au lieu de déborder.
 - Correctif « un fond par écran » : si `hanko.background` est installé mais a perdu son activation (le drapeau vit dans `shell.json`, que d'autres outils réécrivent), le démarrage suivant retombait sur le fond unique d'Omarchy. L'écran vertical reprenait alors le fond du thème, recadré depuis la version horizontale : barre orange du fond « papier » coupée. `hanko.desktop` le réactive maintenant au démarrage, et `hanko doctor` / `hanko fonds status` signalent « installé mais désactivé ».

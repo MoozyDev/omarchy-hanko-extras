@@ -19,6 +19,8 @@
 set -euo pipefail
 
 TARGET="${HANKO_BARICON:-/usr/share/omarchy/shell/Ui/BarIconButton.qml}"
+# The QML block inserted before BarIconContent (kept in its own file, readable).
+PART="${HANKO_ICON_PART:-$(dirname -- "$(readlink -f -- "${BASH_SOURCE[0]}")")/hanko-icon.qml.part}"
 MARK="HANKO-ICONS"
 
 die() { echo "hanko-icons: $*" >&2; exit 1; }
@@ -27,6 +29,7 @@ count() { grep -cxF -- "$1" "$TARGET" || true; }
 
 apply() {
   [[ -f $TARGET ]] || die "introuvable : $TARGET (Omarchy 4 requis)"
+  [[ -f $PART ]] || die "bloc QML introuvable : $PART"
   if is_patched; then echo "hanko-icons: déjà appliqué"; return 0; fi
   [[ $(count 'import qs.Commons') == 1 ]] || die "ancre 'import qs.Commons' absente — rien modifié"
   [[ $(count '        visible: root.iconComponent === null') == 1 ]] || die "ancre du glyphe absente — rien modifié"
@@ -35,84 +38,14 @@ apply() {
   local tmp
   tmp=$(mktemp "${TARGET}.hanko.XXXXXX")
   trap 'rm -f "$tmp"' EXIT
-  awk -v mark="$MARK" '
+  awk -v mark="$MARK" -v part="$PART" '
     {
       if ($0 == "      BarIconContent {") {
-        print "      // " mark " BEGIN — optional icon set: ~/.config/omarchy/hanko/bar-icons/map.json"
-        print "      Item {"
-        print "        id: hankoIcon"
-        print "        anchors.fill: parent"
-        print "        readonly property string dir: (Quickshell.env(\"XDG_CONFIG_HOME\") || (Quickshell.env(\"HOME\") + \"/.config\")) + \"/omarchy/hanko/bar-icons\""
-        print "        property var map: null"
-        print "        readonly property var entry: (root.iconComponent === null && map && root.text) ? map[root.text] : null"
-        print "        readonly property string file: !entry ? \"\" : (typeof entry === \"string\" ? entry : (entry.file || \"\"))"
-        print "        readonly property bool ready: file !== \"\" && hankoSvg.status === Image.Ready"
-        print "        visible: ready"
-        print "        rotation: root.textRotation"
-        print "        FileView {"
-        print "          path: hankoIcon.dir + \"/map.json\""
-        print "          watchChanges: true"
-        print "          onFileChanged: reload()"
-        print "          onLoaded: { try { hankoIcon.map = JSON.parse(text()) } catch (e) { hankoIcon.map = null } }"
-        print "          onLoadFailed: hankoIcon.map = null"
-        print "        }"
-        print "        Image {"
-        print "          id: hankoSvg"
-        print "          anchors.centerIn: parent"
-        print "          width: root.visualIconSize * ((hankoIcon.entry && hankoIcon.entry.scale) ? hankoIcon.entry.scale : 1)"
-        print "          height: width"
-        print "          sourceSize: Qt.size(Math.ceil(width * 2), Math.ceil(height * 2))"
-        print "          source: hankoIcon.file !== \"\" ? \"file://\" + hankoIcon.dir + \"/\" + hankoIcon.file : \"\""
-        print "          fillMode: Image.PreserveAspectFit"
-        print "          visible: false"
-        print "          layer.enabled: true"
-        print "        }"
-        print "        Rectangle {"
-        print "          id: hankoFill"
-        print "          anchors.fill: hankoSvg"
-        print "          visible: false"
-        print "          layer.enabled: true"
-        print "          color: (hankoIcon.entry && hankoIcon.entry.color === \"accent\") ? HankoCommons.Color.accent : (root.active && root.useActiveColor ? root.activeColor : root.foreground)"
-        print "        }"
-        print "        MultiEffect {"
-        print "          anchors.fill: hankoSvg"
-        print "          source: hankoFill"
-        print "          maskEnabled: true"
-        print "          maskSource: hankoSvg"
-        print "        }"
-        print "        // Second shape in the accent colour on top (e.g. the slash of bluetooth-off):"
-        print "        // map entry { \"file\": \"x.svg\", \"accent\": \"x.accent.svg\" }."
-        print "        readonly property string accentFile: (entry && typeof entry !== \"string\" && entry.accent) ? entry.accent : \"\""
-        print "        Image {"
-        print "          id: hankoAccentSvg"
-        print "          anchors.fill: hankoSvg"
-        print "          sourceSize: hankoSvg.sourceSize"
-        print "          source: hankoIcon.accentFile !== \"\" ? \"file://\" + hankoIcon.dir + \"/\" + hankoIcon.accentFile : \"\""
-        print "          fillMode: Image.PreserveAspectFit"
-        print "          visible: false"
-        print "          layer.enabled: true"
-        print "        }"
-        print "        Rectangle {"
-        print "          id: hankoAccentFill"
-        print "          anchors.fill: hankoSvg"
-        print "          visible: false"
-        print "          layer.enabled: true"
-        print "          color: HankoCommons.Color.accent"
-        print "        }"
-        print "        MultiEffect {"
-        print "          visible: hankoIcon.accentFile !== \"\" && hankoAccentSvg.status === Image.Ready"
-        print "          anchors.fill: hankoSvg"
-        print "          source: hankoAccentFill"
-        print "          maskEnabled: true"
-        print "          maskSource: hankoAccentSvg"
-        print "        }"
-        print "      }"
-        print "      // " mark " END"
-        print ""
+        while ((getline line < part) > 0) print line
+        close(part)
       }
       print
       if ($0 == "import qs.Commons") {
-        print "import QtQuick.Effects // " mark
         print "import Quickshell.Io // " mark
         print "import qs.Commons as HankoCommons // " mark
       }
