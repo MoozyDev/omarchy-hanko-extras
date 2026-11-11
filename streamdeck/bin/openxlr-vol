@@ -1,0 +1,121 @@
+#!/usr/bin/env python3
+"""Réglage relatif des volumes OpenXLR, pour les touches du Stream Deck.
+
+Le plugin OpenXLR d'OpenDeck ne règle les volumes qu'avec des molettes ;
+le Stream Deck Original n'a que des touches. Ce script lit le niveau actuel
+dans le démon OpenXLR et le décale d'un pas.
+
+Usage :
+  openxlr-vol send <canal> <mix|all> <pas%>   volume d'un canal dans un mix
+  openxlr-vol mix <mix> <pas%>                volume d'un mix entier
+  openxlr-vol mute <canal> <mix|all>          coupe / rétablit un canal
+
+Exemples : openxlr-vol send music monitor +5
+           openxlr-vol mix chat -4
+           openxlr-vol mute browser all
+Canaux : xlr1 game music browser system voicechat sfx aux line
+Mix    : monitor monitor2 stream chat auxout
+"""
+import http.client
+import json
+import os
+import socket
+import sys
+
+TIMEOUT_S = 3
+
+
+class UnixHTTPConnection(http.client.HTTPConnection):
+    def __init__(self, path):
+        super().__init__("localhost", timeout=TIMEOUT_S)
+        self.unix_path = path
+
+    def connect(self):
+        self.sock = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)
+        self.sock.settimeout(TIMEOUT_S)
+        self.sock.connect(self.unix_path)
+
+
+def socket_path():
+    runtime = os.environ.get("XDG_RUNTIME_DIR") or f"/run/user/{os.getuid()}"
+    return os.path.join(runtime, "openxlr", "control.sock")
+
+
+def request(method, path, body=None):
+    conn = UnixHTTPConnection(socket_path())
+    try:
+        headers = {"Content-Type": "application/json"} if body is not None else {}
+        conn.request(method, path, json.dumps(body) if body is not None else None, headers)
+        resp = conn.getresponse()
+        data = json.loads(resp.read() or b"{}")
+    finally:
+        conn.close()
+    if resp.status >= 400:
+        raise RuntimeError(f"{method} {path} : HTTP {resp.status}")
+    return data
+
+
+def command(payload):
+    data = request("POST", "/api/v1/commands", payload)
+    if not data.get("ok", False):
+        raise RuntimeError(f"commande refusée : {data.get('messages')}")
+
+
+def step(text):
+    value = float(text)
+    if not -100 <= value <= 100:
+        raise ValueError("le pas doit être entre -100 et +100")
+    return value / 100
+
+
+def clamp(value, high=1.0):
+    return round(min(high, max(0.0, value)), 2)
+
+
+def mixes_of(levels, mix):
+    if mix == "all":
+        return list(levels)
+    if mix not in levels:
+        raise ValueError(f"mix inconnu : {mix} (connus : {', '.join(levels)})")
+    return [mix]
+
+
+def main(argv):
+    if len(argv) < 3 or argv[0] not in ("send", "mix", "mute"):
+        print(__doc__, file=sys.stderr)
+        return 2
+    action = argv[0]
+    if action == "mix":
+        mix, delta = argv[1], step(argv[2])
+        state = request("GET", f"/api/v1/mixes/{mix}")
+        high = 1.5 if state.get("kind") == "monitor" else 1.0
+        command({"cmd": "setMixVolume", "mix": mix,
+                 "value": clamp(state["volume"] + delta, high)})
+        return 0
+    channel, mix = argv[1], argv[2]
+    state = request("GET", f"/api/v1/channels/{channel}")
+    levels = state.get("levels") or {}
+    targets = mixes_of(levels, mix)
+    if action == "send":
+        if len(argv) < 4:
+            print(__doc__, file=sys.stderr)
+            return 2
+        delta = step(argv[3])
+        for m in targets:
+            command({"cmd": "setLevel", "channel": channel, "mix": m,
+                     "value": clamp(levels[m] + delta)})
+    else:
+        muted = set(state.get("mutedIn") or [])
+        # « all » : si un seul mix est encore actif, on coupe tout ; sinon on rétablit tout.
+        value = not all(m in muted for m in targets)
+        for m in targets:
+            command({"cmd": "setChannelMuted", "channel": channel, "mix": m, "value": value})
+    return 0
+
+
+if __name__ == "__main__":
+    try:
+        sys.exit(main(sys.argv[1:]))
+    except (OSError, RuntimeError, ValueError, KeyError) as error:
+        print(f"openxlr-vol : {error}", file=sys.stderr)
+        sys.exit(1)

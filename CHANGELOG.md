@@ -1,6 +1,7 @@
 # Changelog
 
 ## Non publié
+- Plugin Stream Deck Hanko 1.1 : action OBS (scène avec son nom écrit sur la touche, live et enregistrement avec leur état réel, clip = sauvegarde du replay), via `streamdeck/bin/obs-deck` (obs-cmd + obs-websocket ; mot de passe lu dans la config d'obs-websocket, jamais recopié). `streamdeck/bin/openxlr-vol` ajouté au dépôt.
 - Barre qui grandit au survol : le contenu grandit aussi (icônes, textes, boutons). Les sections gauche, centre et droite d'une barre horizontale sont agrandies du même rapport que la barre (32 → 50 px, soit ×1,56), chacune depuis son côté ; clics, info-bulles et panneaux suivent. `hanko bar on` remplace l'ancienne version du patch.
 - … sans jamais se chevaucher : la taille est plafonnée à ce qui tient entre la gauche, le centre et la droite (calcul en continu). Si même la taille normale ne tient pas (écran étroit ou vertical, titre de musique long, icônes cachées dépliées), le contenu est réduit (jusqu'à ×0,5) au lieu de déborder.
 - Correctif « un fond par écran » : si `hanko.background` est installé mais a perdu son activation (le drapeau vit dans `shell.json`, que d'autres outils réécrivent), le démarrage suivant retombait sur le fond unique d'Omarchy. L'écran vertical reprenait alors le fond du thème, recadré depuis la version horizontale : barre orange du fond « papier » coupée. `hanko.desktop` le réactive maintenant au démarrage, et `hanko doctor` / `hanko fonds status` signalent « installé mais désactivé ».
