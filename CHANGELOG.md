@@ -2,6 +2,7 @@
 
 ## Non publié
 - Correctif « un fond par écran » : si `hanko.background` est installé mais a perdu son activation (le drapeau vit dans `shell.json`, que d'autres outils réécrivent), le démarrage suivant retombait sur le fond unique d'Omarchy. L'écran vertical reprenait alors le fond du thème, recadré depuis la version horizontale : barre orange du fond « papier » coupée. `hanko.desktop` le réactive maintenant au démarrage, et `hanko doctor` / `hanko fonds status` signalent « installé mais désactivé ».
+- Correctif `hanko.desktop` : la barre charge une copie du widget par écran sans lui dire son écran, si bien que toutes les copies travaillaient. Résultat : fenêtres de widgets superposées (6 au lieu de 2 sur 3 écrans) et météo téléchargée 3 fois. Une seule copie travaille désormais (`Registry.js`, bibliothèque partagée).
 
 ## 1.2.0 — 2026-11-11
 - Un fond d'écran par écran (`hanko fonds`, plugin `hanko.background`, copie de `omarchy.background`) : un double-clic sur le bureau, le sélecteur de fonds ou « fond suivant » ne changent que l'écran choisi (celui du double-clic, sinon celui qui a le focus). Un changement de thème remet le fond du thème partout. Choix gardés dans `~/.local/state/hanko/backgrounds.json`.
