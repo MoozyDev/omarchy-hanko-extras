@@ -411,24 +411,32 @@ Item {
           }
         }
 
-        // ── Vertical screen: big clock on the left, pulsing dot ──
+        // ── Vertical screen: big clock on the left, stacked HH / pulsing dot / mm ──
         Column {
+          id: verticalClock
           visible: canvas.vertical && canvas.clockHere
-          x: canvas.cw * 0.07
+          // 20 px further right than the old 7 % margin (Moozy, 2026-11-11).
+          x: canvas.cw * 0.07 + 20
           anchors.verticalCenter: parent.verticalCenter
           spacing: 0
-          Row {
-            spacing: canvas.cw * 0.03
-            Text {
-              text: Qt.formatTime(root.now, "HH")
-              color: root.noir
-              font.family: "Anton"
-              font.pixelSize: canvas.cw * 0.38
-              renderType: Text.CurveRendering
-              lineHeight: 0.86
-            }
+          readonly property real digitsWidth: Math.max(hoursText.width, minutesText.width)
+          Text {
+            id: hoursText
+            text: Qt.formatTime(root.now, "HH")
+            color: root.noir
+            font.family: "Anton"
+            font.pixelSize: canvas.cw * 0.38
+            renderType: Text.CurveRendering
+            lineHeight: 0.86
+          }
+          // The separator on its own line, centred under the hours, so the
+          // clock reads HH / · / mm on a portrait screen.
+          Item {
+            width: verticalClock.digitsWidth
+            height: dot.height * 1.8
             Rectangle {
-              anchors.verticalCenter: parent.verticalCenter
+              id: dot
+              anchors.centerIn: parent
               width: canvas.cw * 0.05; height: width; radius: width / 2
               color: root.accent
               SequentialAnimation on opacity {
@@ -439,6 +447,7 @@ Item {
             }
           }
           Text {
+            id: minutesText
             text: Qt.formatTime(root.now, "mm")
             color: root.noir
             font.family: "Anton"
