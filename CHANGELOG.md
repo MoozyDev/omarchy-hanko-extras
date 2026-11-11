@@ -1,5 +1,9 @@
 # Changelog
 
+## Non publié
+- Icônes de barre v2 (Claude Design) : 19 icônes redessinées pour 16 px (trait de 1,5 px sur une grille de 16, contre-formes ouvertes) : Bluetooth (vraie rune), micro (capsule), son, Wi-Fi, réseau filaire, alimentation, notifications, mises à jour ; la météo a maintenant 5 icônes (soleil, nuit, nuage, pluie, coucher de soleil) choisies selon le temps. Ajout de `cpu` et `memory` pour plus tard.
+- États « coupé » lisibles : Bluetooth coupé, son coupé et micro coupé ont leur barre / croix en orange. Le point d'accroche des icônes accepte une deuxième forme `"accent"` dans `map.json`, dessinée par-dessus dans la couleur d'accent.
+
 ## 1.2.0 — 2026-11-11
 - Un fond d'écran par écran (`hanko fonds`, plugin `hanko.background`, copie de `omarchy.background`) : un double-clic sur le bureau, le sélecteur de fonds ou « fond suivant » ne changent que l'écran choisi (celui du double-clic, sinon celui qui a le focus). Un changement de thème remet le fond du thème partout. Choix gardés dans `~/.local/state/hanko/backgrounds.json`.
 - Écran vertical : la version `vertical/NN-nom-vertical.png` du fond est affichée quand le thème la fournit.
