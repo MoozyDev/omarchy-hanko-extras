@@ -13,6 +13,7 @@ curl … install.sh | bash -s <variante>
          ├─ barre       clone omarchy.bar → $USER.bar + bar/bar-patch.sh
          ├─ menu        clone omarchy.menu → $USER.menu + menu/menu-patch.sh
          ├─ veille      ~/.config/omarchy/plugins/hanko.screensaver (widget de barre invisible)
+         ├─ fonds       ~/.config/omarchy/plugins/hanko.background (copie de omarchy.background)
          ├─ verrouillage sudo lock/system.sh install
          │               ├─ /usr/local/lib/hanko/lock-patch.sh  → accroche dans LockView.qml
          │               ├─ /etc/pacman.d/hooks/hanko-lock.hook → la remet après chaque mise à jour
@@ -49,6 +50,18 @@ curl … install.sh | bash -s <variante>
 ### 5. Fonds verticaux rangés à part
 - **Décision** : les `*-vertical.png` des variantes sont dans `backgrounds/vertical/`.
 - **Raison** : Omarchy ne liste que le premier niveau de `backgrounds/` et prend le premier fichier par ordre alphabétique ; `01-hanko-vertical.png` passait avant `01-hanko.png`.
+
+### 6. Un fond d'écran par écran : copie du service de fond
+- **Constat** : Omarchy n'a qu'un fond (`~/.local/state/omarchy/current/background`), dessiné à l'identique sur chaque écran par le service `omarchy.background`. Un plugin qui déclare `"omarchy": { "clonedFrom": "omarchy.background" }` le remplace une fois activé (vérifié le 11 nov. 2026 : il se charge, contrairement au service tiers du point 4, et reprend la cible IPC `background` après un redémarrage du shell).
+- **Décision** : `plugins/hanko.background` = le `Background.qml` d'Omarchy, inchangé sauf les blocs marqués `Hanko` :
+  - `background set` (appelé par `omarchy-theme-bg-set`, donc double-clic, sélecteur, « fond suivant ») ne change qu'un écran : celui du double-clic, sinon celui qui a le focus (`Hyprland.focusedMonitor`). Les autres écrans sont figés sur ce qu'ils montrent ;
+  - `themeTransition`, `transition` et `setInstant` (changement de thème) remettent tous les écrans au fond commun ;
+  - choix gardés dans `~/.local/state/hanko/backgrounds.json` (`{ "DP-2": "/chemin/image.png" }`), lu aussi par `hanko.desktop` ;
+  - écran vertical : `…/vertical/<nom>-vertical.<ext>` s'il existe, sinon l'image horizontale recadrée ;
+  - vidéos : restent communes (OWE les dessine sur tous les écrans).
+- **IPC ajoutées** : `omarchy-shell background setScreen <écran> <image>`, `resetScreens`, `screens`.
+- **Mises à jour d'Omarchy** : la copie ne suit pas les changements futurs de `omarchy.background`. Pour la refaire : recopier le `Background.qml` d'Omarchy et réappliquer les blocs `Hanko`. `hanko fonds off` remet le service d'origine.
+- **Rejeté** : un widget de barre invisible qui dessine par-dessus le fond (doublerait chaque image en mémoire et ne capterait pas le double-clic) ; modifier `/usr/share/omarchy` (écrasé à chaque mise à jour).
 
 ## Points d'attention
 - Après une modification de QML, le shell garde l'ancienne version compilée : `hanko` redémarre le shell quand il remplace un fichier.

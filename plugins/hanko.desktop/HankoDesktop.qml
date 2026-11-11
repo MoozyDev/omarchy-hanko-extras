@@ -185,7 +185,29 @@ Item {
   // shows as is. (02-hanko-plein, from older theme versions, also matches.)
   readonly property bool liveWallpaper: setting("liveWallpaper", true)
   property string backgroundName: ""
-  readonly property bool liveTitle: liveWallpaper && /^0[12]-hanko/.test(backgroundName) && themeName.indexOf("hanko-") === 0
+  function liveTitleFor(name) {
+    return liveWallpaper && /^0[12]-hanko/.test(name) && themeName.indexOf("hanko-") === 0
+  }
+
+  // One background per screen (hanko.background): a screen listed in
+  // backgrounds.json shows its own wallpaper, so the live title follows it.
+  property var screenBackgrounds: ({})
+  function screenBackgroundName(screenName) {
+    var path = screenBackgrounds[screenName]
+    return typeof path === "string" && path !== "" ? path.split("/").pop() : backgroundName
+  }
+  FileView {
+    path: root.home + "/.local/state/hanko/backgrounds.json"
+    watchChanges: true
+    printErrors: false
+    onFileChanged: reload()
+    onLoaded: {
+      var parsed = ({})
+      try { parsed = JSON.parse(text() || "{}") } catch (e) { parsed = ({}) }
+      root.screenBackgrounds = parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : ({})
+    }
+    onLoadFailed: root.screenBackgrounds = ({})
+  }
   readonly property var fondByTheme: ({
     "hanko-vermillon": "#e8431c",
     "hanko-cramoisi": "#c8102e",
@@ -238,7 +260,8 @@ Item {
       required property var modelData
       screen: modelData
       readonly property string role: root.roleFor(modelData)
-      visible: role !== "none" || root.liveTitle
+      readonly property bool liveTitleHere: root.liveTitleFor(root.screenBackgroundName(modelData.name))
+      visible: role !== "none" || liveTitleHere
       color: "transparent"
       exclusionMode: ExclusionMode.Ignore
       WlrLayershell.layer: WlrLayer.Bottom
@@ -265,7 +288,7 @@ Item {
         Rectangle {
           id: liveBg
           anchors.fill: parent
-          visible: root.liveTitle
+          visible: win.liveTitleHere
           color: root.fond
 
           // Moozy logo (V1, black symbol) where the disc used to be: centred,
@@ -388,24 +411,32 @@ Item {
           }
         }
 
-        // ── Vertical screen: big clock on the left, pulsing dot ──
+        // ── Vertical screen: big clock on the left, stacked HH / pulsing dot / mm ──
         Column {
+          id: verticalClock
           visible: canvas.vertical && canvas.clockHere
-          x: canvas.cw * 0.07
+          // 40 px further right than the old 7 % margin (Moozy, 2026-11-11).
+          x: canvas.cw * 0.07 + 40
           anchors.verticalCenter: parent.verticalCenter
           spacing: 0
-          Row {
-            spacing: canvas.cw * 0.03
-            Text {
-              text: Qt.formatTime(root.now, "HH")
-              color: root.noir
-              font.family: "Anton"
-              font.pixelSize: canvas.cw * 0.38
-              renderType: Text.CurveRendering
-              lineHeight: 0.86
-            }
+          readonly property real digitsWidth: Math.max(hoursText.width, minutesText.width)
+          Text {
+            id: hoursText
+            text: Qt.formatTime(root.now, "HH")
+            color: root.noir
+            font.family: "Anton"
+            font.pixelSize: canvas.cw * 0.38
+            renderType: Text.CurveRendering
+            lineHeight: 0.86
+          }
+          // The separator on its own line, centred under the hours, so the
+          // clock reads HH / · / mm on a portrait screen.
+          Item {
+            width: verticalClock.digitsWidth
+            height: dot.height * 1.8
             Rectangle {
-              anchors.verticalCenter: parent.verticalCenter
+              id: dot
+              anchors.centerIn: parent
               width: canvas.cw * 0.05; height: width; radius: width / 2
               color: root.accent
               SequentialAnimation on opacity {
@@ -416,6 +447,7 @@ Item {
             }
           }
           Text {
+            id: minutesText
             text: Qt.formatTime(root.now, "mm")
             color: root.noir
             font.family: "Anton"

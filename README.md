@@ -60,6 +60,7 @@ hanko theme <variant>                         switch variant
 hanko bar on|off · hanko menu on|off          bar and menu patches
 hanko icons install|on|off|uninstall          Hanko SVG icons in the bar (sudo once)
 hanko widgets on|off                          desktop widgets + live HANKO wallpaper
+hanko fonds on|off|reset|status               one wallpaper per screen (double-click a screen to change only it)
 hanko boot on|off                             disk-unlock screen
 hanko screensaver on|off|test [animation]     eclipse orbite onde balayage defilement phases
 hanko lock on|off|edit|status|uninstall       lock screen skin (off = Omarchy's default look)
@@ -74,6 +75,8 @@ Why it is built this way (what Omarchy lets a theme do, and the lock screen): [d
 - `install.sh`, `bin/hanko` — installer and command.
 - `bar/`, `menu/`, `lock/` — patches (all marked `HANKO-*`, all reversible) and the lock skin.
 - `plugins/hanko.screensaver/` — the screensaver.
+- `plugins/hanko.background/` — one wallpaper per screen (copy of Omarchy's background service).
+- `plugins/hanko.desktop/` — desktop widgets and the live HANKO wallpaper.
 - `fonts/` — Anton (SIL OFL 1.1). The system font is `ttf-space-mono-nerd` from the Arch repos.
 - `logo/` — Moozy logo, V1 and V2, SVG + PNG from 14 to 1000 px, usage guide.
 - `icons/bar/` — 45 monochrome 24×24 SVG bar icons + `correspondance.md` (icon → Omarchy widget).
@@ -85,7 +88,7 @@ Why it is built this way (what Omarchy lets a theme do, and the lock screen): [d
 - `presentation/` — banners, comparison image, avatars.
 
 ## Status
-Done: installer (3 levels), bar (32 px, grows on hover, Hanko icons, accent workspace pill, widget order), wide menu, desktop widgets, live HANKO wallpaper, lock screen skin, boot screen, the 11 screensaver animations, window look'n'feel, cursor and font, notification / OSD styling, accent capture frame. Not yet: app themes (Spotify, Vesktop, Obsidian, Steam), per-screen roles and wallpapers, Twitch badge. Detailed status against the mockups: `docs/ETAT.md`.
+Done: installer (3 levels), bar (32 px, grows on hover, Hanko icons, accent workspace pill, widget order), wide menu, desktop widgets, live HANKO wallpaper, lock screen skin, boot screen, the 11 screensaver animations, window look'n'feel, cursor and font, notification / OSD styling, accent capture frame, one wallpaper per screen (vertical versions on portrait screens). Not yet: app themes (Spotify, Vesktop, Obsidian, Steam), fixed per-screen roles, Twitch badge. Detailed status against the mockups: `docs/ETAT.md`.
 
 ---
 

@@ -1,4 +1,6 @@
 # Fond différent par écran — effort moyen (copie de `omarchy.background`)
+
+> **État (11 nov. 2026)** : fait dans `plugins/hanko.background` (`hanko fonds`), sauf les rôles fixes ci-dessous, laissés de côté : le fond de chaque écran se choisit à la main (double-clic sur l'écran). Détails : `docs/architecture.md`, décision 6.
 - Fichiers par paires dans `backgrounds/` : `NN-nom.png` (3840×2160) + `NN-nom-vertical.png` (2160×3840).
 - Écran vertical (hauteur > largeur) : charger `<fond courant>-vertical.png` s'il existe, sinon l'horizontal recadré.
 - Rôles 1 à 4 (voir `widgets-bureau/fiche.md`) : écran 2 → `05-papier-vertical`, écran 4 → `04-moozy`, autres → fond courant.

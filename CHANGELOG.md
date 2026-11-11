@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.2.0 — 2026-11-11
+- Un fond d'écran par écran (`hanko fonds`, plugin `hanko.background`, copie de `omarchy.background`) : un double-clic sur le bureau, le sélecteur de fonds ou « fond suivant » ne changent que l'écran choisi (celui du double-clic, sinon celui qui a le focus). Un changement de thème remet le fond du thème partout. Choix gardés dans `~/.local/state/hanko/backgrounds.json`.
+- Écran vertical : la version `vertical/NN-nom-vertical.png` du fond est affichée quand le thème la fournit.
+- Fond HANKO dessiné (`hanko.desktop`) : suit maintenant le fond de chaque écran au lieu du fond commun.
+- Horloge de l'écran vertical : heures, point clignotant et minutes sur trois lignes (le point était collé aux heures) ; décalée de 40 px vers la droite.
+
 ## 1.1.0 — 2026-11-07
 - Installation en une commande (`install.sh`) et commande `hanko` (install, doctor, update, uninstall).
 - Barre qui grandit au survol (copie de la barre Omarchy + patch réversible).

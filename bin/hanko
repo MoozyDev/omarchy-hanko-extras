@@ -281,7 +281,7 @@ cmd_menu() {
 
 # Install or refresh one of Hanko's shell plugins (invisible bar widgets).
 install_widget_plugin() {
-  local id="$1" dest="$PLUGINS/$1"
+  local id="$1" dest="$PLUGINS/$1" section="${2-right}"
   mkdir -p "$PLUGINS"
   shell_ok || die "le shell Omarchy ne répond pas — ouvre une session graphique puis relance."
   # The shell hot-reloads a plugin as soon as a file in it changes, and a
@@ -302,7 +302,11 @@ install_widget_plugin() {
     omarchy-plugin-list --json 2>/dev/null | jq -e --arg id "$id" 'any(.[]; .id == $id)' >/dev/null && break
     sleep 0.1
   done
-  omarchy-plugin-enable "$id" --section right >/dev/null || die "activation refusée — essaie : omarchy plugin enable $id --section right"
+  if [[ -n $section ]]; then
+    omarchy-plugin-enable "$id" --section "$section" >/dev/null || die "activation refusée — essaie : omarchy plugin enable $id --section $section"
+  else
+    omarchy-plugin-enable "$id" >/dev/null || die "activation refusée — essaie : omarchy plugin enable $id"
+  fi
   # The shell keeps the previous version's compiled QML: restart it so an
   # update really shows (the bar blinks once).
   if (( replaced )); then omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"; fi
@@ -622,6 +626,44 @@ cmd_widgets() {
   esac
 }
 
+# ───────────────────────────────────────────────────────────────── backgrounds
+# One wallpaper per screen: hanko.background replaces omarchy.background.
+# A background chosen (double-click on the desktop, switcher, bg next) only
+# changes that screen; a theme switch resets every screen.
+cmd_fonds() {
+  local action="${1:-on}"
+  case "$action" in
+    on)
+      bold "Un fond d'écran par écran"
+      need_omarchy
+      local had=0
+      [[ -d $PLUGINS/hanko.background ]] && had=1
+      install_widget_plugin hanko.background ""
+      # A first install swaps the shell's background service: restart once.
+      if (( ! had )); then omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"; fi
+      ok "double-clic sur le bureau : le fond choisi ne change que cet écran"
+      info "Tous les écrans au même fond : hanko fonds reset · revenir au fond unique d'Omarchy : hanko fonds off"
+      ;;
+    off)
+      need_omarchy
+      [[ -d $PLUGINS/hanko.background ]] || { ok "déjà inactif"; return 0; }
+      remove_widget_plugin hanko.background
+      omarchy-plugin-enable omarchy.background >/dev/null 2>&1 || true
+      omarchy-restart-shell >/dev/null 2>&1 || warn "redémarre le shell : omarchy-restart-shell"
+      ok "fond unique d'Omarchy rétabli"
+      ;;
+    reset)
+      need_omarchy
+      omarchy-shell background resetScreens >/dev/null 2>&1 || die "hanko.background n'est pas actif (hanko fonds on)"
+      ok "tous les écrans reprennent le même fond"
+      ;;
+    status)
+      [[ -d $PLUGINS/hanko.background ]] && echo "actif (un fond par écran)" || echo "inactif (fond unique)"
+      ;;
+    *) die "usage : hanko fonds on|off|reset|status" ;;
+  esac
+}
+
 # ───────────────────────────────────────────────────────────────── screensaver
 cmd_screensaver() {
   local action="${1:-on}"
@@ -719,7 +761,7 @@ cmd_lock() {
 
 # ───────────────────────────────────────────────────────────────── all
 # Three levels:
-#   totale     theme + extras + bar + menu + widgets + screensaver + lock + boot
+#   totale     theme + extras + bar + menu + widgets + one background per screen + screensaver + lock + boot
 #   essentiel  theme + extras (fonts, app icons, ASCII logo, fastfetch) + window look + cursor
 #   theme      theme only (colours, wallpapers, folder icons)
 cmd_install() {
@@ -743,6 +785,7 @@ cmd_install() {
     cmd_bar on
     cmd_menu on
     cmd_widgets on
+    cmd_fonds on
     cmd_screensaver on
     cmd_icons install
     cmd_barstyle install
@@ -765,6 +808,7 @@ cmd_update() {
   [[ -f $(bar_file) ]] && cmd_bar on
   [[ -f $(menu_file) ]] && cmd_menu on
   [[ -d $PLUGINS/hanko.desktop ]] && cmd_widgets on
+  [[ -d $PLUGINS/hanko.background ]] && cmd_fonds on
   [[ -f $CONFIG/omarchy/hanko/bar-icons/map.json ]] && cmd_icons on
   [[ -f $STATE/screensaver-on ]] && cmd_screensaver on
   [[ -f $CONFIG/omarchy/lock-skin/Skin.qml ]] && cmd_lock on
@@ -782,6 +826,7 @@ cmd_uninstall() {
   if [[ -x /usr/local/lib/hanko/barstyle-patch.sh ]]; then cmd_barstyle uninstall; fi
   if [[ -x /usr/local/lib/hanko/ui-patch.sh ]]; then cmd_ui uninstall; fi
   cmd_widgets off
+  cmd_fonds off
   cmd_screensaver off
   if [[ -x /usr/local/lib/hanko/lock-patch.sh ]]; then cmd_lock uninstall; else rm -rf "$CONFIG/omarchy/lock-skin"; fi
   if [[ -d $BACKUP ]]; then
@@ -836,6 +881,7 @@ cmd_doctor() {
   echo "  barre           : $(cmd_bar status)"
   echo "  menu            : $(cmd_menu status)"
   echo "  widgets bureau  : $(cmd_widgets status)"
+  echo "  fonds d'écran   : $(cmd_fonds status)"
   echo "  fenêtres        : $(cmd_looknfeel status)"
   echo "  icônes barre    : $(cmd_icons status)"
   echo "  style barre     : $(cmd_barstyle status)"
@@ -858,6 +904,7 @@ hanko — thème Hanko pour Omarchy 4
   hanko barstyle install|on|off|status|uninstall   bureau actif en pastille, horloge en capitales
   hanko ui install|on|off|status|uninstall         notifications et jauge volume / luminosité
   hanko widgets on|off|status                      horloge, météo, musique sur le bureau
+  hanko fonds on|off|reset|status                  un fond d'écran par écran
   hanko screensaver on|off|test [animation]        écran de veille Hanko
   hanko lock install|on|off|edit|status|uninstall  écran de verrouillage Hanko
   hanko boot on|off                                écran de déverrouillage du disque
@@ -882,6 +929,7 @@ main() {
     barstyle) cmd_barstyle "$@" ;;
     ui) cmd_ui "$@" ;;
     widgets) cmd_widgets "$@" ;;
+    fonds|backgrounds) cmd_fonds "$@" ;;
     screensaver) cmd_screensaver "$@" ;;
     lock) cmd_lock "$@" ;;
     boot) cmd_boot "$@" ;;
