@@ -6,7 +6,8 @@
 # a marked block to it: when ~/.config/omarchy/hanko/bar-icons/map.json maps
 # the character to an SVG, that SVG is shown instead, in the colour the glyph
 # would have had. Anything not in the map stays as Omarchy draws it. Widgets
-# keep all their behaviour: only the picture changes.
+# keep all their behaviour: only the picture changes. An entry can add an
+# "accent" SVG, drawn on top in the theme's accent colour (a slash, a cross).
 #
 #   icons-patch.sh apply     add the hook (idempotent; run by the pacman hook)
 #   icons-patch.sh restore   put back Omarchy's original file
@@ -78,6 +79,32 @@ apply() {
         print "          source: hankoFill"
         print "          maskEnabled: true"
         print "          maskSource: hankoSvg"
+        print "        }"
+        print "        // Second shape in the accent colour on top (e.g. the slash of bluetooth-off):"
+        print "        // map entry { \"file\": \"x.svg\", \"accent\": \"x.accent.svg\" }."
+        print "        readonly property string accentFile: (entry && typeof entry !== \"string\" && entry.accent) ? entry.accent : \"\""
+        print "        Image {"
+        print "          id: hankoAccentSvg"
+        print "          anchors.fill: hankoSvg"
+        print "          sourceSize: hankoSvg.sourceSize"
+        print "          source: hankoIcon.accentFile !== \"\" ? \"file://\" + hankoIcon.dir + \"/\" + hankoIcon.accentFile : \"\""
+        print "          fillMode: Image.PreserveAspectFit"
+        print "          visible: false"
+        print "          layer.enabled: true"
+        print "        }"
+        print "        Rectangle {"
+        print "          id: hankoAccentFill"
+        print "          anchors.fill: hankoSvg"
+        print "          visible: false"
+        print "          layer.enabled: true"
+        print "          color: HankoCommons.Color.accent"
+        print "        }"
+        print "        MultiEffect {"
+        print "          visible: hankoIcon.accentFile !== \"\" && hankoAccentSvg.status === Image.Ready"
+        print "          anchors.fill: hankoSvg"
+        print "          source: hankoAccentFill"
+        print "          maskEnabled: true"
+        print "          maskSource: hankoAccentSvg"
         print "        }"
         print "      }"
         print "      // " mark " END"
