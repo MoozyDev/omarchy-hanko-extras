@@ -1,8 +1,8 @@
 {
   "Name": "Hanko",
-  "Description": "Touches Hanko vivantes : volume OpenXLR avec jauge en direct, sourdines OpenXLR avec leur état réel, lecture / aléatoire / répétition Spotify (MPRIS).",
+  "Description": "Touches Hanko vivantes : volume OpenXLR avec jauge en direct, sourdines OpenXLR avec leur état réel, Spotify (MPRIS), OBS (scènes, live, enregistrement, clip) avec leur état réel.",
   "Author": "MoozyDev",
-  "Version": "1.0.0",
+  "Version": "1.1.0",
   "CodePath": "plugin.mjs",
   "Icon": "icons/plugin",
   "Category": "Hanko",
@@ -22,27 +22,60 @@
       "UUID": "com.moozydev.hanko.vol",
       "Icon": "icons/vol",
       "Tooltip": "Monte ou baisse un canal dans un mix OpenXLR (ou un mix entier) et affiche le niveau en direct",
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "SupportedInMultiActions": false,
-      "States": [{ "Image": "icons/vol" }]
+      "States": [
+        {
+          "Image": "icons/vol"
+        }
+      ]
     },
     {
       "Name": "Sourdine",
       "UUID": "com.moozydev.hanko.mute",
       "Icon": "icons/mute",
       "Tooltip": "Coupe ou rétablit un canal dans un mix OpenXLR (ou un mix entier), avec l'état réel",
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "SupportedInMultiActions": false,
-      "States": [{ "Image": "icons/mute" }]
+      "States": [
+        {
+          "Image": "icons/mute"
+        }
+      ]
     },
     {
       "Name": "Spotify",
       "UUID": "com.moozydev.hanko.media",
       "Icon": "icons/media",
       "Tooltip": "Lecture / pause, aléatoire ou répétition de Spotify, avec l'état réel",
-      "Controllers": ["Keypad"],
+      "Controllers": [
+        "Keypad"
+      ],
       "SupportedInMultiActions": false,
-      "States": [{ "Image": "icons/media" }]
+      "States": [
+        {
+          "Image": "icons/media"
+        }
+      ]
+    },
+    {
+      "Name": "OBS",
+      "UUID": "com.moozydev.hanko.obs",
+      "Icon": "icons/obs",
+      "Tooltip": "OBS : changer de scène, lancer / couper le live, l'enregistrement, sauver un clip (replay), avec l'état réel",
+      "Controllers": [
+        "Keypad"
+      ],
+      "SupportedInMultiActions": false,
+      "States": [
+        {
+          "Image": "icons/obs"
+        }
+      ]
     }
   ]
 }

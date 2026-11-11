@@ -8,7 +8,10 @@
 //                             d'un mix entier, image « on » / « off » selon
 //                             l'état réel ;
 //   com.moozydev.hanko.media  Spotify : lecture/pause, aléatoire, répétition,
-//                             image selon l'état réel (MPRIS, via playerctl).
+//                             image selon l'état réel (MPRIS, via playerctl) ;
+//   com.moozydev.hanko.obs    OBS : scène (nom écrit sur la touche), live et
+//                             enregistrement (image selon l'état réel), clip
+//                             (sauve le replay), via ~/.local/bin/obs-deck.
 //
 // État : OpenXLR par son API HTTP sur la socket Unix privée
 // ($XDG_RUNTIME_DIR/openxlr/control.sock), toutes les 500 ms et juste après
@@ -20,6 +23,7 @@
 //   vol   { channel?, mix, delta, picto, canal, mixLabel }   (sans channel : le mix entier)
 //   mute  { channel?, mix, on, off }   mix = un id de mix, ou "all" avec channel
 //   media { kind: "playpause" | "shuffle" | "repeat" }
+//   obs   { kind: "scene" | "live" | "record" | "clip", scene? }
 import fs from "node:fs";
 import http from "node:http";
 import path from "node:path";
@@ -233,7 +237,48 @@ function render(context) {
     else if (s.kind === "shuffle") file = media.shuffle === "On" ? "media-aleatoire--on" : "media-aleatoire--off";
     else if (s.kind === "repeat") file = { Playlist: "media-repetition--playlist", Track: "media-repetition--titre" }[media.loop] || "media-repetition--off";
     if (file) show(context, pngDataUrl(`media/${file}.png`));
+  } else if (kind === "obs") {
+    if (s.kind === "scene") show(context, sceneImage(s.scene || ""));
+    else if (s.kind === "live") show(context, pngDataUrl(`obs/${obs.streaming ? "obs-live--en-direct" : "obs-live--hors-ligne"}.png`));
+    else if (s.kind === "record") show(context, pngDataUrl(`obs/${obs.recording ? "obs-enregistrer--enregistre" : "obs-enregistrer--arret"}.png`));
+    else if (s.kind === "clip") show(context, pngDataUrl("obs/obs-clip.png"));
   }
+}
+
+// ── OBS (obs-websocket, via obs-cmd et ~/.local/bin/obs-deck) ────────────────
+// obs-deck lit le mot de passe dans la config d'obs-websocket à chaque appel.
+function obsDeck(args) {
+  return new Promise(resolve => {
+    execFile("obs-deck", args, { timeout: TIMEOUT_MS, env: { ...process.env, PATH: `${process.env.HOME}/.local/bin:${process.env.PATH}` } },
+      (err, out) => resolve(err ? null : String(out)));
+  });
+}
+let obs = { streaming: false, recording: false };
+let obsReadAt = 0;
+let obsDirty = false;
+async function readObs(kinds) {
+  const ask = async (cmd) => {
+    const out = await obsDeck([cmd, "status"]);
+    return out !== null && /active:\s*true/.test(out);
+  };
+  obs = {
+    streaming: kinds.has("live") ? await ask("streaming") : false,
+    recording: kinds.has("record") ? await ask("recording") : false,
+  };
+}
+// Touche Scène : le gabarit Hanko avec le nom de la scène sur deux lignes.
+function sceneImage(name) {
+  const words = String(name).toUpperCase().split(/\s+/).filter(Boolean);
+  let one = "", two = "";
+  for (const w of words) {
+    if (!two && (one + " " + w).trim().length <= 9) one = (one + " " + w).trim();
+    else two = (two + " " + w).trim();
+  }
+  if (!one && words.length) one = words[0].slice(0, 9);
+  const cut = s => (s.length > 9 ? s.slice(0, 8) + "…" : s);
+  let svg = readAsset("obs/obs-scene.svg", "utf8");
+  svg = svg.replace(">NOM DE</text>", `>${escapeXml(cut(one))}</text>`).replace(">SCÈNE</text>", `>${escapeXml(cut(two))}</text>`);
+  return "data:image/svg+xml;base64," + Buffer.from(resolveColors(svg)).toString("base64");
 }
 
 let busy = false;
@@ -244,6 +289,15 @@ async function refresh() {
     const kinds = new Set([...keys.values()].map(k => kindOf(k.action)));
     if (kinds.has("vol") || kinds.has("mute")) await readMixer().catch(() => { mixer = null; });
     if (kinds.has("media")) await readMedia();
+    if (kinds.has("obs")) {
+      const obsKinds = new Set([...keys.values()].filter(k => kindOf(k.action) === "obs").map(k => k.settings.kind));
+      // Toutes les 2 s au plus (chaque lecture lance obs-cmd), sauf juste après un appui.
+      if ((obsKinds.has("live") || obsKinds.has("record")) && (obsDirty || Date.now() - obsReadAt > 2000)) {
+        obsReadAt = Date.now();
+        obsDirty = false;
+        await readObs(obsKinds);
+      }
+    }
     for (const context of keys.keys()) render(context);
   } finally {
     busy = false;
@@ -274,6 +328,12 @@ async function press(context) {
     } else {
       await command({ cmd: "setMixMuted", mix: s.mix, value: !snd.muted });
     }
+  } else if (kind === "obs") {
+    const args = { scene: ["scene", "switch", s.scene || ""], live: ["streaming", "toggle"],
+      record: ["recording", "toggle"], clip: ["replay", "save"] }[s.kind];
+    if (!args || (await obsDeck(args)) === null) throw new Error("OBS injoignable");
+    if (s.kind === "clip") send({ event: "showOk", context });
+    obsDirty = true;
   } else if (kind === "media") {
     if (s.kind === "playpause") await playerctl(["play-pause"]);
     else if (s.kind === "shuffle") await playerctl(["shuffle", "toggle"]);

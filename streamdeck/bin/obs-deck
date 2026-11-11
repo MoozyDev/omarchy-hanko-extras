@@ -1,0 +1,15 @@
+#!/bin/sh
+# Pilote OBS pour les touches du Stream Deck (via obs-cmd et obs-websocket).
+# Le mot de passe n'est recopié nulle part : il est lu à chaque appel dans la
+# config d'obs-websocket, et passé à obs-cmd par une variable d'environnement
+# (pas en argument, donc invisible dans la liste des processus).
+# Exemples : obs-deck scene switch "Game" · obs-deck streaming toggle · obs-deck replay save
+CONF="${XDG_CONFIG_HOME:-$HOME/.config}/obs-studio/plugin_config/obs-websocket/config.json"
+[ -r "$CONF" ] || { echo "obs-deck : config obs-websocket introuvable ($CONF)" >&2; exit 1; }
+url=$(python3 -I -c '
+import json, sys, urllib.parse
+d = json.load(open(sys.argv[1]))
+pw = urllib.parse.quote(d.get("server_password", ""), safe="")
+print("obsws://localhost:%s/%s" % (d.get("server_port", 4455), pw))
+' "$CONF") || exit 1
+OBS_WEBSOCKET_URL="$url" exec obs-cmd "$@"
