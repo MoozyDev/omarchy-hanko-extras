@@ -1,0 +1,48 @@
+{
+  "Name": "Hanko",
+  "Description": "Touches Hanko vivantes : volume OpenXLR avec jauge en direct, sourdines OpenXLR avec leur état réel, lecture / aléatoire / répétition Spotify (MPRIS).",
+  "Author": "MoozyDev",
+  "Version": "1.0.0",
+  "CodePath": "plugin.mjs",
+  "Icon": "icons/plugin",
+  "Category": "Hanko",
+  "CategoryIcon": "icons/plugin",
+  "SDKVersion": 2,
+  "OS": [
+    {
+      "Platform": "linux"
+    }
+  ],
+  "Software": {
+    "MinimumVersion": "6.0"
+  },
+  "Actions": [
+    {
+      "Name": "Volume (jauge)",
+      "UUID": "com.moozydev.hanko.vol",
+      "Icon": "icons/vol",
+      "Tooltip": "Monte ou baisse un canal dans un mix OpenXLR (ou un mix entier) et affiche le niveau en direct",
+      "Controllers": ["Keypad"],
+      "SupportedInMultiActions": false,
+      "States": [{ "Image": "icons/vol" }]
+    },
+    {
+      "Name": "Sourdine",
+      "UUID": "com.moozydev.hanko.mute",
+      "Icon": "icons/mute",
+      "Tooltip": "Coupe ou rétablit un canal dans un mix OpenXLR (ou un mix entier), avec l'état réel",
+      "Controllers": ["Keypad"],
+      "SupportedInMultiActions": false,
+      "States": [{ "Image": "icons/mute" }]
+    },
+    {
+      "Name": "Spotify",
+      "UUID": "com.moozydev.hanko.media",
+      "Icon": "icons/media",
+      "Tooltip": "Lecture / pause, aléatoire ou répétition de Spotify, avec l'état réel",
+      "Controllers": ["Keypad"],
+      "SupportedInMultiActions": false,
+      "States": [{ "Image": "icons/media" }]
+    }
+  ]
+}

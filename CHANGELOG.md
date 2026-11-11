@@ -1,5 +1,9 @@
 # Changelog
 
+## Non publié
+- Kit Stream Deck Hanko (`streamdeck/`) : 110 icônes par familles (sourdine orange, volume « enfoncé », navigation crème avec coin plié, Spotify, jeux, apps, raccourcis façon touche de clavier, macros), tous les états, gabarits dynamiques, aperçus et correspondance touche → fichier (livraison Claude Design v2).
+- Plugin OpenDeck `com.moozydev.hanko` (`streamdeck/plugin/`) : touches vivantes. Volume OpenXLR avec jauge à 10 segments et valeur en direct, calque « COUPÉ » ; sourdines OpenXLR avec leur état réel ; Spotify lecture/pause, aléatoire, répétition selon MPRIS. Couleurs du thème actif.
+
 ## 1.2.0 — 2026-11-11
 - Un fond d'écran par écran (`hanko fonds`, plugin `hanko.background`, copie de `omarchy.background`) : un double-clic sur le bureau, le sélecteur de fonds ou « fond suivant » ne changent que l'écran choisi (celui du double-clic, sinon celui qui a le focus). Un changement de thème remet le fond du thème partout. Choix gardés dans `~/.local/state/hanko/backgrounds.json`.
 - Écran vertical : la version `vertical/NN-nom-vertical.png` du fond est affichée quand le thème la fournit.
